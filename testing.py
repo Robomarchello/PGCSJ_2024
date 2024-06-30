@@ -40,11 +40,6 @@ class App():
             delta = self.get_delta()
 
             self.screen.fill('black')    
-            
-            Player.velocity += Player.acceleration * delta * SPEED_FACTOR
-            Player.position += Player.velocity * delta * SPEED_FACTOR
-            
-            Player.acceleration *= 0
 
             diff = BlackHole.position - Player.position
             norm_vec = diff.normalize()
@@ -52,6 +47,11 @@ class App():
             gravity_force = (GRAVITY_CONST * Player.mass * BlackHole.mass) / distance ** 2
             
             Player.acceleration += norm_vec * gravity_force
+
+            Player.velocity += Player.acceleration * delta * SPEED_FACTOR
+            Player.position += Player.velocity * delta * SPEED_FACTOR
+            
+            Player.acceleration *= 0
 
             pygame.draw.circle(self.screen, Player.color, Player.position, Player.radius)
             pygame.draw.circle(self.screen, BlackHole.color, BlackHole.position, BlackHole.radius)

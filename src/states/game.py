@@ -2,6 +2,7 @@ import pygame
 from src.engine import State, Debug, AssetManager
 from src.engine.constants import *
 from src.engine.player import Player, Controller
+from src.engine.objects import PhysicsHandler, BlackHole
 
 
 class Game(State):
@@ -12,16 +13,24 @@ class Game(State):
         self.player = Player()
         rect = pygame.Rect(0, 0, 75, 75)
         rect.center = self.player.position
-        self.controller = Controller(self.player, rect)
+        
+        objects = []
+        objects.append(BlackHole((250, 384), 50))
+        objects.append(BlackHole((500, 384), 50))
+        self.physics_handler = PhysicsHandler(self.player, objects)
+
+        self.controller = Controller(self.player, rect, self.physics_handler)
 
     def on_start(self):
         print('start')
     
     def on_exit(self):
-        print('*exit*')
+        print('exit')
 
     def draw(self):
         self.surface.fill((0, 0, 0))
+
+        self.physics_handler.draw(self.surface)
 
         self.controller.draw(self.surface)
         self.player.draw(self.surface)
@@ -30,7 +39,8 @@ class Game(State):
 
     def update(self, delta):
         self.player.update(delta)
-        self.controller.update()
+        self.controller.update(delta)
+        self.physics_handler.update(delta)
 
     def handle_event(self, event):
         if event.type == pygame.KEYDOWN:
