@@ -56,7 +56,7 @@ class PhysicsHandler:
         for _ in range(count):
             last_pos = positions[-1]
             for object in self.objects:
-                if type(object) == BlackHole:
+                if isinstance(object, BlackHole):
                     norm_vec, gravity_force = object.calculate_attraction(
                         last_pos, self.player.mass
                     )
@@ -70,7 +70,7 @@ class PhysicsHandler:
             positions.append(last_pos.copy())
 
         if count == 1:
-            return last_position
+            return last_pos
         else:
             return positions
         
