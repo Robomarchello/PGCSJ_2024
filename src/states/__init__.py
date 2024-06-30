@@ -1,1 +1,1 @@
-from .test import MyState
+from .game import Game

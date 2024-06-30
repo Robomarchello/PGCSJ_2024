@@ -1,12 +1,18 @@
 import pygame
-from src.engine import StateMachine, State, Debug, AssetManager, load_spritesheet
+from src.engine import State, Debug, AssetManager
 from src.engine.constants import *
+from src.engine.player import Player, Controller
 
 
-class MyState(State):
+class Game(State):
     def __init__(self):
         super().__init__()
         self.surface = pygame.Surface(SCREENSIZE)
+
+        self.player = Player()
+        rect = pygame.Rect(0, 0, 75, 75)
+        rect.center = self.player.position
+        self.controller = Controller(self.player, rect)
 
     def on_start(self):
         print('start')
@@ -15,16 +21,22 @@ class MyState(State):
         print('*exit*')
 
     def draw(self):
-        self.surface.fill((255, 255, 255))
+        self.surface.fill((0, 0, 0))
+
+        self.controller.draw(self.surface)
+        self.player.draw(self.surface)
 
         Debug.add_text(self.manager.clock.get_fps())
 
     def update(self, delta):
-        pass
+        self.player.update(delta)
+        self.controller.update()
 
     def handle_event(self, event):
         if event.type == pygame.KEYDOWN:
             self.manager.next_state = NewNextState()
+
+        self.controller.handle_event(event)
 
 
 class NewNextState(State):

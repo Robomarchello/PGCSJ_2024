@@ -2,7 +2,7 @@ import pygame
 from pygame.locals import *
 from .constants import *
 from .state_machine import StateMachine, State
-from .screen import ResizableScreen
+from .screen import Screen
 from .utils import Debug
 from .asset_manager import AssetManager
 
@@ -12,7 +12,7 @@ class App(StateMachine):
         super().__init__(initial_state)
 
         self.clock = pygame.time.Clock()
-        self.screen = ResizableScreen(SCREENSIZE)
+        self.screen = Screen(SCREENSIZE)
 
         AssetManager.load_assets(ASSETS_PATH)
 

@@ -15,7 +15,7 @@ class Screen:
         self.draw_surface = self.window.copy()
 
     def update_window(self):
-        pass
+        self.window.blit(self.draw_surface, (0, 0))
 
     def on_resize(self):
         pass

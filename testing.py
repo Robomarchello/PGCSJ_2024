@@ -52,7 +52,6 @@ class App():
             gravity_force = (GRAVITY_CONST * Player.mass * BlackHole.mass) / distance ** 2
             
             Player.acceleration += norm_vec * gravity_force
-            
 
             pygame.draw.circle(self.screen, Player.color, Player.position, Player.radius)
             pygame.draw.circle(self.screen, BlackHole.color, BlackHole.position, BlackHole.radius)
