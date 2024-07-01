@@ -36,6 +36,7 @@ class Controller:
         self.rect = rect
 
         self.physics_handler = physics_handler
+        self.prediction = []
 
         self.preview_balls = 7
 
@@ -48,26 +49,9 @@ class Controller:
 
     def draw(self, surface):
         pygame.draw.rect(surface, 'blue', self.rect)
-
-        if self.holding:
-            start_vel = self.launch_force
-        else:
-            start_vel = self.player.velocity
-
-        prediction = self.physics_handler.predict_player(
-            0.016, self.player.position, start_vel, self.player.acceleration, 100
-            )
         
-        for pos in prediction:
-            pygame.draw.circle(surface, 'green', pos, 3)
-
-        start_pos = [self.rect.centerx, self.rect.centery]
-        for n in range(self.preview_balls):
-            start_pos[0] += self.difference[0] * 0.2
-            start_pos[1] += self.difference[1] * 0.2
-
-            #if self.holding:
-            #    pygame.draw.circle(surface, 'green', start_pos, 3)
+        for posisition in self.prediction:
+            pygame.draw.circle(surface, 'green', posisition , 3)
 
         if self.holding:
             pygame.draw.circle(surface, 'grey', self.mouse_pos, 10)
@@ -75,12 +59,21 @@ class Controller:
     def update(self, delta):
         self.mouse_pos = pygame.mouse.get_pos()
 
-        if self.holding:
+        if self.holding and self.player.position != self.mouse_pos:
             self.difference = self.player.position - self.mouse_pos
             norm_diff = self.difference.normalize()
             magnitude = self.difference.magnitude() * 0.03
 
             self.launch_force = norm_diff * magnitude
+
+        if self.holding:
+            start_vel = self.launch_force
+        else:
+            start_vel = self.player.velocity.copy()
+        start_acc = self.player.acceleration.copy()
+        self.prediction = self.physics_handler.predict_player(
+            0.016, self.player.position, start_vel, start_acc, 50
+            )[::3]
 
         self.rect.center = self.player.position
 
