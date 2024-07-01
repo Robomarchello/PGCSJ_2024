@@ -5,13 +5,15 @@ import pygame
 from src.engine.constants import GRAVITY_CONST, SPEED_FACTOR
 
 
-__all__ = ['BlackHole', 'Asteroid', 'ForceZone', 'GravityInvertor', 'PhysicsHandler']
+__all__ = ['BlackHole', 'Asteroid', 'ForceZone', 
+           'GravityInvertor', 'PhysicsHandler', 'Collectible',
+           ]
 
 
 class BlackHole:
     def __init__(self, position, mass):
         self.position = position
-        self.mass = mass  # with negative mass repels👍
+        self.mass = mass 
 
         self.radius = 20
         self.color = pygame.Color(255, 255, 255)
@@ -67,6 +69,42 @@ class ForceZone:
         pass
 
 
+class Collectible:
+    def __init__(self, position, texture=None):
+        self.position = position
+
+        self.rect = pygame.Rect(*self.position, 30, 30) # texture.get_rect(center=self.position)
+        self.radius = self.rect.width / 2
+
+        self.picked_up = False
+
+        self.texture = texture
+
+    def draw(self, surface):
+        # make animation?
+        pygame.draw.circle(surface, 'yellow', self.position, self.radius)
+        #surface.blit(self.texture, self.rect.topleft)
+
+
+class ReflectiveSurface:
+    def __init__(self, start_pos, end_pos):
+        self.start_pos = pygame.Vector2(start_pos)
+        self.end_pos = pygame.Vector2(end_pos)
+
+        line = self.end_pos - self.start_pos
+        self.normal = line.normalize().rotate(90)
+
+    def draw(self, surface):
+        pygame.draw.line(surface, (255, 0, 0), self.start_pos, self.end_pos, 5)
+
+    def get_closest(self, position):
+        # feels kinda hard to implement, so L.A.T.E.R
+        pass
+
+    def resolve_collision(self, position):
+        pass
+
+
 class GravityInvertor:
     def __init__(self, position, timer, physics_handler):
         self.position = position
@@ -86,6 +124,21 @@ class GravityInvertor:
             # *invert here* (which is probably is *-1 object's or player's mass )
 
 
+class LaunchPoint:
+    def __init__(self, rect, player, controller):
+        self.rect = rect
+
+        self.player = player
+        self.controller = controller
+        
+        self.used = False
+
+    def update(self, delta):
+        if self.rect.colliderect(self.player.rect):
+            self.player.freeze = True
+            self.controller.shot = False
+            
+            
 class PhysicsHandler:
     def __init__(self, player, objects, obstacles):
         self.player = player
