@@ -38,7 +38,7 @@ class Controller:
         self.physics_handler = physics_handler
         self.prediction = []
 
-        self.preview_balls = 7
+        self.preview_balls = 51
 
         self.holding = False
         self.difference = pygame.Vector2(0, 0)
@@ -67,12 +67,12 @@ class Controller:
             self.launch_force = norm_diff * magnitude
 
         if self.holding:
-            start_vel = self.launch_force
+            start_vel = self.player.velocity + self.launch_force
         else:
             start_vel = self.player.velocity.copy()
         start_acc = self.player.acceleration.copy()
         self.prediction = self.physics_handler.predict_player(
-            0.016, self.player.position, start_vel, start_acc, 50
+            0.016, self.player.position, start_vel, start_acc, self.preview_balls
             )[::3]
 
         self.rect.center = self.player.position

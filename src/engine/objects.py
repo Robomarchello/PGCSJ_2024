@@ -5,6 +5,9 @@ import pygame
 from src.engine.constants import GRAVITY_CONST, SPEED_FACTOR
 
 
+__all__ = ['BlackHole', 'Asteroid', 'ForceZone', 'GravityInvertor', 'PhysicsHandler']
+
+
 class BlackHole:
     def __init__(self, position, mass):
         self.position = position
@@ -51,9 +54,16 @@ class Asteroid:
 
 class ForceZone:
     def __init__(self, force, rect, timer=0.0):
-        pass
+        self.force = force
+        self.rect = pygame.Rect(rect)
 
-    def draw(self):
+        self.timer = timer
+        self.crnt_timer = timer
+
+    def draw(self, surface):
+        pygame.draw.rect(surface, 'orange', self.rect, 5)
+
+    def update(self, delta):
         pass
 
 
@@ -98,6 +108,10 @@ class PhysicsHandler:
                 )
 
                 self.player.acceleration += norm_vec * gravity_force
+            
+            if isinstance(obj, ForceZone):
+                if obj.rect.collidepoint(self.player.position):
+                    self.player.acceleration += obj.force
 
         self._update_obstacles(delta)
             
@@ -106,13 +120,15 @@ class PhysicsHandler:
         # update dynamic objects
         for obstacle in self.obstacles:
             for obj in self.objects:
-            
                 if isinstance(obj, BlackHole):
                     norm_vec, gravity_force = obj.calculate_attraction(
                         obstacle.position, obstacle.mass
                     )
+                    obstacle.force += norm_vec * gravity_force
 
-                obstacle.force += norm_vec * gravity_force
+                if isinstance(obj, ForceZone):
+                    if obj.rect.collidepoint(obstacle.position):
+                        obstacle.force += obj.force
 
             obstacle.update(delta)
 
@@ -133,7 +149,13 @@ class PhysicsHandler:
                         last_pos, self.player.mass
                     )
 
-                acceleration += norm_vec * gravity_force
+                    acceleration += norm_vec * gravity_force
+
+                if isinstance(obj, ForceZone):
+                    if obj.rect.collidepoint(last_pos):
+                        acceleration += obj.force
+
+                
 
             velocity += acceleration * time * SPEED_FACTOR
             last_pos += velocity * time * SPEED_FACTOR

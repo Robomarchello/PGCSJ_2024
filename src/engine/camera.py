@@ -9,6 +9,7 @@ class Camera:
     # I think zooming is possible, but will cause a lot of problems
     position = Vector2()
     rect = pygame.Rect(*position, *c.SCREENSIZE)
+    bounds: pygame.Rect
 
     focus: Vector2 | None
 
