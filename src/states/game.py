@@ -2,7 +2,8 @@ import pygame
 from src.engine import State, Debug, AssetManager
 from src.engine.constants import *
 from src.engine.player import Player, Controller
-from src.engine.objects import PhysicsHandler, BlackHole, Asteroid, ForceZone
+from src.engine.objects import PhysicsHandler
+from src.engine.level import Level
 
 
 class Game(State):
@@ -14,15 +15,8 @@ class Game(State):
         rect = pygame.Rect(0, 0, 75, 75)
         rect.center = self.player.position
         
-        objects = []
-        objects.append(BlackHole((250, 384), 50))
-        objects.append(BlackHole((500, 384), 50))
-        objects.append(ForceZone((0, 0.3), (300, 200, 300, 300)))
-        obstacles = []
-        obstacles.append(Asteroid((500, 280), pygame.Vector2(4.3, 0), 20, 15))
-        obstacles.append(Asteroid((500, 488), pygame.Vector2(-4.3, 0), 20, 15))
-        self.physics_handler = PhysicsHandler(self.player, objects, obstacles)
-
+        self.physics_handler = PhysicsHandler(self.player, [], [])
+        self.level = Level(self.player, self.physics_handler)
         self.controller = Controller(self.player, rect, self.physics_handler)
 
     def on_start(self):

@@ -1,5 +1,6 @@
 from time import perf_counter
 from typing import List, Tuple, Any
+import math
 import pygame
 from pygame.locals import KEYDOWN, K_d
 from .constants import *
@@ -7,6 +8,34 @@ from .asset_manager import AssetManager
 
 DEBUG_TEXT_OFFSET = 20
 
+
+
+def load_spritesheet(image, sprite_size) -> List[pygame.Surface]:
+    image_size = image.get_size()
+
+    sprites = []
+    sprite = pygame.Surface(sprite_size)
+    for y in range(0, image_size[1], sprite_size[1]):
+        for x in range(0, image_size[0], sprite_size[0]):
+            sprite.fill((0, 0, 0))
+            sprite.blit(image, (-x, -y))
+            sprites.append(sprite.copy())
+
+    return sprites
+
+
+def collide_circles(position1, radius1, position2, radius2):
+    difference = (
+        position2[0] - position1[0],
+        position2[1] - position1[1]
+    )
+    length = math.sqrt(difference[0] ** 2 + difference[1] ** 2)
+
+    if length - radius1 - radius2 < 0:
+        return True
+    else:
+        return False
+    
 
 class Debug:
     points = []
@@ -87,16 +116,3 @@ class Debug:
                     cls.visible = True 
 
 
-
-def load_spritesheet(image, sprite_size) -> List[pygame.Surface]:
-    image_size = image.get_size()
-
-    sprites = []
-    sprite = pygame.Surface(sprite_size)
-    for y in range(0, image_size[1], sprite_size[1]):
-        for x in range(0, image_size[0], sprite_size[0]):
-            sprite.fill((0, 0, 0))
-            sprite.blit(image, (-x, -y))
-            sprites.append(sprite.copy())
-
-    return sprites
