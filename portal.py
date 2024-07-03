@@ -57,12 +57,12 @@ class App():
             Player.acceleration *= 0
 
             if Player.rect.colliderect(Portal1.hitrect):
-                portal_angle = Player.velocity.angle_to(Portal2.normal)
+                portal_angle = Portal2.normal.angle_to(Portal1.normal)
                 Player.position = Portal2.rect.center
                 Player.velocity.rotate_ip(portal_angle)
 
-            if Player.rect.colliderect(Portal2.hitrect):
-                portal_angle = Player.velocity.angle_to(Portal1.normal)
+            if Player.rect.colliderect(Portal2.hitrect): # additional dop 
+                portal_angle = Portal1.normal.angle_to(Portal2.normal)
                 Player.position = Portal1.rect.center
                 Player.velocity.rotate_ip(portal_angle)
 

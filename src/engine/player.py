@@ -31,11 +31,11 @@ class Player:
 
 
 class Controller:
-    def __init__(self, player, rect, physics_handler):
+    def __init__(self, player, rect, object_handler):
         self.player = player
         self.rect = rect
 
-        self.physics_handler = physics_handler
+        self.object_handler = object_handler
         self.prediction = []
 
         self.preview_balls = 51
@@ -71,7 +71,7 @@ class Controller:
         else:
             start_vel = self.player.velocity.copy()
         start_acc = self.player.acceleration.copy()
-        self.prediction = self.physics_handler.predict_player(
+        self.prediction = self.object_handler.predict_player(
             0.016, self.player.position, start_vel, start_acc, self.preview_balls
             )[::3]
 

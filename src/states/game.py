@@ -2,7 +2,7 @@ import pygame
 from src.engine import State, Debug, AssetManager
 from src.engine.constants import *
 from src.engine.player import Player, Controller
-from src.engine.objects import PhysicsHandler
+from src.engine.objects import ObjectHandler
 from src.engine.level import Level
 
 
@@ -15,9 +15,9 @@ class Game(State):
         rect = pygame.Rect(0, 0, 75, 75)
         rect.center = self.player.position
         
-        self.physics_handler = PhysicsHandler(self.player, [], [])
-        self.level = Level(self.player, self.physics_handler)
-        self.controller = Controller(self.player, rect, self.physics_handler)
+        self.object_handler = ObjectHandler(self.player, [], [])
+        self.level = Level(self.player, self.object_handler)
+        self.controller = Controller(self.player, rect, self.object_handler)
 
     def on_start(self):
         print('start')
@@ -28,7 +28,7 @@ class Game(State):
     def draw(self):
         self.surface.fill((0, 0, 0))
 
-        self.physics_handler.draw(self.surface)
+        self.object_handler.draw(self.surface)
 
         self.controller.draw(self.surface)
         self.player.draw(self.surface)
@@ -38,7 +38,7 @@ class Game(State):
     def update(self, delta):
         self.player.update(delta)
         self.controller.update(delta)
-        self.physics_handler.update(delta)
+        self.object_handler.update(delta)
 
     def handle_event(self, event):
         if event.type == pygame.KEYDOWN:

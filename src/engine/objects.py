@@ -1,12 +1,14 @@
 # TODO/ideas: 
 # Physics handler, black hole (attractor), negative mass object (repel), asteroids (static and dynamic ones)
 # teleport, timed barriers, gravity inversion timer, reflective surfaces, additional launch thingy
+from dataclasses import dataclass
 import pygame
 from src.engine.constants import GRAVITY_CONST, SPEED_FACTOR
 
 
 __all__ = ['BlackHole', 'Asteroid', 'ForceZone', 
-           'GravityInvertor', 'PhysicsHandler', 'Collectible',
+           'GravityInvertor', 'ObjectHandler', 'Collectible',
+           'Portal', 'PortalPair',
            ]
 
 
@@ -86,6 +88,59 @@ class Collectible:
         #surface.blit(self.texture, self.rect.topleft)
 
 
+@dataclass
+class Portal:
+    rect: pygame.Rect
+    hitrect: pygame.Rect
+    normal: pygame.Vector2    
+    color: pygame.Color
+
+    def draw(self, surface):
+        pygame.draw.rect(surface, self.color, self.rect)
+        pygame.draw.rect(surface, 'white', self.hitrect)
+
+
+class PortalPair:
+    def __init__(self, portal_1, portal_2):
+        self.portal_1 = portal_1
+        self.portal_2 = portal_2
+
+    def update(self, delta):
+        pass
+
+    def draw(self, surface):
+        self.portal_1.draw(surface)
+        self.portal_2.draw(surface)
+
+    def on_collision(self, rect, velocity):
+        if velocity == (0, 0):
+            return False
+        
+        rect_after = rect.copy()
+        vel_after = velocity.copy()
+        vel_normal = vel_after.normalize()
+        
+        dot_check = vel_normal.dot(self.portal_1.normal)
+        if self.portal_1.hitrect.colliderect(rect) and dot_check > 0.0:
+            print('updated')
+            portal_angle = self.portal_1.normal.angle_to(self.portal_2.normal)
+            rect_after.center = self.portal_2.rect.center
+            vel_after.rotate_ip(portal_angle)
+            
+            return rect_after, vel_after
+
+        dot_check = vel_normal.dot(self.portal_2.normal) 
+        if self.portal_2.hitrect.colliderect(rect) and dot_check < 0.0:
+            print('updated')
+            portal_angle = self.portal_2.normal.angle_to(self.portal_1.normal)
+            rect_after.center = self.portal_1.rect.center
+            vel_after.rotate_ip(portal_angle)
+
+            return rect_after, vel_after
+
+        return False
+
+
 class ReflectiveSurface:
     def __init__(self, start_pos, end_pos):
         self.start_pos = pygame.Vector2(start_pos)
@@ -106,12 +161,12 @@ class ReflectiveSurface:
 
 
 class GravityInvertor:
-    def __init__(self, position, timer, physics_handler):
+    def __init__(self, position, timer, object_handler):
         self.position = position
 
         self.timer = timer
         self.crnt_timer = timer
-        self.physics_handler = physics_handler
+        self.object_handler = object_handler
         
     def draw(self, surface):
         pass
@@ -139,12 +194,40 @@ class LaunchPoint:
             self.controller.shot = False
             
             
-class PhysicsHandler:
+class ObjectHandler:
+    # performs physical and other calculations
     def __init__(self, player, objects, obstacles):
         self.player = player
 
         self.objects = objects
         self.obstacles = obstacles
+
+    def get_forces(self, position, mass):
+        '''
+        Calculate forces that self.objects act on a body (position, mass)
+        '''
+        forces = pygame.Vector2(0, 0)
+        for obj in self.objects:
+            if isinstance(obj, BlackHole):
+                norm_vec, gravity_force = obj.calculate_attraction(
+                    position, mass
+                )
+                forces += norm_vec * gravity_force
+
+            if isinstance(obj, ForceZone):
+                if obj.rect.collidepoint(position):
+                    forces += obj.force
+
+        return forces
+
+    def teleport_check(self, position, radius, velocity):
+        for obj in self.objects:
+            if isinstance(obj, PortalPair):
+                rect = pygame.Rect(0, 0, radius * 2, radius * 2)
+                rect.center = position
+                collision = obj.on_collision(rect, velocity)
+
+                return collision
 
     def draw(self, surface):
         for obj in self.objects:
@@ -154,34 +237,34 @@ class PhysicsHandler:
             obstacle.draw(surface)
 
     def update(self, delta):
-        for obj in self.objects:
-            if isinstance(obj, BlackHole):
-                norm_vec, gravity_force = obj.calculate_attraction(
-                    self.player.position, self.player.mass
-                )
+        forces = self.get_forces(self.player.position, self.player.mass)
+        self.player.acceleration += forces
 
-                self.player.acceleration += norm_vec * gravity_force
-            
-            if isinstance(obj, ForceZone):
-                if obj.rect.collidepoint(self.player.position):
-                    self.player.acceleration += obj.force
+        collision = self.teleport_check(
+            self.player.position, 
+            10, self.player.velocity
+            )
+        if collision:
+            new_rect, new_vel = collision
+            self.player.position = new_rect.center
+            self.player.velocity = new_vel
 
         self._update_obstacles(delta)
-            
 
     def _update_obstacles(self, delta):
         # update dynamic objects
         for obstacle in self.obstacles:
-            for obj in self.objects:
-                if isinstance(obj, BlackHole):
-                    norm_vec, gravity_force = obj.calculate_attraction(
-                        obstacle.position, obstacle.mass
-                    )
-                    obstacle.force += norm_vec * gravity_force
+            forces = self.get_forces(obstacle.position, obstacle.mass)
+            obstacle.force += forces
 
-                if isinstance(obj, ForceZone):
-                    if obj.rect.collidepoint(obstacle.position):
-                        obstacle.force += obj.force
+            collision = self.teleport_check(
+                obstacle.position, 
+                10, obstacle.velocity
+                )
+            if collision:
+                new_rect, new_vel = collision
+                obstacle.position = pygame.Vector2(new_rect.center)
+                obstacle.velocity = new_vel
 
             obstacle.update(delta)
 
@@ -196,23 +279,23 @@ class PhysicsHandler:
 
         for _ in range(count):
             last_pos = positions[-1]
-            for obj in self.objects:
-                if isinstance(obj, BlackHole):
-                    norm_vec, gravity_force = obj.calculate_attraction(
-                        last_pos, self.player.mass
-                    )
+            forces = self.get_forces(last_pos, self.player.mass)
 
-                    acceleration += norm_vec * gravity_force
-
-                if isinstance(obj, ForceZone):
-                    if obj.rect.collidepoint(last_pos):
-                        acceleration += obj.force
-
-                
+            acceleration += forces    
 
             velocity += acceleration * time * SPEED_FACTOR
             last_pos += velocity * time * SPEED_FACTOR
             acceleration *= 0 
+
+            # portal stuff
+            collision = self.teleport_check(
+                last_pos, 
+                10, velocity
+                )
+            if collision:
+                new_rect, new_vel = collision
+                last_pos = pygame.Vector2(new_rect.center)
+                velocity = new_vel
 
             positions.append(last_pos.copy())
 
