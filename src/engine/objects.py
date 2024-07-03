@@ -72,19 +72,23 @@ class ForceZone:
 
 
 class Collectible:
-    def __init__(self, position, texture=None):
+    def __init__(self, position, texture=None, texture_picked=None):
         self.position = position
 
-        self.rect = pygame.Rect(*self.position, 30, 30) # texture.get_rect(center=self.position)
+        self.rect = texture.get_rect(center=self.position)
         self.radius = self.rect.width / 2
 
         self.picked_up = False
 
         self.texture = texture
+        self.texture_picked = texture_picked
 
     def draw(self, surface):
         # make animation?
-        pygame.draw.circle(surface, 'yellow', self.position, self.radius)
+        if not self.picked_up:
+            surface.blit(self.texture, self.rect.topleft)
+        else:
+            surface.blit(self.texture_picked, self.rect.topleft)
         #surface.blit(self.texture, self.rect.topleft)
 
 
@@ -122,7 +126,6 @@ class PortalPair:
         
         dot_check = vel_normal.dot(self.portal_1.normal)
         if self.portal_1.hitrect.colliderect(rect) and dot_check > 0.0:
-            print('updated')
             portal_angle = self.portal_1.normal.angle_to(self.portal_2.normal)
             rect_after.center = self.portal_2.rect.center
             vel_after.rotate_ip(portal_angle)
@@ -131,7 +134,6 @@ class PortalPair:
 
         dot_check = vel_normal.dot(self.portal_2.normal) 
         if self.portal_2.hitrect.colliderect(rect) and dot_check < 0.0:
-            print('updated')
             portal_angle = self.portal_2.normal.angle_to(self.portal_1.normal)
             rect_after.center = self.portal_1.rect.center
             vel_after.rotate_ip(portal_angle)

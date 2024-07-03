@@ -29,6 +29,7 @@ class Game(State):
         self.surface.fill((0, 0, 0))
 
         self.object_handler.draw(self.surface)
+        self.level.draw(self.surface)
 
         self.controller.draw(self.surface)
         self.player.draw(self.surface)
@@ -39,6 +40,7 @@ class Game(State):
         self.player.update(delta)
         self.controller.update(delta)
         self.object_handler.update(delta)
+        self.level.update(delta)
 
     def handle_event(self, event):
         if event.type == pygame.KEYDOWN:

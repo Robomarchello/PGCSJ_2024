@@ -1,10 +1,11 @@
 import pygame
 from pygame.locals import *
 from .constants import *
+from .asset_manager import AssetManager
+AssetManager.load_assets(ASSETS_PATH)
 from .state_machine import StateMachine, State
 from .screen import Screen
 from .utils import Debug
-from .asset_manager import AssetManager
 
 
 class App(StateMachine):
@@ -12,9 +13,7 @@ class App(StateMachine):
         super().__init__(initial_state)
 
         self.clock = pygame.time.Clock()
-        self.screen = Screen(SCREENSIZE)
-
-        AssetManager.load_assets(ASSETS_PATH)
+        self.screen = Screen(SCREENSIZE)        
 
     def loop(self):
         while True:

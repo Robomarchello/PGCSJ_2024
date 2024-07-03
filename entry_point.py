@@ -1,4 +1,3 @@
-import pygame
 from src.engine.app import App
 from src.states import Game
 

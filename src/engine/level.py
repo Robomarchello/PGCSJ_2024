@@ -1,5 +1,7 @@
 import pygame
 from src.engine.objects import *
+from src.engine.asset_manager import AssetManager
+from src.engine.utils import collide_circles
 
 
 class Level:
@@ -7,7 +9,7 @@ class Level:
         objects = []
         objects.append(BlackHole((250, 384), 50))
         objects.append(BlackHole((500, 384), 50))
-        objects.append(ForceZone((0, 0.3), (300, 200, 300, 300)))
+        #objects.append(ForceZone((0, 0.3), (300, 200, 300, 300)))
 
         portal_1 = Portal(
             pygame.Rect(300, 190, 50, 70), 
@@ -19,7 +21,7 @@ class Level:
             pygame.Rect(500, 445, 70, 5), 
             pygame.Vector2(0, -1), pygame.Color('blue')
         )
-        objects.append(PortalPair(portal_1, portal_2))
+        #objects.append(PortalPair(portal_1, portal_2))
         obstacles = []
         obstacles.append(Asteroid((500, 280), pygame.Vector2(4.3, 0), 20, 15))
         obstacles.append(Asteroid((500, 488), pygame.Vector2(-4.3, 0), 20, 15))
@@ -32,14 +34,23 @@ class Level:
         self.object_handler.obstacles = obstacles
 
         self.collectibles = []
+        coin_img = AssetManager.images['coin']
+        coin_picked_img = AssetManager.images['coin_picked']
         self.collectibles.append(
-            Collectible((300, 50))
+            Collectible((250, 300), coin_img, coin_picked_img)
             )
-    
+        self.collectibles.append(
+            Collectible((375, 384), coin_img, coin_picked_img)
+            )
+        self.collectibles.append(
+            Collectible((500, 468), coin_img, coin_picked_img)
+            )
+
     def update(self, delta):
         # physics handler part of game or level? I have to answer this myself
         for collectible in self.collectibles:
-            if self.player.rect.colliderect(collectible.rect):
+            if collide_circles(self.player.position, self.player.radius,
+                               collectible.position, collectible.radius):
                 if not collectible.picked_up:
                     collectible.picked_up = True
 
