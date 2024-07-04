@@ -18,9 +18,11 @@ class Player:
         self.freeze = True
 
     def update(self, delta):
-        if not self.freeze:
-            self.velocity += self.acceleration * delta * c.SPEED_FACTOR
-            self.position += self.velocity * delta * c.SPEED_FACTOR
+        if self.freeze:
+            self.velocity *= 0
+            self.acceleration *= 0  
+        self.velocity += self.acceleration * delta * c.SPEED_FACTOR
+        self.position += self.velocity * delta * c.SPEED_FACTOR
 
         ...
 
@@ -38,14 +40,17 @@ class Controller:
         self.object_handler = object_handler
         self.prediction = []
 
-        self.preview_balls = 51
+        self.preview_balls = 1000  # 51
 
         self.holding = False
-        self.difference = pygame.Vector2(0, 0)
+        self.difference = pygame.Vector2(0, 0)  
 
+        self.launch_point = None
         self.launch_force = pygame.Vector2()
         
         self.mouse_pos = pygame.mouse.get_pos()
+
+        self.debug_movement = True
 
     def draw(self, surface):
         pygame.draw.rect(surface, 'blue', self.rect)
@@ -77,6 +82,17 @@ class Controller:
 
         self.rect.center = self.player.position
 
+        if self.debug_movement:
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_a]:
+                self.player.position.x -= c.DEBUG_VEL
+            if keys[pygame.K_d]:
+                self.player.position.x += c.DEBUG_VEL
+            if keys[pygame.K_w]:
+                self.player.position.y -= c.DEBUG_VEL
+            if keys[pygame.K_s]:
+                self.player.position.y += c.DEBUG_VEL
+
     def handle_event(self, event):
         if event.type == MOUSEBUTTONDOWN:
             if self.rect.collidepoint(self.mouse_pos):
@@ -86,5 +102,9 @@ class Controller:
             if self.holding:
                 self.player.velocity += self.launch_force
                 self.player.freeze = False
+
+                if self.launch_point is not None:
+                    self.launch_point.used = True
+                    self.launch_point = None
 
                 self.holding = False

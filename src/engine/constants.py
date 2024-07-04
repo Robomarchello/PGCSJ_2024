@@ -17,3 +17,4 @@ BLACK = (0, 0, 0)
 # Debug font path and size
 DEBUG_FONT = ABS_DIR + '/src/assets/other/font.ttf'
 DEBUG_SIZE = 16
+DEBUG_VEL = 5

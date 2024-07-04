@@ -16,8 +16,8 @@ class Game(State):
         rect.center = self.player.position
         
         self.object_handler = ObjectHandler(self.player, [], [])
-        self.level = Level(self.player, self.object_handler)
         self.controller = Controller(self.player, rect, self.object_handler)
+        self.level = Level(self.player, self.controller, self.object_handler)
 
     def on_start(self):
         print('start')
@@ -43,8 +43,8 @@ class Game(State):
         self.level.update(delta)
 
     def handle_event(self, event):
-        if event.type == pygame.KEYDOWN:
-            self.manager.next_state = NewNextState()
+        #if event.type == pygame.KEYDOWN:
+        #    self.manager.next_state = NewNextState()
 
         self.controller.handle_event(event)
 

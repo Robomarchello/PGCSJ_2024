@@ -4,11 +4,12 @@
 from dataclasses import dataclass
 import pygame
 from src.engine.constants import GRAVITY_CONST, SPEED_FACTOR
+from src.engine.utils import collide_circles
 
 
 __all__ = ['BlackHole', 'Asteroid', 'ForceZone', 
            'GravityInvertor', 'ObjectHandler', 'Collectible',
-           'Portal', 'PortalPair',
+           'Portal', 'PortalPair', 'LaunchPoint'
            ]
 
 
@@ -25,6 +26,8 @@ class BlackHole:
         
     def calculate_attraction(self, position_other, mass_other):
         diff = self.position - position_other
+        if diff == (0, 0):
+            return pygame.Vector2(0, 0), 0
         norm_vec = diff.normalize()
         distance = diff.magnitude()
         gravity_force = (GRAVITY_CONST * mass_other * self.mass) / distance ** 2
@@ -182,8 +185,9 @@ class GravityInvertor:
 
 
 class LaunchPoint:
-    def __init__(self, rect, player, controller):
-        self.rect = rect
+    def __init__(self, position, radius, player, controller):
+        self.position = position
+        self.radius = radius
 
         self.player = player
         self.controller = controller
@@ -191,11 +195,30 @@ class LaunchPoint:
         self.used = False
 
     def update(self, delta):
-        if self.rect.colliderect(self.player.rect):
+        collision = collide_circles(
+            self.position, self.radius,
+            self.player.position, self.player.radius
+        )
+        if collision and not self.used:
             self.player.freeze = True
             self.controller.shot = False
-            
-            
+
+            self.controller.launch_point = self
+
+            pull_force = self.pull_to_force(self.player.position)
+            self.player.position += pull_force * delta * SPEED_FACTOR
+
+    def pull_to_force(self, position): 
+        difference = pygame.Vector2(
+            self.position[0] - position[0],
+            self.position[1] - position[1]
+        )
+        return difference * 0.18
+
+    def draw(self, surface):
+        pygame.draw.circle(surface, 'grey', self.position, self.radius)
+
+
 class ObjectHandler:
     # performs physical and other calculations
     def __init__(self, player, objects, obstacles):

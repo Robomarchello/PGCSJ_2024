@@ -5,7 +5,11 @@ from src.engine.utils import collide_circles
 
 
 class Level:
-    def __init__(self, player, object_handler):
+    def __init__(self, player, controller, object_handler):
+        self.player = player
+        self.controller = controller
+        self.object_handler = object_handler
+
         objects = []
         objects.append(BlackHole((250, 384), 50))
         objects.append(BlackHole((500, 384), 50))
@@ -26,12 +30,13 @@ class Level:
         obstacles.append(Asteroid((500, 280), pygame.Vector2(4.3, 0), 20, 15))
         obstacles.append(Asteroid((500, 488), pygame.Vector2(-4.3, 0), 20, 15))
         
-
-        self.player = player
-        self.object_handler = object_handler
-
         self.object_handler.objects = objects
         self.object_handler.obstacles = obstacles
+
+        self.launch_points = []
+        self.launch_points.append(
+            LaunchPoint((700, 384), 30, self.player, self.controller)
+        )
 
         self.collectibles = []
         coin_img = AssetManager.images['coin']
@@ -53,10 +58,16 @@ class Level:
                                collectible.position, collectible.radius):
                 if not collectible.picked_up:
                     collectible.picked_up = True
+        
+        for launch_point in self.launch_points:
+            launch_point.update(delta)
 
     def draw(self, surface):
         for collectible in self.collectibles:
             collectible.draw(surface)
+
+        for launch_point in self.launch_points:
+            launch_point.draw(surface)
 
     def load_level(self):
         pass
