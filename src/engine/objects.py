@@ -9,7 +9,7 @@ from src.engine.utils import collide_circles
 
 __all__ = ['BlackHole', 'Asteroid', 'ForceZone', 
            'GravityInvertor', 'ObjectHandler', 'Collectible',
-           'Portal', 'PortalPair', 'LaunchPoint'
+           'Portal', 'PortalPair', 'LaunchPoint', 'FinishPoint'
            ]
 
 
@@ -28,11 +28,11 @@ class BlackHole:
         diff = self.position - position_other
         if diff == (0, 0):
             return pygame.Vector2(0, 0), 0
-        norm_vec = diff.normalize()
+        direction = diff.normalize()
         distance = diff.magnitude()
         gravity_force = (GRAVITY_CONST * mass_other * self.mass) / distance ** 2
         
-        return norm_vec, gravity_force
+        return direction * gravity_force
 
 
 class Asteroid:
@@ -201,7 +201,7 @@ class LaunchPoint:
         )
         if collision and not self.used:
             self.player.freeze = True
-            self.controller.shot = False
+            self.controller.shot = True
 
             self.controller.launch_point = self
 
@@ -219,6 +219,49 @@ class LaunchPoint:
         pygame.draw.circle(surface, 'grey', self.position, self.radius)
 
 
+class FinishPoint:
+    def __init__(self, position, radius, player):
+        self.position = position
+        self.radius = radius
+
+        self.player = player
+        
+        self.touched = False
+
+        self.complete_timer = 2.0
+        self.timer = self.complete_timer
+        self.completed = False
+
+    def update(self, delta):
+        collision = collide_circles(
+            self.position, self.radius,
+            self.player.position, self.player.radius
+        )
+        if collision and not self.completed:
+            self.player.freeze = True
+            self.touched = True
+
+            pull_force = self.pull_to_force(self.player.position)
+            self.player.position += pull_force * delta * SPEED_FACTOR
+
+        if self.touched:
+            self.timer -= delta
+
+            if self.timer < 0.0:
+                self.completed = True
+
+    def pull_to_force(self, position): 
+        difference = pygame.Vector2(
+            self.position[0] - position[0],
+            self.position[1] - position[1]
+        )
+        return difference * 0.1
+
+    def draw(self, surface):
+        pygame.draw.circle(surface, 'yellow', self.position, self.radius)
+
+
+
 class ObjectHandler:
     # performs physical and other calculations
     def __init__(self, player, objects, obstacles):
@@ -234,10 +277,10 @@ class ObjectHandler:
         forces = pygame.Vector2(0, 0)
         for obj in self.objects:
             if isinstance(obj, BlackHole):
-                norm_vec, gravity_force = obj.calculate_attraction(
+                gravity_force = obj.calculate_attraction(
                     position, mass
                 )
-                forces += norm_vec * gravity_force
+                forces += gravity_force
 
             if isinstance(obj, ForceZone):
                 if obj.rect.collidepoint(position):

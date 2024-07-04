@@ -50,6 +50,8 @@ class Level:
         self.collectibles.append(
             Collectible((500, 468), coin_img, coin_picked_img)
             )
+        
+        self.finish_point = FinishPoint((700, 600), 30, self.player)
 
     def update(self, delta):
         # physics handler part of game or level? I have to answer this myself
@@ -62,12 +64,19 @@ class Level:
         for launch_point in self.launch_points:
             launch_point.update(delta)
 
+        self.finish_point.update(delta)
+
     def draw(self, surface):
         for collectible in self.collectibles:
             collectible.draw(surface)
 
         for launch_point in self.launch_points:
             launch_point.draw(surface)
+
+        self.finish_point.draw(surface)
+
+        if self.finish_point.completed:
+            print('*transition to next level*')
 
     def load_level(self):
         pass

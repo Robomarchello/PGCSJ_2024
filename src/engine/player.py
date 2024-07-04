@@ -56,7 +56,7 @@ class Controller:
         pygame.draw.rect(surface, 'blue', self.rect)
         
         for posisition in self.prediction:
-            pygame.draw.circle(surface, 'green', posisition , 3)
+            pygame.draw.circle(surface, 'green', posisition, 3)
 
         if self.holding:
             pygame.draw.circle(surface, 'grey', self.mouse_pos, 10)
