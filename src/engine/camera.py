@@ -4,15 +4,18 @@ from src.engine.utils import Debug
 from src.engine.constants import *
 
 
+# TODO: take player's velocity, launch_direction into account, allow freecam
 class Camera:
     # for every object, separate the physics position and player's view
     # I think zooming is possible, but will cause a lot of problems
     pos = Vector2() 
-    target_pos = Vector2(200, SCREEN_H // 2)
+    offset = Vector2(200, SCREEN_H // 2) # SCREEN_W // 2
     rect = pygame.Rect(*pos, *SCREENSIZE)
     bounds: pygame.Rect
 
     focus: Vector2 | None = None
+    # for target_pos, perhaps a secondary focus?
+    secondary_focus: Vector2 | None = None
 
     @classmethod
     def debug_draw(cls):
@@ -24,29 +27,20 @@ class Camera:
         )
 
     @classmethod
-    def set_focus(cls):
-        pass
-
-    @classmethod
     def update(cls, delta):
-        # update camera
-
+        #cls.focus = None
         if cls.focus is not None:
-            difference = cls.focus - (cls.pos + cls.target_pos)
+            difference = cls.focus - (cls.pos + cls.offset)
             cls.pos += difference * 0.1 * delta * SPEED_FACTOR
         else:
             pass
 
-        Debug.add_text(str(Camera.pos))
-        
-        # clamp rect to level bounds
-
     @classmethod
-    def position_displace(cls, position: Vector2):
+    def displace_position(cls, position: Vector2):
         return position - cls.pos
 
     @classmethod
-    def rect_displace(cls, rect: Vector2):
+    def displace_rect(cls, rect: Vector2):
         cam_rect = rect.copy()
         cam_rect.x -= cls.pos.x
         cam_rect.y -= cls.pos.y

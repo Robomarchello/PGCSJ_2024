@@ -1,8 +1,10 @@
+import pygame
 from pathlib import Path
 
 
 TITLE = 'Game Title'
 SCREENSIZE = SCREEN_W, SCREEN_H = (960, 768)
+SCREEN_AREA = pygame.Rect(0, 0, SCREEN_W, SCREEN_H)
 FPS = 480
 
 # to compencate small delta time values

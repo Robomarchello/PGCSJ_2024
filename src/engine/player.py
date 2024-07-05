@@ -60,13 +60,13 @@ class Controller:
 
     @property
     def cam_rect(self):
-        return Camera.rect_displace(self.rect)
+        return Camera.displace_rect(self.rect)
 
     def draw(self, surface):
         pygame.draw.rect(surface, 'blue', self.cam_rect)
         
         for position in self.prediction:
-            cam_pos = Camera.position_displace(position)
+            cam_pos = Camera.displace_position(position)
             pygame.draw.circle(surface, 'green', cam_pos, 3)
 
         if self.holding:
@@ -106,9 +106,12 @@ class Controller:
 
     def handle_event(self, event):
         if event.type == MOUSEBUTTONDOWN:
-            if self.cam_rect.collidepoint(self.mouse_pos):
-                self.holding = True
-
+            if event.button == 1:
+                if self.cam_rect.collidepoint(self.mouse_pos):
+                    self.holding = True
+            if event.button == 3:
+                self.holding = False
+                
         if event.type == MOUSEBUTTONUP:
             if self.holding:
                 self.player.velocity += self.launch_force

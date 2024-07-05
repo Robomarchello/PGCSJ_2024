@@ -6,6 +6,7 @@ import pygame
 from src.engine.constants import GRAVITY_CONST, SPEED_FACTOR
 from src.engine.utils import collide_circles
 from src.engine.camera import Camera
+from src.engine.asset_manager import AssetManager
 
 
 __all__ = ['BlackHole', 'Asteroid', 'ForceZone', 
@@ -16,7 +17,7 @@ __all__ = ['BlackHole', 'Asteroid', 'ForceZone',
 
 class BlackHole:
     def __init__(self, position, mass):
-        self.position = position
+        self.position = pygame.Vector2(position)
         self.mass = mass 
 
         self.radius = 20
@@ -24,7 +25,7 @@ class BlackHole:
 
     @property
     def cam_pos(self):
-        return self.position - Camera.pos
+        return Camera.displace_position(self.position)
 
     def draw(self, surface):
         pygame.draw.circle(surface, self.color, self.cam_pos, self.radius)
@@ -54,7 +55,7 @@ class Asteroid:
 
     @property
     def cam_pos(self):
-        return self.position - Camera.pos
+        return Camera.displace_position(self.position)
 
     def update(self, delta):
         self.acceleration += self.force / self.mass
@@ -78,11 +79,7 @@ class ForceZone:
 
     @property
     def cam_rect(self):
-        cam_rect = self.rect.copy()
-        cam_rect.x -= Camera.pos.x
-        cam_rect.y -= Camera.pos.y
-
-        return cam_rect
+        return Camera.displace_rect(self.rect)
 
     def draw(self, surface):
         pygame.draw.rect(surface, 'orange', self.cam_rect, 5)
@@ -92,20 +89,23 @@ class ForceZone:
 
 
 class Collectible:
-    def __init__(self, position, texture=None, texture_picked=None):
-        self.position = position
+    def __init__(self, position, texture_key, texture_key_picked):
+        self.position = pygame.Vector2(position)
 
-        self.rect = texture.get_rect(center=self.position)
+        self.texture_key = texture_key
+        self.texture_key_picked = texture_key_picked
+
+        self.texture = AssetManager.images[texture_key]
+        self.texture_picked = AssetManager.images[texture_key_picked]
+
+        self.rect = self.texture.get_rect(center=self.position)
         self.radius = self.rect.width / 2
 
         self.picked_up = False
 
-        self.texture = texture
-        self.texture_picked = texture_picked
-
     @property
     def cam_pos(self):
-        return self.position - Camera.pos
+        return Camera.displace_position(self.position)
 
     def draw(self, surface):
         cam_rect = self.rect.copy()
@@ -227,7 +227,7 @@ class LaunchPoint:
 
     @property
     def cam_pos(self):
-        return self.position - Camera.pos
+        return Camera.displace_position(self.position)
 
     def update(self, delta):
         collision = collide_circles(
@@ -256,7 +256,7 @@ class LaunchPoint:
 
 class FinishPoint:
     def __init__(self, position, radius, player):
-        self.position = position
+        self.position = pygame.Vector2(position)
         self.radius = radius
 
         self.player = player
@@ -269,7 +269,7 @@ class FinishPoint:
 
     @property
     def cam_pos(self):
-        return self.position - Camera.pos
+        return Camera.displace_position(self.position) 
 
     def update(self, delta):
         collision = collide_circles(

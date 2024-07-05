@@ -21,7 +21,7 @@ class AssetManager():
 
     @classmethod
     def load_image(cls, file_path) -> pygame.Surface:
-        image = pygame.image.load(file_path)#.convert_alpha()
+        image = pygame.image.load(file_path).convert_alpha()
         name = Path(file_path).stem
         cls.images[name] = image
 
