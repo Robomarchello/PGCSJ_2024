@@ -5,6 +5,7 @@ from dataclasses import dataclass
 import pygame
 from src.engine.constants import GRAVITY_CONST, SPEED_FACTOR
 from src.engine.utils import collide_circles
+from src.engine.camera import Camera
 
 
 __all__ = ['BlackHole', 'Asteroid', 'ForceZone', 
@@ -21,8 +22,12 @@ class BlackHole:
         self.radius = 20
         self.color = pygame.Color(255, 255, 255)
 
+    @property
+    def cam_pos(self):
+        return self.position - Camera.pos
+
     def draw(self, surface):
-        pygame.draw.circle(surface, self.color, self.position, self.radius)
+        pygame.draw.circle(surface, self.color, self.cam_pos, self.radius)
         
     def calculate_attraction(self, position_other, mass_other):
         diff = self.position - position_other
@@ -47,6 +52,10 @@ class Asteroid:
 
         self.orientation = 0.0
 
+    @property
+    def cam_pos(self):
+        return self.position - Camera.pos
+
     def update(self, delta):
         self.acceleration += self.force / self.mass
         self.velocity += self.acceleration * delta * SPEED_FACTOR
@@ -56,7 +65,7 @@ class Asteroid:
         self.force *= 0
     
     def draw(self, surface):
-        pygame.draw.circle(surface, 'grey', self.position, self.radius)
+        pygame.draw.circle(surface, 'grey', self.cam_pos, self.radius)
 
 
 class ForceZone:
@@ -67,8 +76,16 @@ class ForceZone:
         self.timer = timer
         self.crnt_timer = timer
 
+    @property
+    def cam_rect(self):
+        cam_rect = self.rect.copy()
+        cam_rect.x -= Camera.pos.x
+        cam_rect.y -= Camera.pos.y
+
+        return cam_rect
+
     def draw(self, surface):
-        pygame.draw.rect(surface, 'orange', self.rect, 5)
+        pygame.draw.rect(surface, 'orange', self.cam_rect, 5)
 
     def update(self, delta):
         pass
@@ -86,12 +103,19 @@ class Collectible:
         self.texture = texture
         self.texture_picked = texture_picked
 
+    @property
+    def cam_pos(self):
+        return self.position - Camera.pos
+
     def draw(self, surface):
+        cam_rect = self.rect.copy()
+        cam_rect.center = self.cam_pos
+
         # make animation?
         if not self.picked_up:
-            surface.blit(self.texture, self.rect.topleft)
+            surface.blit(self.texture, cam_rect.topleft)
         else:
-            surface.blit(self.texture_picked, self.rect.topleft)
+            surface.blit(self.texture_picked, cam_rect.topleft)
         #surface.blit(self.texture, self.rect.topleft)
 
 
@@ -103,8 +127,15 @@ class Portal:
     color: pygame.Color
 
     def draw(self, surface):
-        pygame.draw.rect(surface, self.color, self.rect)
-        pygame.draw.rect(surface, 'white', self.hitrect)
+        cam_rect = self.rect.copy()
+        cam_rect.x -= Camera.pos[0]
+        cam_rect.x -= Camera.pos[1]
+        # temporary thing?
+        cam_hit_rect = self.rect.copy()
+        cam_hit_rect.x -= Camera.pos[0]
+        cam_hit_rect.x -= Camera.pos[1]
+        pygame.draw.rect(surface, self.color, cam_rect)
+        pygame.draw.rect(surface, 'white', cam_hit_rect)
 
 
 class PortalPair:
@@ -194,6 +225,10 @@ class LaunchPoint:
         
         self.used = False
 
+    @property
+    def cam_pos(self):
+        return self.position - Camera.pos
+
     def update(self, delta):
         collision = collide_circles(
             self.position, self.radius,
@@ -216,7 +251,7 @@ class LaunchPoint:
         return difference * 0.18
 
     def draw(self, surface):
-        pygame.draw.circle(surface, 'grey', self.position, self.radius)
+        pygame.draw.circle(surface, 'grey', self.cam_pos, self.radius)
 
 
 class FinishPoint:
@@ -231,6 +266,10 @@ class FinishPoint:
         self.complete_timer = 2.0
         self.timer = self.complete_timer
         self.completed = False
+
+    @property
+    def cam_pos(self):
+        return self.position - Camera.pos
 
     def update(self, delta):
         collision = collide_circles(
@@ -258,7 +297,7 @@ class FinishPoint:
         return difference * 0.1
 
     def draw(self, surface):
-        pygame.draw.circle(surface, 'yellow', self.position, self.radius)
+        pygame.draw.circle(surface, 'yellow', self.cam_pos, self.radius)
 
 
 

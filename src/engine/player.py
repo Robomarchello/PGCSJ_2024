@@ -1,8 +1,8 @@
 import pygame
 from pygame import Vector2
 from pygame.locals import MOUSEBUTTONDOWN, MOUSEBUTTONUP
-from src.engine.constants import SCREEN_H
-import src.engine.constants as c
+from src.engine.constants import SPEED_FACTOR, DEBUG_VEL, SCREEN_H
+from src.engine.camera import Camera
 
 
 class Player:
@@ -17,19 +17,25 @@ class Player:
 
         self.freeze = True
 
+    @property
+    def cam_pos(self):
+        return self.position - Camera.pos
+
     def update(self, delta):
         if self.freeze:
             self.velocity *= 0
             self.acceleration *= 0  
-        self.velocity += self.acceleration * delta * c.SPEED_FACTOR
-        self.position += self.velocity * delta * c.SPEED_FACTOR
+        self.velocity += self.acceleration * delta * SPEED_FACTOR
+        self.position += self.velocity * delta * SPEED_FACTOR
 
         ...
 
         self.acceleration *= 0 
 
     def draw(self, surface):
-        pygame.draw.circle(surface, 'red', self.position, self.radius)
+        #pygame.draw.circle(surface, 'red', self.position, self.radius)
+
+        pygame.draw.circle(surface, 'red', self.cam_pos, self.radius)
 
 
 class Controller:
@@ -40,7 +46,7 @@ class Controller:
         self.object_handler = object_handler
         self.prediction = []
 
-        self.preview_balls = 1000  # 51
+        self.preview_balls = 51 #1000
 
         self.holding = False
         self.difference = pygame.Vector2(0, 0)  
@@ -52,11 +58,16 @@ class Controller:
 
         self.debug_movement = True
 
+    @property
+    def cam_rect(self):
+        return Camera.rect_displace(self.rect)
+
     def draw(self, surface):
-        pygame.draw.rect(surface, 'blue', self.rect)
+        pygame.draw.rect(surface, 'blue', self.cam_rect)
         
-        for posisition in self.prediction:
-            pygame.draw.circle(surface, 'green', posisition, 3)
+        for position in self.prediction:
+            cam_pos = Camera.position_displace(position)
+            pygame.draw.circle(surface, 'green', cam_pos, 3)
 
         if self.holding:
             pygame.draw.circle(surface, 'grey', self.mouse_pos, 10)
@@ -64,8 +75,8 @@ class Controller:
     def update(self, delta):
         self.mouse_pos = pygame.mouse.get_pos()
 
-        if self.holding and self.player.position != self.mouse_pos:
-            self.difference = self.player.position - self.mouse_pos
+        if self.holding and self.player.cam_pos != self.mouse_pos:
+            self.difference = self.player.cam_pos - self.mouse_pos
             norm_diff = self.difference.normalize()
             magnitude = self.difference.magnitude() * 0.03
 
@@ -85,17 +96,17 @@ class Controller:
         if self.debug_movement:
             keys = pygame.key.get_pressed()
             if keys[pygame.K_a]:
-                self.player.position.x -= c.DEBUG_VEL
+                self.player.position.x -= DEBUG_VEL * delta * SPEED_FACTOR
             if keys[pygame.K_d]:
-                self.player.position.x += c.DEBUG_VEL
+                self.player.position.x += DEBUG_VEL * delta * SPEED_FACTOR
             if keys[pygame.K_w]:
-                self.player.position.y -= c.DEBUG_VEL
+                self.player.position.y -= DEBUG_VEL * delta * SPEED_FACTOR 
             if keys[pygame.K_s]:
-                self.player.position.y += c.DEBUG_VEL
+                self.player.position.y += DEBUG_VEL * delta * SPEED_FACTOR
 
     def handle_event(self, event):
         if event.type == MOUSEBUTTONDOWN:
-            if self.rect.collidepoint(self.mouse_pos):
+            if self.cam_rect.collidepoint(self.mouse_pos):
                 self.holding = True
 
         if event.type == MOUSEBUTTONUP:

@@ -2,7 +2,7 @@ from pathlib import Path
 
 
 TITLE = 'Game Title'
-SCREENSIZE = SCREEN_W, SCREEN_H = (768, 768)
+SCREENSIZE = SCREEN_W, SCREEN_H = (960, 768)
 FPS = 480
 
 # to compencate small delta time values

@@ -2,6 +2,7 @@ import pygame
 from src.engine.objects import *
 from src.engine.asset_manager import AssetManager
 from src.engine.utils import collide_circles
+from src.engine.camera import Camera
 
 
 class Level:
@@ -53,8 +54,9 @@ class Level:
         
         self.finish_point = FinishPoint((700, 600), 30, self.player)
 
-    def update(self, delta):
-        # physics handler part of game or level? I have to answer this myself
+        Camera.focus = self.player.position
+
+    def update(self, delta):        
         for collectible in self.collectibles:
             if collide_circles(self.player.position, self.player.radius,
                                collectible.position, collectible.radius):

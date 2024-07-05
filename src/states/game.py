@@ -4,6 +4,7 @@ from src.engine.constants import *
 from src.engine.player import Player, Controller
 from src.engine.objects import ObjectHandler
 from src.engine.level import Level
+from src.engine.camera import Camera
 
 
 class Game(State):
@@ -28,6 +29,8 @@ class Game(State):
     def draw(self):
         self.surface.fill((0, 0, 0))
 
+        Camera.debug_draw()
+
         self.object_handler.draw(self.surface)
         self.level.draw(self.surface)
 
@@ -37,6 +40,8 @@ class Game(State):
         Debug.add_text(self.manager.clock.get_fps())
 
     def update(self, delta):
+        Camera.update(delta)
+
         self.player.update(delta)
         self.controller.update(delta)
         self.object_handler.update(delta)

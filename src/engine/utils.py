@@ -2,7 +2,7 @@ from time import perf_counter
 from typing import List, Tuple, Any
 import math
 import pygame
-from pygame.locals import KEYDOWN, K_d
+from pygame.locals import KEYDOWN, K_g
 from .constants import *
 from .asset_manager import AssetManager
 
@@ -57,7 +57,7 @@ class Debug:
             pygame.draw.circle(screen, (255, 0, 0), point, 4)
 
         for line in cls.lines:
-            pygame.draw.line(screen, (255, 0, 0), line[0])
+            pygame.draw.line(screen, (255, 0, 0), line[0], line[1], 2)
         
         offset = 0
         for text in cls.texts:
@@ -109,7 +109,7 @@ class Debug:
     @classmethod
     def handle_event(cls, event):
         if event.type == KEYDOWN:
-            if event.key == K_d:
+            if event.key == K_g:
                 if cls.visible:
                     cls.visible = False
                 else:
