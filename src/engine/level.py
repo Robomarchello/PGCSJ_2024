@@ -186,7 +186,7 @@ class Level:
         # read obstacles
         self.obstacles = []
         obs_dict = level_dict['obstacles']
-        for obs_key in self.obstacles:
+        for obs_key in obs_dict:
             if obs_key.startswith('asteroid'):
                 read_object = Asteroid(
                     obs_dict[obs_key]['position'],
@@ -194,8 +194,7 @@ class Level:
                     obs_dict[obs_key]['mass'],
                     obs_dict[obs_key]['radius']
                 )
-
-                self.objects.append(read_object)
+                self.obstacles.append(read_object)
     
         # read collectibles
         self.collectibles = []
