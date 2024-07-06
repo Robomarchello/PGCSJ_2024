@@ -15,49 +15,16 @@ class Level:
         self.level_bounds = pygame.Rect(10, 10, 1200, 800)
 
         self.objects = []
-        self.objects.append(BlackHole((250, 384), 50))
-        self.objects.append(BlackHole((500, 384), 50))
-        #self.objects.append(ForceZone((0, 0.3), (300, 200, 300, 300)))
-
-        portal_1 = Portal(
-            pygame.Rect(300, 190, 50, 70), 
-            pygame.Rect(345, 190, 5, 70), 
-            pygame.Vector2(1, 0), pygame.Color('yellow')
-        )
-        portal_2 = Portal(
-            pygame.Rect(500, 400, 70, 50), 
-            pygame.Rect(500, 445, 70, 5), 
-            pygame.Vector2(0, -1), pygame.Color('blue')
-        )
-        #self.objects.append(PortalPair(portal_1, portal_2))
         self.obstacles = []
-        self.obstacles.append(Asteroid((500, 280), pygame.Vector2(4.3, 0), 20, 15))
-        self.obstacles.append(Asteroid((500, 488), pygame.Vector2(-4.3, 0), 20, 15))
-        
-        self.object_handler.objects = self.objects
-        self.object_handler.obstacles = self.obstacles
-
         self.launch_points = []
-        self.launch_points.append(
-            LaunchPoint((700, 384), 30, self.player, self.controller)
-        )
-
         self.collectibles = []
-        self.collectibles.append(
-            Collectible((250, 300), 'coin', 'coin_picked')
-            )
-        self.collectibles.append(
-            Collectible((375, 384), 'coin', 'coin_picked')
-            )
-        self.collectibles.append(
-            Collectible((500, 468), 'coin', 'coin_picked')
-            )
-        
-        self.finish_point = FinishPoint((700, 600), 30, self.player)
 
         #self.save_level('level_saved.json')
         self.load_level('level_saved.json')
 
+        self.object_handler.objects = self.objects
+        self.object_handler.obstacles = self.obstacles
+        
         Camera.focus = self.player.position
         Camera.secondary_focus = self.finish_point.position
 
@@ -75,7 +42,6 @@ class Level:
 
     def draw(self, surface):
         cam_level_bounds = Camera.displace_rect(self.level_bounds)
-        Camera.secondary_focus = cam_level_bounds.center
         pygame.draw.rect(surface, (255, 0, 0), cam_level_bounds, 3)
         for collectible in self.collectibles:
             collectible.draw(surface)

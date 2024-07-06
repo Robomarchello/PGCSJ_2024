@@ -8,14 +8,20 @@ from src.engine.constants import *
 class Camera:
     # for every object, separate the physics position and player's view
     # I think zooming is possible, but will cause a lot of problems
+    displacement = Vector2()
     pos = Vector2() 
-    offset = Vector2(200, SCREEN_H // 2) # SCREEN_W // 2
+    offset = Vector2(SCREEN_W // 2, SCREEN_H // 2) # 
     rect = pygame.Rect(*pos, *SCREENSIZE)
-    bounds: pygame.Rect
+    bounds: pygame.Rect = None
 
     focus: Vector2 | None = None
-    # for target_pos, perhaps a secondary focus?
+    
+    player = None
     secondary_focus: Vector2 | None = None
+    
+    @classmethod
+    def initialize(cls, player):
+        cls.player = player
 
     @classmethod
     def debug_draw(cls):
@@ -26,14 +32,33 @@ class Camera:
             (SCREEN_W / 2, 0), (SCREEN_W / 2, SCREEN_H)
         )
 
+        Debug.add_point(cls.offset)
+
     @classmethod
     def update(cls, delta):
         #cls.focus = None
         if cls.focus is not None:
-            difference = cls.focus - (cls.pos + cls.offset)
-            cls.pos += difference * 0.1 * delta * SPEED_FACTOR
+            difference = cls.focus - cls.displacement
+            cls.displacement += difference * 0.1 * delta * SPEED_FACTOR
+            cls.pos = cls.displacement - cls.offset
         else:
             pass
+        
+        if cls.secondary_focus is not None:
+            diff = pygame.Vector2(
+                cls.player.position.x - cls.secondary_focus[0],
+                cls.player.position.y - cls.secondary_focus[1]
+                )
+            diff_len = min(diff.length(), 400)
+            diff_norm = diff.normalize()
+            displacement = diff_norm * diff_len
+            cls.offset[0] = SCREEN_W // 2 + displacement[0] * 0.5
+            cls.offset[1] = SCREEN_H // 2 + displacement[1] * 0.3
+
+        if cls.bounds is not None:
+            cls.rect.topleft = cls.pos
+            cls.rect.clamp_ip(cls.bounds)
+            cls.pos.update(cls.rect.topleft)
 
     @classmethod
     def displace_position(cls, position: Vector2):

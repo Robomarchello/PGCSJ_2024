@@ -353,7 +353,7 @@ class ObjectHandler:
             )
         if collision:
             new_rect, new_vel = collision
-            self.player.position = new_rect.center
+            self.player.position.update(new_rect.center)
             self.player.velocity = new_vel
 
         self._update_obstacles(delta)

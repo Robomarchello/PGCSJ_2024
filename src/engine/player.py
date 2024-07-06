@@ -53,7 +53,8 @@ class Controller:
 
         self.launch_point = None
         self.launch_force = pygame.Vector2()
-        
+        self.max_speed = 7
+
         self.mouse_pos = pygame.mouse.get_pos()
 
         self.debug_movement = True
@@ -63,9 +64,10 @@ class Controller:
         return Camera.displace_rect(self.rect)
 
     def draw(self, surface):
-        pygame.draw.rect(surface, 'blue', self.cam_rect)
+        pygame.draw.rect(surface, 'blue', self.cam_rect, 2)
         
         for position in self.prediction:
+            #if self.holding:
             cam_pos = Camera.displace_position(position)
             pygame.draw.circle(surface, 'green', cam_pos, 3)
 
@@ -78,7 +80,8 @@ class Controller:
         if self.holding and self.player.cam_pos != self.mouse_pos:
             self.difference = self.player.cam_pos - self.mouse_pos
             norm_diff = self.difference.normalize()
-            magnitude = self.difference.magnitude() * 0.03
+            magnitude = self.difference.magnitude() * 0.02  # 0.03
+            magnitude = min(magnitude, self.max_speed)
 
             self.launch_force = norm_diff * magnitude
 
@@ -86,6 +89,7 @@ class Controller:
             start_vel = self.player.velocity + self.launch_force
         else:
             start_vel = self.player.velocity.copy()
+            
         start_acc = self.player.acceleration.copy()
         self.prediction = self.object_handler.predict_player(
             0.016, self.player.position, start_vel, start_acc, self.preview_balls

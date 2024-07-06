@@ -13,8 +13,10 @@ class Game(State):
         self.surface = pygame.Surface(SCREENSIZE)
 
         self.player = Player()
-        rect = pygame.Rect(0, 0, 75, 75)
+        rect = pygame.Rect(0, 0, 150, 150)
         rect.center = self.player.position
+
+        Camera.initialize(self.player)
         
         self.object_handler = ObjectHandler(self.player, [], [])
         self.controller = Controller(self.player, rect, self.object_handler)
