@@ -42,7 +42,7 @@ class Debug:
     lines = []
     texts = []
 
-    visible = True
+    visible = False
 
     font: pygame.Font = AssetManager.load_font(DEBUG_FONT, DEBUG_SIZE)
 

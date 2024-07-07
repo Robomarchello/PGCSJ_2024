@@ -3,6 +3,7 @@ from pygame import Vector2
 from pygame.locals import MOUSEBUTTONDOWN, MOUSEBUTTONUP
 from src.engine.constants import SPEED_FACTOR, DEBUG_VEL, SCREEN_H
 from src.engine.camera import Camera
+from src.engine.utils import Debug
 
 
 class Player:
@@ -22,6 +23,7 @@ class Player:
         return self.position - Camera.pos
 
     def update(self, delta):
+        Debug.add_text(f'player_pos: {self.position}')
         if self.freeze:
             self.velocity *= 0
             self.acceleration *= 0  
@@ -53,6 +55,7 @@ class Controller:
 
         self.launch_point = None
         self.launch_force = pygame.Vector2()
+        self.min_speed = 1
         self.max_speed = 7
 
         self.mouse_pos = pygame.mouse.get_pos()
@@ -81,6 +84,7 @@ class Controller:
             self.difference = self.player.cam_pos - self.mouse_pos
             norm_diff = self.difference.normalize()
             magnitude = self.difference.magnitude() * 0.02  # 0.03
+            magnitude = max(self.min_speed, magnitude)
             magnitude = min(magnitude, self.max_speed)
 
             self.launch_force = norm_diff * magnitude

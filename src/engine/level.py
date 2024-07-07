@@ -4,6 +4,7 @@ from src.engine.objects import *
 from src.engine.asset_manager import AssetManager
 from src.engine.utils import collide_circles
 from src.engine.camera import Camera
+from src.engine.constants import SCREENSIZE
 
 
 class Level:
@@ -12,21 +13,42 @@ class Level:
         self.controller = controller
         self.object_handler = object_handler
 
-        self.level_bounds = pygame.Rect(10, 10, 1200, 800)
+        self.player.position.x = 200
+
+        self.level_bounds = pygame.Rect(-10, -10, 1044, 788)
+        self.lock_camera = True
 
         self.objects = []
         self.obstacles = []
         self.launch_points = []
         self.collectibles = []
 
-        #self.save_level('level_saved.json')
-        self.load_level('level_saved.json')
+        center = (
+            SCREENSIZE[0] // 2,
+            SCREENSIZE[1] // 2
+        )
+        another_hole = OrbitingBlackHole(
+            center, (center[0] + 100, center[1]), 35, 2
+        )
+        self.objects.append(another_hole)
+        another_hole = BlackHole(
+            center, 10
+        )
+        self.objects.append(another_hole)
+
+        self.finish_point = FinishPoint((824, SCREENSIZE[1] // 2), 30, self.player)
+
+        self.save_level('level_saved.json')
+        #self.load_level('level_saved.json')
 
         self.object_handler.objects = self.objects
         self.object_handler.obstacles = self.obstacles
         
         Camera.focus = self.player.position
         Camera.secondary_focus = self.finish_point.position
+
+        if self.lock_camera:
+            Camera.origin_lock()
 
     def update(self, delta):        
         for collectible in self.collectibles:
@@ -52,8 +74,10 @@ class Level:
         self.finish_point.draw(surface)
 
         if self.finish_point.completed:
-            print('*transition to next level*')
+            Camera.focus = self.player.position
 
+            # print('*transition to next level*')
+            
     def save_level(self, path):
         level_dict = {}
 
@@ -139,8 +163,11 @@ class Level:
         level_dict['finish_point']['position'] = tuple(self.finish_point.position)
         level_dict['finish_point']['radius'] = self.finish_point.radius 
 
+        level_dict['level_bounds'] = tuple(self.level_bounds)
+
+        return 
         with open(path, 'w') as file:
-            print(json.dump(level_dict, file))
+            print(json.dumps(level_dict, file))
 
     def load_level(self, path):
         self.objects = []
@@ -208,7 +235,7 @@ class Level:
 
             self.collectibles.append(read_object)
 
-        # save launch points
+        # read launch points
         self.launch_points = []
         lp_dict = level_dict['launch_points']
         for lp_key in lp_dict:
@@ -221,9 +248,30 @@ class Level:
 
             self.launch_points.append(read_object)
 
-        # save finish point
+        # read finish point
         self.finish_point = FinishPoint(
             level_dict['finish_point']['position'],
             level_dict['finish_point']['radius'],
             self.player
         )
+
+        if level_dict['level_bounds'] is not None:
+            self.level_bounds = pygame.Rect(level_dict['level_bounds'])
+        else:
+            self.level_bounds = None
+
+
+class LevelManager:
+    def __init__(self, levels_folder, player, controller, object_handler):
+        self.levels = []
+
+        self.levels_folder = levels_folder
+        self.player = player
+        self.controller = controller
+        self.object_handler = object_handler
+
+        self.crnt_level = None
+
+    def next_level(self):
+        self.crnt_level = Level()
+        self.levels.pop()

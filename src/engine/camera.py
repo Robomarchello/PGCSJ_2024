@@ -10,7 +10,7 @@ class Camera:
     # I think zooming is possible, but will cause a lot of problems
     displacement = Vector2()
     pos = Vector2() 
-    offset = Vector2(SCREEN_W // 2, SCREEN_H // 2) # 
+    offset = Vector2(SCREEN_W // 2, SCREEN_H // 2)
     rect = pygame.Rect(*pos, *SCREENSIZE)
     bounds: pygame.Rect = None
 
@@ -22,6 +22,14 @@ class Camera:
     @classmethod
     def initialize(cls, player):
         cls.player = player
+
+    @classmethod
+    def origin_lock(cls):
+        cls.focus = None
+        cls.secondary_focus = None
+
+        # cls.pos *= 0
+        # cls.offset *= 0
 
     @classmethod
     def debug_draw(cls):
@@ -36,7 +44,6 @@ class Camera:
 
     @classmethod
     def update(cls, delta):
-        #cls.focus = None
         if cls.focus is not None:
             difference = cls.focus - cls.displacement
             cls.displacement += difference * 0.1 * delta * SPEED_FACTOR

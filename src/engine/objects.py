@@ -8,10 +8,10 @@ from src.engine.utils import collide_circles
 from src.engine.camera import Camera
 from src.engine.asset_manager import AssetManager
 
-
-__all__ = ['BlackHole', 'Asteroid', 'ForceZone', 
-           'GravityInvertor', 'ObjectHandler', 'Collectible',
-           'Portal', 'PortalPair', 'LaunchPoint', 'FinishPoint'
+__all__ = ['BlackHole', 'OrbitingBlackHole', 'Asteroid', 
+           'ForceZone', 'GravityInvertor', 'ObjectHandler', 
+           'Collectible', 'Portal', 'PortalPair', 
+           'LaunchPoint', 'FinishPoint'
            ]
 
 
@@ -20,7 +20,7 @@ class BlackHole:
         self.position = pygame.Vector2(position)
         self.mass = mass 
 
-        self.radius = 20
+        self.radius = 15 + abs(mass) * 0.5
         self.color = pygame.Color(255, 255, 255)
 
     @property
@@ -39,6 +39,23 @@ class BlackHole:
         gravity_force = (GRAVITY_CONST * mass_other * self.mass) / distance ** 2
         
         return direction * gravity_force
+
+
+class OrbitingBlackHole(BlackHole):
+    def __init__(self, origin, position, mass, rot_speed):
+        super().__init__(position, mass)
+
+        self.origin = pygame.Vector2(origin)
+        self.rot_speed = rot_speed
+
+    # def draw additional circle
+
+    def update(self, delta):
+        vec = self.position - self.origin
+        vec.rotate_ip(self.rot_speed * delta * SPEED_FACTOR)
+
+        new_position = vec + self.origin
+        self.position = new_position
 
 
 class Asteroid:
@@ -321,6 +338,12 @@ class ObjectHandler:
                 )
                 forces += gravity_force
 
+            if isinstance(obj, OrbitingBlackHole):
+                gravity_force = obj.calculate_attraction(
+                    position, mass
+                )
+                forces += gravity_force
+
             if isinstance(obj, ForceZone):
                 if obj.rect.collidepoint(position):
                     forces += obj.force
@@ -344,6 +367,10 @@ class ObjectHandler:
             obstacle.draw(surface)
 
     def update(self, delta):
+        for obj in self.objects:
+            if isinstance(obj, OrbitingBlackHole):
+                obj.update(delta)
+
         forces = self.get_forces(self.player.position, self.player.mass)
         self.player.acceleration += forces
 
