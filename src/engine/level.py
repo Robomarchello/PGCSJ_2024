@@ -17,7 +17,7 @@ class Level:
         self.level_manager = level_manager
 
         # remove this
-        self.player_position = (300, 384)
+        self.player_position = (100, 500)
         self.player.position.update(self.player_position)
 
         self.max_speed = None
@@ -32,18 +32,14 @@ class Level:
         self.launch_points = []
         self.collectibles = []
 
-        #self.objects.append(
-        #   BlackHole((790, 375), -55)
-        #)
+        self.objects.append(
+           BlackHole((350 + 300, 380 + 50), 75)
+        )
 
-        #self.objects.append(
-        #   BlackHole((700, 600), 30)
-        #)
+        self.finish_point = FinishPoint((820, SCREENSIZE[1] // 2 - 150), 25, self.player)
 
-        self.finish_point = FinishPoint((720, SCREENSIZE[1] // 2), 25, self.player)
-
-        # self.save_level('src/levels/level11.json', False)
-        # self.load_level('src/levels/level3.json')
+        #self.save_level('src/levels/level14.json', False)
+        self.load_level('src/levels/level13.json')
 
         self.object_handler.objects = self.objects
         self.object_handler.obstacles = self.obstacles

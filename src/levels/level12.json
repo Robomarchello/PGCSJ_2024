@@ -1,0 +1,1 @@
+{"objects": {"black_hole_0": {"position": [600.0, 250.0], "mass": -60}, "black_hole_1": {"position": [700.0, 700.0], "mass": -40}}, "obstacles": {}, "collectibles": {}, "launch_points": {}, "finish_point": {"position": [820.0, 384.0], "radius": 25}, "level_bounds": [-10, -10, 1044, 788], "player_position": [200, 384], "controller_max_speed": null}

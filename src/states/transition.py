@@ -1,19 +1,31 @@
+import pygame
+from pygame.locals import BLEND_SUB
+from src.engine.constants import SCREENSIZE
+
 
 class TransitionFade():
-    def __init__(self, duration):
-        #self.state_1 = state_1
-        #self.state_2 = state_2
-        
+    def __init__(self, duration, function, *args):
+        self.surface = pygame.Surface(SCREENSIZE)
+
         self.duration = duration
         self.half_duration = duration / 2
         
         self.timer = self.half_duration
 
-        self.switch_state = False
+        self.function = function()
+        self.args = args
+
+        self.run_action = False
         self.switched = False
 
     def draw(self, surface):
-        pass
+        surface.blit(self.surface, (0, 0), special_flags=BLEND_SUB)
 
     def update(self, delta):
-        pass
+        self.timer -= delta
+
+        if self.timer < 0:
+            if not self.run_action:
+                self.timer = self.half_duration
+                self.function(*self.args)
+                self.run_action = True
