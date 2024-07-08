@@ -6,6 +6,7 @@ from src.engine.asset_manager import AssetManager
 from src.engine.utils import collide_circles
 from src.engine.camera import Camera
 from src.engine.constants import SCREENSIZE, LEVELS_PATH
+from src.states.transition import TransitionState
 
 
 class Level:
@@ -76,12 +77,14 @@ class Level:
         if self.finish_point.completed:
             if self.level_manager is not None:
                 self.level_manager.next_level()
+                self.next_level()
 
             self.finish_point.completed = False
             # print('*transition to next level*')
 
     def next_level(self):
-        pass
+        transition = self.level_manager.transition
+        transition.state = TransitionState.FADING_IN
             
     def save_level(self, path, save=False):
         level_dict = {}
@@ -307,13 +310,16 @@ class Level:
 
 
 class LevelManager:
-    def __init__(self, levels_folder, player, controller, object_handler):
+    def __init__(self, levels_folder, player, controller, object_handler, transition):
         self.levels = self.get_levels(levels_folder)
 
         self.levels_folder = levels_folder
         self.player = player
         self.controller = controller
         self.object_handler = object_handler
+
+        self.transition = transition
+        self.transition.function = self.next_level
 
         self.crnt_level = None
 

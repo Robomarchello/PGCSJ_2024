@@ -5,6 +5,7 @@ from src.engine.player import Player, Controller
 from src.engine.objects import ObjectHandler
 from src.engine.level import Level, LevelManager
 from src.engine.camera import Camera
+from src.states.transition import TransitionFade
 
 
 class Game(State):
@@ -17,15 +18,17 @@ class Game(State):
         rect.center = self.player.position
 
         Camera.initialize(self.player)
-        
+
+        self.transition = TransitionFade(2.5, self.level_manager.next_level)
+
         self.object_handler = ObjectHandler(self.player, [], [])
         self.controller = Controller(self.player, rect, self.object_handler)
         self.level = Level(self.player, self.controller, self.object_handler)
         self.level_manager = LevelManager(
-            LEVELS_PATH, self.player, self.controller, self.object_handler
+            LEVELS_PATH, self.player, self.controller, 
+            self.object_handler, self.transition
         )
-        
-
+    
         self.level_manager.next_level()
         self.level = self.level_manager.crnt_level
 
@@ -46,6 +49,8 @@ class Game(State):
         self.controller.draw(self.surface)
         self.player.draw(self.surface)
 
+        self.transition.draw(self.surface)
+
         Debug.add_text(self.manager.clock.get_fps())
 
     def update(self, delta):
@@ -56,6 +61,8 @@ class Game(State):
         self.controller.update(delta)
         self.object_handler.update(delta)
         self.level.update(delta)
+
+        self.transition.update(delta)
 
     def handle_event(self, event):
         #if event.type == pygame.KEYDOWN:
