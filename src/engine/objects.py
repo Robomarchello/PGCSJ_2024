@@ -20,7 +20,7 @@ class BlackHole:
         self.position = pygame.Vector2(position)
         self.mass = mass 
 
-        self.radius = 15 + abs(mass) * 0.5
+        self.radius = 25 + abs(mass) * 0.15
         self.color = pygame.Color(255, 255, 255)
 
     @property
@@ -28,8 +28,11 @@ class BlackHole:
         return Camera.displace_position(self.position)
 
     def draw(self, surface):
-        pygame.draw.circle(surface, self.color, self.cam_pos, self.radius)
-        
+        if self.mass > 0:
+            pygame.draw.circle(surface, self.color, self.cam_pos, self.radius)
+        else:
+            pygame.draw.circle(surface, self.color, self.cam_pos, self.radius, 5)
+
     def calculate_attraction(self, position_other, mass_other):
         diff = self.position - position_other
         if diff == (0, 0):
@@ -383,6 +386,9 @@ class ObjectHandler:
             self.player.position.update(new_rect.center)
             self.player.velocity = new_vel
 
+        if self.black_holes_collision():
+            print('Collision!')
+
         self._update_obstacles(delta)
 
     def _update_obstacles(self, delta):
@@ -401,6 +407,26 @@ class ObjectHandler:
                 obstacle.velocity = new_vel
 
             obstacle.update(delta)
+
+    def black_holes_collision(self):
+        for obj in self.objects:
+            if isinstance(obj, BlackHole):
+                collision = collide_circles(
+                    obj.position, obj.radius,
+                    self.player.position, self.player.radius
+                )
+                if collision:
+                    return True
+
+            if isinstance(obj, OrbitingBlackHole):
+                collision = collide_circles(
+                    obj.position, obj.radius,
+                    self.player.position, self.player.radius
+                )
+                if collision:
+                    return True
+        
+        return False
 
     def predict_player(self, time, position, start_vel, start_accel, count):
         '''

@@ -48,7 +48,7 @@ class Controller:
         self.object_handler = object_handler
         self.prediction = []
 
-        self.preview_balls = 51 #1000
+        self.preview_balls = 80 #1000
 
         self.holding = False
         self.difference = pygame.Vector2(0, 0)  

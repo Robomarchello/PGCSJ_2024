@@ -3,7 +3,7 @@ from src.engine import State, Debug, AssetManager
 from src.engine.constants import *
 from src.engine.player import Player, Controller
 from src.engine.objects import ObjectHandler
-from src.engine.level import Level
+from src.engine.level import Level, LevelManager
 from src.engine.camera import Camera
 
 
@@ -21,6 +21,13 @@ class Game(State):
         self.object_handler = ObjectHandler(self.player, [], [])
         self.controller = Controller(self.player, rect, self.object_handler)
         self.level = Level(self.player, self.controller, self.object_handler)
+        self.level_manager = LevelManager(
+            LEVELS_PATH, self.player, self.controller, self.object_handler
+        )
+        
+
+        self.level_manager.next_level()
+        self.level = self.level_manager.crnt_level
 
     def on_start(self):
         print('start')
@@ -42,6 +49,7 @@ class Game(State):
         Debug.add_text(self.manager.clock.get_fps())
 
     def update(self, delta):
+        self.level = self.level_manager.crnt_level
         Camera.update(delta)
 
         self.player.update(delta)

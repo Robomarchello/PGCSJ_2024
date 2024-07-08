@@ -16,7 +16,7 @@ class AssetManager():
     @classmethod
     def load_assets(cls, assets_path):
         cls.images = cls.load_images(assets_path + '/images')
-        cls.sounds = cls.load_images(assets_path + '/sfx')
+        cls.sounds = cls.load_sounds(assets_path + '/sfx')
         cls.fonts = {}
 
     @classmethod

@@ -1,19 +1,28 @@
+import os
 import json
 import pygame
 from src.engine.objects import *
 from src.engine.asset_manager import AssetManager
 from src.engine.utils import collide_circles
 from src.engine.camera import Camera
-from src.engine.constants import SCREENSIZE
+from src.engine.constants import SCREENSIZE, LEVELS_PATH
 
 
 class Level:
-    def __init__(self, player, controller, object_handler):
+    def __init__(self, player, controller, object_handler, level_manager=None):
         self.player = player
         self.controller = controller
         self.object_handler = object_handler
 
-        self.player.position.x = 200
+        self.level_manager = level_manager
+
+        # remove this
+        self.player_position = (300, 384)
+        self.player.position.update(self.player_position)
+
+        self.max_speed = None
+        if self.max_speed is not None:
+            self.controller.max_speed = self.max_speed
 
         self.level_bounds = pygame.Rect(-10, -10, 1044, 788)
         self.lock_camera = True
@@ -23,23 +32,18 @@ class Level:
         self.launch_points = []
         self.collectibles = []
 
-        center = (
-            SCREENSIZE[0] // 2,
-            SCREENSIZE[1] // 2
-        )
-        another_hole = OrbitingBlackHole(
-            center, (center[0] + 100, center[1]), 35, 2
-        )
-        self.objects.append(another_hole)
-        another_hole = BlackHole(
-            center, 10
-        )
-        self.objects.append(another_hole)
+        #self.objects.append(
+        #   BlackHole((790, 375), -55)
+        #)
 
-        self.finish_point = FinishPoint((824, SCREENSIZE[1] // 2), 30, self.player)
+        #self.objects.append(
+        #   BlackHole((700, 600), 30)
+        #)
 
-        self.save_level('level_saved.json')
-        #self.load_level('level_saved.json')
+        self.finish_point = FinishPoint((720, SCREENSIZE[1] // 2), 25, self.player)
+
+        # self.save_level('src/levels/level11.json', False)
+        # self.load_level('src/levels/level3.json')
 
         self.object_handler.objects = self.objects
         self.object_handler.obstacles = self.obstacles
@@ -72,13 +76,18 @@ class Level:
             launch_point.draw(surface)
 
         self.finish_point.draw(surface)
-
+        
         if self.finish_point.completed:
-            Camera.focus = self.player.position
+            if self.level_manager is not None:
+                self.level_manager.next_level()
 
+            self.finish_point.completed = False
             # print('*transition to next level*')
+
+    def next_level(self):
+        pass
             
-    def save_level(self, path):
+    def save_level(self, path, save=False):
         level_dict = {}
 
         # save objects
@@ -86,11 +95,19 @@ class Level:
         obj_dict = level_dict['objects']
         obj_id = 0
         for obj in self.objects:
-            if isinstance(obj, BlackHole):
+            if isinstance(obj, BlackHole) and not isinstance(obj, OrbitingBlackHole):
                 key = f'black_hole_{obj_id}'
                 obj_dict[key] = {}
                 obj_dict[key]['position'] = tuple(obj.position)
                 obj_dict[key]['mass'] = obj.mass
+
+            if isinstance(obj, OrbitingBlackHole):
+                key = f'orbiting_black_hole_{obj_id}'
+                obj_dict[key] = {}
+                obj_dict[key]['origin'] = tuple(obj.origin)
+                obj_dict[key]['position'] = tuple(obj.position)
+                obj_dict[key]['mass'] = obj.mass
+                obj_dict[key]['rot_speed'] = obj.rot_speed
 
             if isinstance(obj, ForceZone):
                 key = f'force_zone_{obj_id}'
@@ -165,9 +182,15 @@ class Level:
 
         level_dict['level_bounds'] = tuple(self.level_bounds)
 
-        return 
-        with open(path, 'w') as file:
-            print(json.dumps(level_dict, file))
+        level_dict['player_position'] = self.player_position
+        if self.max_speed is not None:
+            level_dict['controller_max_speed'] = self.max_speed
+        else:
+            level_dict['controller_max_speed'] = None
+
+        if save:
+            with open(path, 'w') as file:
+                json.dump(level_dict, file)
 
     def load_level(self, path):
         self.objects = []
@@ -181,6 +204,15 @@ class Level:
                 read_object = BlackHole(
                     obj_dict[obj_key]['position'],
                     obj_dict[obj_key]['mass']
+                )
+                self.objects.append(read_object)
+
+            if obj_key.startswith('orbiting_black_hole'):
+                read_object = OrbitingBlackHole(
+                    obj_dict[obj_key]['origin'],
+                    obj_dict[obj_key]['position'],
+                    obj_dict[obj_key]['mass'],
+                    obj_dict[obj_key]['rot_speed'],
                 )
                 self.objects.append(read_object)
                 
@@ -255,15 +287,32 @@ class Level:
             self.player
         )
 
+        self.player_position = level_dict['player_position']
+        self.player.position.update(self.player_position)
+
+        if level_dict.get('controller_max_speed'):
+            self.player.controller = level_dict['controller_max_speed']
+
+        # level bounds
         if level_dict['level_bounds'] is not None:
             self.level_bounds = pygame.Rect(level_dict['level_bounds'])
         else:
-            self.level_bounds = None
+            self.level_bounds = pygame.Rect(-10, -10, 1044, 788)
+
+        self.object_handler.objects = self.objects
+        self.object_handler.obstacles = self.obstacles
+
+    @classmethod
+    def level_from_file(cls, player, controller, object_handler, path, level_manager=None):
+        new_level = Level(player, controller, object_handler, level_manager)
+        new_level.load_level(path)
+
+        return new_level
 
 
 class LevelManager:
     def __init__(self, levels_folder, player, controller, object_handler):
-        self.levels = []
+        self.levels = self.get_levels(levels_folder)
 
         self.levels_folder = levels_folder
         self.player = player
@@ -272,6 +321,28 @@ class LevelManager:
 
         self.crnt_level = None
 
+    def get_levels(self, folder_path):
+        levels = []
+        for name in os.listdir(folder_path):
+            if name.endswith('.json'):
+                levels.append(folder_path + name)
+        
+        return levels
+
     def next_level(self):
-        self.crnt_level = Level()
-        self.levels.pop()
+        if len(self.levels) <= 0:
+            return
+        
+        if self.crnt_level is not None:
+            self.crnt_level.finish_point.completed = False
+            self.crnt_level.level_manager = None
+
+
+        self.crnt_level = Level.level_from_file(
+            self.player, self.controller, 
+            self.object_handler, self.levels[0], self
+            )
+        self.crnt_level.load_level(self.levels[0])
+        self.levels.pop(0)
+
+

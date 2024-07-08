@@ -9,11 +9,11 @@ FPS = 480
 
 # to compencate small delta time values
 SPEED_FACTOR = 60
-GRAVITY_CONST = 50
+GRAVITY_CONST = 60
 
 ABS_DIR = str(Path.cwd()).replace('\\', '/')
 ASSETS_PATH = 'src/assets/'
-
+LEVELS_PATH = 'src/levels/'
 BLACK = (0, 0, 0)
 
 # Debug font path and size
