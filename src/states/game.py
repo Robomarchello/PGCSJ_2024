@@ -19,7 +19,7 @@ class Game(State):
 
         Camera.initialize(self.player)
 
-        self.transition = TransitionFade(2.5, self.level_manager.next_level)
+        self.transition = TransitionFade(2)
 
         self.object_handler = ObjectHandler(self.player, [], [])
         self.controller = Controller(self.player, rect, self.object_handler)

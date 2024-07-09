@@ -1,8 +1,8 @@
 from enum import Enum
 import pygame
 from pygame.locals import BLEND_SUB
-#from src.engine.constants import SCREENSIZE
-SCREENSIZE = (960, 540)
+from src.engine.constants import SCREENSIZE
+
 
 # Define an enumeration for the two states
 class TransitionState(Enum):
@@ -26,17 +26,16 @@ class TransitionFade:
         self.run_action = False
         self.finished = False
 
-        # Initialize the state to FADING_OUT
-        self.state = TransitionState.FADING_OUT
+        self.state = TransitionState.FADING_IN
 
     def draw(self, surface):
         alpha = 255 * (self.timer / self.half_duration)
         if self.state == TransitionState.FADING_IN:
             alpha = 255 - alpha
         
-        alpha = min(alpha, 255)
+        alpha = int(min(alpha, 255))
 
-        self.surface.fill((125, 125, 125))
+        self.surface.fill((alpha, alpha, alpha))
         surface.blit(self.surface, (0, 0), special_flags=BLEND_SUB)
 
     def update(self, delta):
@@ -53,22 +52,10 @@ class TransitionFade:
                 self.state = TransitionState.FADING_OUT
 
             elif self.state == TransitionState.FADING_OUT:
-                print('finished.')
                 self.finished = True
     
     def restart(self):
         self.timer = self.half_duration
         self.run_action = False
         self.finished = False
-        self.state = TransitionState.FADING_OUT
-
-
-if __name__ == '__main__':
-    def hello():
-        print('piska')
-
-    transition = TransitionFade(2, hello)
-    for _ in range(30):
-        surf = pygame.Surface((10, 10))
-        transition.update(0.1)
-        transition.draw(surf)
+        self.state = TransitionState.FADING_IN

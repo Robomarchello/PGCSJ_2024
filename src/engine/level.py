@@ -74,17 +74,20 @@ class Level:
 
         self.finish_point.draw(surface)
         
-        if self.finish_point.completed:
+        if self.finish_point.completed and not self.finish_point.reacted:
             if self.level_manager is not None:
-                self.level_manager.next_level()
                 self.next_level()
+                #self.level_manager.next_level()
 
-            self.finish_point.completed = False
+
+            self.finish_point.reacted = True
             # print('*transition to next level*')
 
     def next_level(self):
         transition = self.level_manager.transition
-        transition.state = TransitionState.FADING_IN
+        transition.restart()
+        
+        #print(transition)
             
     def save_level(self, path, save=False):
         level_dict = {}

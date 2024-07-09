@@ -283,10 +283,11 @@ class FinishPoint:
         
         self.touched = False
 
-        self.complete_timer = 2.0
+        self.complete_timer = 1.0
         self.timer = self.complete_timer
         self.completed = False
-
+        self.reacted = False
+        
     @property
     def cam_pos(self):
         return Camera.displace_position(self.position) 
