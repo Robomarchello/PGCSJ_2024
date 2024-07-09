@@ -6,8 +6,8 @@ from src.engine.constants import SCREENSIZE
 
 # Define an enumeration for the two states
 class TransitionState(Enum):
-    FADING_OUT = 1
-    FADING_IN = 2
+    FADING_IN = 1
+    FADING_OUT = 2
     TURNED_OFF = 3
 
 
@@ -18,7 +18,7 @@ class TransitionFade:
         self.duration = duration
         self.half_duration = duration / 2
         
-        self.timer = self.half_duration
+        self.timer = 0
 
         self.function = function
         self.args = args
@@ -26,7 +26,7 @@ class TransitionFade:
         self.run_action = False
         self.finished = False
 
-        self.state = TransitionState.FADING_IN
+        self.state = TransitionState.TURNED_OFF
 
     def draw(self, surface):
         alpha = 255 * (self.timer / self.half_duration)
@@ -52,9 +52,9 @@ class TransitionFade:
                 self.state = TransitionState.FADING_OUT
 
             elif self.state == TransitionState.FADING_OUT:
-                self.finished = True
+                self.state = TransitionState.TURNED_OFF
     
-    def restart(self):
+    def start(self):
         self.timer = self.half_duration
         self.run_action = False
         self.finished = False
