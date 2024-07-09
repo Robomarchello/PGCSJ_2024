@@ -5,7 +5,7 @@ from src.engine.objects import *
 from src.engine.asset_manager import AssetManager
 from src.engine.utils import collide_circles
 from src.engine.camera import Camera
-from src.engine.constants import SCREENSIZE, LEVELS_PATH
+from src.engine.constants import SCREENSIZE, SCREEN_W, SCREEN_H
 from src.states.transition import TransitionState
 
 
@@ -17,9 +17,12 @@ class Level:
 
         self.level_manager = level_manager
 
-        # remove this
-        self.player_position = (100, 500)
-        self.player.position.update(self.player_position)
+        self.path = None
+        self.collided = False
+
+        # for level creation
+        # self.player_position = (100, 500)
+        # self.player.position.update(self.player_position)
 
         self.max_speed = None
         if self.max_speed is not None:
@@ -40,18 +43,34 @@ class Level:
         self.finish_point = FinishPoint((820, SCREENSIZE[1] // 2 - 150), 25, self.player)
 
         #self.save_level('src/levels/level14.json', False)
-        self.load_level('src/levels/level13.json')
+        #self.load_level('src/levels/level13.json')
 
         self.object_handler.objects = self.objects
         self.object_handler.obstacles = self.obstacles
         
-        Camera.focus = self.player.position
-        Camera.secondary_focus = self.finish_point.position
+        Camera.focus = pygame.Vector2(512, 384) #  self.player.position
+        Camera.offset = pygame.Vector2(512, 384)
+        
+        # if self.lock_camera:
+        #     Camera.origin_lock()
 
-        if self.lock_camera:
-            Camera.origin_lock()
+        self.text_timer = 1
+        self.text_timer_crnt = self.text_timer
 
-    def update(self, delta):        
+        self.text_visible = False
+
+
+    def update(self, delta):      
+        if self.object_handler.black_holes_collision():
+            self.player.velocity *= 0
+            self.player.acceleration *= 0
+
+            if not self.collided:
+                self.collided = True
+                
+                Camera.focus = self.player.position
+            # Camera.secondary_focus = pygame.Vector2(self.finish_point.position)
+
         for collectible in self.collectibles:
             if collide_circles(self.player.position, self.player.radius,
                                collectible.position, collectible.radius):
@@ -62,6 +81,8 @@ class Level:
             launch_point.update(delta)
 
         self.finish_point.update(delta)
+
+        self.time_restart_text(delta)
 
     def draw(self, surface):
         cam_level_bounds = Camera.displace_rect(self.level_bounds)
@@ -77,18 +98,47 @@ class Level:
         if self.finish_point.completed and not self.finish_point.reacted:
             if self.level_manager is not None:
                 self.next_level()
-                #self.level_manager.next_level()
-
 
             self.finish_point.reacted = True
-            # print('*transition to next level*')
+
+        self.restart_text(surface)
+
+    def restart_text(self, surface):
+        font = AssetManager.fonts['font_24']
+        text = 'Press R To Restart'
+
+        render = font.render(text, False, 'white')
+        render_rect = render.get_rect()
+        render_rect.centerx = SCREEN_W // 2
+        render_rect.top = SCREEN_H - 150
+
+        if self.collided:
+            surface.blit(render, render_rect.topleft)
+
+    def time_restart_text(self, delta):
+        self.text_timer_crnt -= delta
+        if self.text_timer_crnt < 0.0:
+            self.text_visible = not self.text_visible
+            self.text_timer_crnt = self.text_timer
 
     def next_level(self):
         transition = self.level_manager.transition
-        transition.restart()
-        
-        #print(transition)
-            
+        transition.function = self.level_manager.next_level
+        transition.start()
+
+    def restart(self):
+        # like why should I reset everything 
+        # if I can just load the whole level
+        if self.path is not None:
+            self.load_level(self.path)
+
+        self.player.freeze = True
+        self.player.velocity *= 0
+        self.player.acceleration *= 0
+
+        self.collided = False
+        Camera.focus = pygame.Vector2(512, 384)
+
     def save_level(self, path, save=False):
         level_dict = {}
 
@@ -198,6 +248,9 @@ class Level:
         self.objects = []
         with open(path, 'r') as file:
             level_dict = json.load(file)
+
+        if self.path is None:
+            self.path = path
 
         # read objects
         obj_dict = level_dict['objects']

@@ -11,7 +11,7 @@ class TransitionState(Enum):
     TURNED_OFF = 3
 
 
-class TransitionFade:
+class Transition:
     def __init__(self, duration, function=None, *args):
         self.surface = pygame.Surface(SCREENSIZE)
         
@@ -24,22 +24,14 @@ class TransitionFade:
         self.args = args
 
         self.run_action = False
-        self.finished = False
 
         self.state = TransitionState.TURNED_OFF
 
     def draw(self, surface):
-        alpha = 255 * (self.timer / self.half_duration)
-        if self.state == TransitionState.FADING_IN:
-            alpha = 255 - alpha
-        
-        alpha = int(min(alpha, 255))
-
-        self.surface.fill((alpha, alpha, alpha))
-        surface.blit(self.surface, (0, 0), special_flags=BLEND_SUB)
+        raise NotImplementedError("Subclasses must implement this method")
 
     def update(self, delta):
-        if self.finished or self.state == TransitionState.TURNED_OFF:
+        if self.state == TransitionState.TURNED_OFF:
             return  
         
         self.timer -= delta
@@ -57,5 +49,21 @@ class TransitionFade:
     def start(self):
         self.timer = self.half_duration
         self.run_action = False
-        self.finished = False
         self.state = TransitionState.FADING_IN
+
+
+
+class TransitionFade(Transition):
+    def __init__(self, duration, function=None, *args):
+        super().__init__(duration, function, *args)
+
+    def draw(self, surface):
+        alpha = 255 * (self.timer / self.half_duration)
+        if self.state == TransitionState.FADING_IN:
+            alpha = 255 - alpha
+        
+        alpha = int(min(alpha, 255))
+
+        self.surface.fill((alpha, alpha, alpha))
+        surface.blit(self.surface, (0, 0), special_flags=BLEND_SUB)
+

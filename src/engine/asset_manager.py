@@ -1,4 +1,5 @@
 from typing import Dict
+import json
 import os
 import pygame
 from pathlib import Path
@@ -10,7 +11,7 @@ pygame.init()
 class AssetManager():
     images = {}
     sounds = {}
-    fonts = {}
+    fonts: Dict[str, pygame.Font] = {}
     data = {}
 
     @classmethod
@@ -38,13 +39,28 @@ class AssetManager():
     @classmethod
     def load_font(cls, file_path, size) -> pygame.Font:
         name = Path(file_path).stem
-
+        key = f'{name}_{size}'
+        
+        # font loaded, so ignore
+        if cls.fonts.get(key):
+            return
+        
         font = pygame.font.Font(file_path, size)
-
-        cls.fonts[f'{name}_{size}'] = font
+        cls.fonts[key] = font
 
         return font
 
+    @classmethod
+    def load_fonts_json(cls, file_path):
+        with open(file_path, 'r') as file:
+            data = json.load(file)
+            
+            for font in data['fonts']:
+                path = font['path']
+                size = font['size']
+
+                cls.load_font(path, size)
+                print(f"Font Path: {path}, Font Size: {size}")
 
     @classmethod
     def load_images(cls, path):

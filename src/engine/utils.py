@@ -6,9 +6,6 @@ from pygame.locals import KEYDOWN, K_g
 from .constants import *
 from .asset_manager import AssetManager
 
-DEBUG_TEXT_OFFSET = 20
-
-
 
 def load_spritesheet(image, sprite_size) -> List[pygame.Surface]:
     image_size = image.get_size()

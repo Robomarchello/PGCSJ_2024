@@ -387,9 +387,6 @@ class ObjectHandler:
             self.player.position.update(new_rect.center)
             self.player.velocity = new_vel
 
-        if self.black_holes_collision():
-            print('Collision!')
-
         self._update_obstacles(delta)
 
     def _update_obstacles(self, delta):

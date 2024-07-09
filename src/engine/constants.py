@@ -14,9 +14,13 @@ GRAVITY_CONST = 60
 ABS_DIR = str(Path.cwd()).replace('\\', '/')
 ASSETS_PATH = 'src/assets/'
 LEVELS_PATH = 'src/levels/'
+FONTS_JSON_PATH = 'src/assets/other/fonts.json'
+
 BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
 
 # Debug font path and size
-DEBUG_FONT = ABS_DIR + '/src/assets/other/font.ttf'
+DEBUG_FONT = ABS_DIR + '/src/assets/other/debug_font.ttf'
 DEBUG_SIZE = 16
+DEBUG_TEXT_OFFSET = 22
 DEBUG_VEL = 5

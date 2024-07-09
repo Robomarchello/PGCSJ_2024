@@ -3,6 +3,7 @@ from pygame.locals import *
 from .constants import *
 from .asset_manager import AssetManager
 AssetManager.load_assets(ASSETS_PATH)
+AssetManager.load_fonts_json(FONTS_JSON_PATH)
 from .state_machine import StateMachine, State
 from .screen import Screen
 from .utils import Debug

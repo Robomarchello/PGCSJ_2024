@@ -1,0 +1,16 @@
+{
+    "fonts": [
+        {
+            "path": "src/assets/other/font.ttf",
+            "size": 24
+        },
+        {
+            "path": "src/assets/other/font.ttf",
+            "size": 36
+        },
+        {
+            "path": "src/assets/other/font.ttf",
+            "size": 48
+        }
+    ]
+}
