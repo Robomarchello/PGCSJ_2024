@@ -62,6 +62,7 @@ class Game(State):
         self.controller.update(delta)
         self.object_handler.update(delta)
         self.level.update(delta)
+        self.level_manager.update(delta)
 
         self.transition.update(delta)
 

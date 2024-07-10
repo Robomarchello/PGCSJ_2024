@@ -5,7 +5,7 @@ from src.engine.objects import *
 from src.engine.asset_manager import AssetManager
 from src.engine.utils import collide_circles
 from src.engine.camera import Camera
-from src.engine.constants import SCREENSIZE, SCREEN_W, SCREEN_H
+from src.engine.constants import *
 from src.states.transition import TransitionState
 
 
@@ -19,6 +19,7 @@ class Level:
 
         self.path = None
         self.collided = False
+        self.in_bounds = False
 
         # for level creation
         # self.player_position = (100, 500)
@@ -48,8 +49,8 @@ class Level:
         self.object_handler.objects = self.objects
         self.object_handler.obstacles = self.obstacles
         
-        Camera.focus = pygame.Vector2(512, 384) #  self.player.position
-        Camera.offset = pygame.Vector2(512, 384)
+        Camera.focus = pygame.Vector2(SCREEN_AREA.center) #  self.player.position
+        Camera.offset = pygame.Vector2(SCREEN_AREA.center)
         
         # if self.lock_camera:
         #     Camera.origin_lock()
@@ -59,18 +60,19 @@ class Level:
 
         self.text_visible = False
 
-
-    def update(self, delta):      
-        if self.object_handler.black_holes_collision():
+    def update(self, delta):   
+        focus = None   
+        if self.object_handler.black_holes_collision(
+            self.player.position, self.player.radius
+        ):
             self.player.velocity *= 0
             self.player.acceleration *= 0
 
             if not self.collided:
                 self.collided = True
-                
-                Camera.focus = self.player.position
-            # Camera.secondary_focus = pygame.Vector2(self.finish_point.position)
 
+            # Camera.secondary_focus = pygame.Vector2(self.finish_point.position)
+        
         for collectible in self.collectibles:
             if collide_circles(self.player.position, self.player.radius,
                                collectible.position, collectible.radius):
@@ -377,7 +379,21 @@ class LevelManager:
         self.transition = transition
         self.transition.function = self.next_level
 
+        self.level_index = 0
+
         self.crnt_level = None
+
+    def update(self, delta):
+        self.in_bounds = self.crnt_level.level_bounds.collidepoint(self.player.position)
+        if self.in_bounds:
+            focus = SCREEN_AREA.center
+
+            if self.crnt_level.collided:
+                focus = self.player.position
+        else:
+            focus = self.player.position
+        
+        Camera.focus.update(focus)
 
     def get_levels(self, folder_path):
         levels = []
@@ -388,19 +404,16 @@ class LevelManager:
         return levels
 
     def next_level(self):
-        if len(self.levels) <= 0:
+        if self.level_index >= len(self.levels):
             return
         
         if self.crnt_level is not None:
             self.crnt_level.finish_point.completed = False
             self.crnt_level.level_manager = None
 
-
         self.crnt_level = Level.level_from_file(
             self.player, self.controller, 
-            self.object_handler, self.levels[0], self
+            self.object_handler, self.levels[self.level_index], self
             )
-        self.crnt_level.load_level(self.levels[0])
-        self.levels.pop(0)
-
+        self.level_index += 1
 
