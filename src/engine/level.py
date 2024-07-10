@@ -3,7 +3,7 @@ import json
 import pygame
 from src.engine.objects import *
 from src.engine.asset_manager import AssetManager
-from src.engine.utils import collide_circles
+from src.engine.utils import Debug, collide_circles
 from src.engine.camera import Camera
 from src.engine.constants import *
 from src.states.transition import TransitionState
@@ -115,7 +115,7 @@ class Level:
         render_rect.centerx = SCREEN_W // 2
         render_rect.top = SCREEN_H - 150
 
-        if self.collided:
+        if self.collided or not self.in_bounds:
             surface.blit(render, render_rect.topleft)
 
     def time_restart_text(self, delta):
@@ -127,7 +127,7 @@ class Level:
     def next_level(self):
         transition = self.level_manager.transition
         transition.function = self.level_manager.next_level
-        transition.start(2)
+        transition.start(1.5)
 
     def restart(self):
         # like why should I reset everything 
@@ -391,8 +391,11 @@ class LevelManager:
         self.crnt_level = None
 
     def update(self, delta):
-        self.in_bounds = self.crnt_level.level_bounds.collidepoint(self.player.position)
-        if self.in_bounds:
+        self.crnt_level.in_bounds = self.crnt_level.level_bounds.collidepoint(
+            self.player.position
+        )
+
+        if self.crnt_level.in_bounds:
             focus = SCREEN_AREA.center
 
             if self.crnt_level.collided:
@@ -401,6 +404,7 @@ class LevelManager:
             focus = self.player.position
         
         Camera.focus.update(focus)
+        Debug.add_text(f'Level: {self.level_index}')
 
     def get_levels(self, folder_path):
         levels = []

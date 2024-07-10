@@ -3,6 +3,7 @@ from typing import List, Tuple, Any
 import json
 import math
 import pygame
+import random
 from pygame.locals import KEYDOWN, K_g
 from .constants import *
 from .asset_manager import AssetManager
@@ -21,6 +22,13 @@ def load_spritesheet(image, sprite_size) -> List[pygame.Surface]:
 
     return sprites
 
+
+def get_shake(strength):
+    shake = (
+        random.uniform(-strength, strength),
+        random.uniform(-strength, strength)
+    )
+    return shake
 
 def json_spritesheet(image, file_path):
     sprites = []

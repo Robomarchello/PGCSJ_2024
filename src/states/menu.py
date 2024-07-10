@@ -1,10 +1,59 @@
 import pygame
-from pygame.locals import KEYDOWN, K_r
-from src.engine import State, Debug, AssetManager
+from pygame.locals import *
+from src.states.game import Game
+from src.engine import State, AssetManager
 from src.engine.constants import *
+from src.engine.gui import Button, PlayButton, LevelSelectionButton
 
 
 class Menu(State):
+    def __init__(self):
+        super().__init__()
+        self.surface = pygame.Surface(SCREENSIZE)
+
+        self.play_button = PlayButton(self.play)
+        self.level_select_button = LevelSelectionButton(self.level_selection)
+
+    def on_start(self):
+        print('start')
+    
+    def on_exit(self):
+        print('exit')
+
+    def play(self):
+        self.manager.next_state = Game()
+
+    def level_selection(self):
+        self.manager.next_state = LevelSelection()
+
+    def draw_title(self):
+        font  = AssetManager.fonts['font_72']
+        render = font.render(TITLE, True, 'white')
+        rect = render.get_rect()
+        rect.centerx = SCREEN_W / 2
+        rect.top = 50
+
+        self.surface.blit(render, rect.topleft)
+
+    def draw(self):
+        self.surface.fill((0, 0, 0))
+
+        self.draw_title()
+
+        self.play_button.draw(self.surface)
+        self.level_select_button.draw(self.surface)
+
+    def update(self, delta):
+        self.play_button.update()
+        self.level_select_button.update()
+
+    def handle_event(self, event):
+        self.play_button.handle_event(event)
+        self.level_select_button.handle_event(event)
+
+
+
+class LevelSelection(State):
     def __init__(self):
         super().__init__()
         self.surface = pygame.Surface(SCREENSIZE)
@@ -18,35 +67,18 @@ class Menu(State):
     def draw(self):
         self.surface.fill((0, 0, 0))
 
-    def update(self, delta):
-        pass
+        self.draw_title()
+
+    def draw_title(self):
+        font  = AssetManager.fonts['font_72']
+        render = font.render('Level Selection', True, 'white')
+        rect = render.get_rect()
+        rect.centerx = SCREEN_W / 2
+        rect.top = 50
+
+        self.surface.blit(render, rect.topleft)
 
     def handle_event(self, event):
-        pass
-
-
-class NewNextState(State):
-    def __init__(self):
-        super().__init__()
-        self.surface = pygame.Surface(SCREENSIZE)
-
-        self.image = AssetManager.images['fff']
-
-    def on_start(self):
-        print('start')
-    
-    def on_exit(self):
-        print('*exit*')
-
-    def draw(self):
-        self.surface.fill((0, 0, 255))
-
-        self.surface.blit(self.image, (0, 0))
-
-        Debug.add_text(self.manager.clock.get_fps())
-
-    def update(self, delta):
-        pass
-
-    def handle_event(self, event):
-        pass
+        if event.type == KEYDOWN:
+            if event.key == K_ESCAPE:
+                self.manager.next_state = Menu()

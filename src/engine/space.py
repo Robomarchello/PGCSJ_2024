@@ -9,11 +9,13 @@ from src.engine.camera import Camera
 class Star:
     position: pygame.Vector2
     texture: pygame.Surface
+    move_factor: float
     life_time: float
 
     @property
     def cam_pos(self):
-        return Camera.displace_position(self.position)
+        pos = self.position - (Camera.displacement - Camera.offset) * self.move_factor
+        return pos
 
 
 class SpaceBackground:
@@ -27,10 +29,14 @@ class SpaceBackground:
                 random.randint(0, SCREENSIZE[0]),
                 random.randint(0, SCREENSIZE[1])
                 )
-            star_texture = star_textures
+            
+            move_factor = random.uniform(0.5, 1)
+            star_texture = pygame.transform.scale_by(
+                star_textures, move_factor
+            )
             life_time = random.randint(300, 600)
 
-            star = Star(position, star_texture, life_time)
+            star = Star(position, star_texture, move_factor, life_time)
             self.stars.append(star)
 
     def draw(self, surface):

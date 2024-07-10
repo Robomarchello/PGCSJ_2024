@@ -1,3 +1,4 @@
+import asyncio
 import pygame
 from pygame.locals import *
 from .constants import *
@@ -16,7 +17,7 @@ class App(StateMachine):
         self.clock = pygame.time.Clock()
         self.screen = Screen(SCREENSIZE, TITLE)        
 
-    def loop(self):
+    async def loop(self):
         while True:
             self.handle_events()
             
@@ -31,14 +32,16 @@ class App(StateMachine):
             pygame.display.update()
             self.clock.tick(FPS)
 
+            await asyncio.sleep(0)
+
     def handle_events(self):
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
                 raise SystemExit
             
-            if event.type == WINDOWSIZECHANGED:
-                self.screen.on_resize((event.x, event.y))
+            #if event.type == WINDOWSIZECHANGED:
+            #    self.screen.on_resize((event.x, event.y))
 
             Debug.handle_event(event)
             self.active_state.handle_event(event)

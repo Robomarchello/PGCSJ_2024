@@ -11,6 +11,10 @@
         {
             "path": "src/assets/other/font.ttf",
             "size": 48
+        },
+        {
+            "path": "src/assets/other/font.ttf",
+            "size": 72
         }
     ]
 }
