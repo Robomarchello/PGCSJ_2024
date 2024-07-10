@@ -46,7 +46,11 @@ class Transition:
             elif self.state == TransitionState.FADING_OUT:
                 self.state = TransitionState.TURNED_OFF
     
-    def start(self):
+    def start(self, duration=None):
+        if duration is not None:
+            self.duration = duration
+            self.half_duration = duration / 2
+
         self.timer = self.half_duration
         self.run_action = False
         self.state = TransitionState.FADING_IN
@@ -63,6 +67,7 @@ class TransitionFade(Transition):
             alpha = 255 - alpha
         
         alpha = int(min(alpha, 255))
+        alpha = max(0, alpha)
 
         self.surface.fill((alpha, alpha, alpha))
         surface.blit(self.surface, (0, 0), special_flags=BLEND_SUB)

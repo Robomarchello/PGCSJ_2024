@@ -14,7 +14,7 @@ class App(StateMachine):
         super().__init__(initial_state)
 
         self.clock = pygame.time.Clock()
-        self.screen = Screen(SCREENSIZE)        
+        self.screen = Screen(SCREENSIZE, TITLE)        
 
     def loop(self):
         while True:

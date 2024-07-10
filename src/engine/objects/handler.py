@@ -23,6 +23,7 @@ class ObjectHandler:
                 gravity_force = obj.calculate_attraction(
                     position, mass
                 )
+
                 forces += gravity_force
 
             if isinstance(obj, OrbitingBlackHole):

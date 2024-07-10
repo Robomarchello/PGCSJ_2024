@@ -71,4 +71,6 @@ class Game(State):
 
         if event.type == KEYDOWN:
             if event.key == K_r:
-                self.level.restart()
+                self.transition.function = self.level.restart
+                self.transition.start(0.5)
+                #self.level.restart()

@@ -69,10 +69,10 @@ class Controller:
     def draw(self, surface):
         pygame.draw.rect(surface, 'blue', self.cam_rect, 2)
         
-        for position in self.prediction:
-            #if self.holding:
-            cam_pos = Camera.displace_position(position)
-            pygame.draw.circle(surface, 'green', cam_pos, 3)
+        if not self.player.freeze or self.holding:
+            for position in self.prediction:
+                cam_pos = Camera.displace_position(position)
+                pygame.draw.circle(surface, 'green', cam_pos, 3)
 
         if self.holding:
             pygame.draw.circle(surface, 'grey', self.mouse_pos, 10)

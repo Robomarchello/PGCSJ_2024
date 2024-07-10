@@ -30,7 +30,7 @@ class BlackHole:
     def calculate_attraction(self, position_other, mass_other):
         diff = self.position - position_other
         if diff == (0, 0):
-            return pygame.Vector2(0, 0), 0
+            return pygame.Vector2()
         direction = diff.normalize()
         distance = diff.magnitude()
         gravity_force = (GRAVITY_CONST * mass_other * self.mass) / distance ** 2

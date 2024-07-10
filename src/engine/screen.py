@@ -8,9 +8,10 @@ class Screen:
     draw_surface: pygame.Surface
     window_size: tuple[int, int]
 
-    def __init__(self, screen_size):
+    def __init__(self, screen_size, title):
         self.window_size = screen_size
         self.window = pygame.display.set_mode(self.window_size, *self.FLAGS)
+        pygame.display.set_caption(title)
 
         self.draw_surface = self.window.copy()
 

@@ -43,6 +43,7 @@ class Level:
 
         self.finish_point = FinishPoint((820, SCREENSIZE[1] // 2 - 150), 25, self.player)
 
+        # level creation
         #self.save_level('src/levels/level14.json', False)
         #self.load_level('src/levels/level13.json')
 
@@ -126,7 +127,7 @@ class Level:
     def next_level(self):
         transition = self.level_manager.transition
         transition.function = self.level_manager.next_level
-        transition.start()
+        transition.start(2)
 
     def restart(self):
         # like why should I reset everything 
