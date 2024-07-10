@@ -7,6 +7,7 @@ from src.engine.objects import ObjectHandler
 from src.engine.level import Level, LevelManager
 from src.engine.camera import Camera
 from src.states.transition import TransitionFade
+from src.engine.space import SpaceBackground
 
 
 class Game(State):
@@ -17,6 +18,8 @@ class Game(State):
         self.player = Player()
         rect = pygame.Rect(0, 0, 150, 150)
         rect.center = self.player.position
+
+        self.space_backgroud = SpaceBackground(100, AssetManager.images['star'])
 
         Camera.initialize(self.player)
 
@@ -42,7 +45,7 @@ class Game(State):
     def draw(self):
         self.surface.fill((0, 0, 0))
 
-        Camera.debug_draw()
+        self.space_backgroud.draw(self.surface)
 
         self.object_handler.draw(self.surface)
         self.level.draw(self.surface)
@@ -50,9 +53,11 @@ class Game(State):
         self.controller.draw(self.surface)
         self.player.draw(self.surface)
 
-        Debug.add_text(self.manager.clock.get_fps())
-
         self.transition.draw(self.surface)
+
+        Debug.add_text(self.manager.clock.get_fps())
+        Camera.debug_draw()
+
 
     def update(self, delta):
         self.level = self.level_manager.crnt_level

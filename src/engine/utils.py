@@ -1,5 +1,6 @@
 from time import perf_counter
 from typing import List, Tuple, Any
+import json
 import math
 import pygame
 from pygame.locals import KEYDOWN, K_g
@@ -20,6 +21,19 @@ def load_spritesheet(image, sprite_size) -> List[pygame.Surface]:
 
     return sprites
 
+
+def json_spritesheet(image, file_path):
+    sprites = []
+    with open(file_path, 'r') as file:
+        rects = json.load(file)
+
+    for rect in rects:
+        surface = pygame.Surface(rect.size)
+        surface.blit(image, (-rect.x, -rect.y))
+
+        sprites.append(surface.copy())
+
+    return sprites
 
 def collide_circles(position1, radius1, position2, radius2):
     difference = (

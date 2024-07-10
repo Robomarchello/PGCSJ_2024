@@ -357,6 +357,12 @@ class Level:
         else:
             self.level_bounds = pygame.Rect(-10, -10, 1044, 788)
 
+        # IMPORTANT BELOW
+        # self.launch_points.append(
+        #     LaunchPoint(self.player_position, self.player.radius * 1.3,
+        #                 self.player, self.controller)
+        # )
+
         self.object_handler.objects = self.objects
         self.object_handler.obstacles = self.obstacles
 
