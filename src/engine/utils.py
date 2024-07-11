@@ -56,6 +56,29 @@ def collide_circles(position1, radius1, position2, radius2):
         return False
     
 
+def draw_dashed_line(surface, pos1, pos2, dash_len, blank_len, color, width=1):
+    diff = pygame.Vector2(
+        pos2[0] - pos1[0],
+        pos2[1] - pos1[1]
+    )
+    direction = diff.normalize()
+    length = diff.length()
+    count = length // (dash_len + blank_len)
+
+    dash_vec = direction * dash_len
+    blank_vec = direction * blank_len
+
+    last_pos = pygame.Vector2(pos1)
+    for _ in range(int(count)):
+        other_pos = last_pos + dash_vec
+
+        pygame.draw.line(surface, color, last_pos, other_pos, width)
+
+        last_pos += dash_vec + blank_vec
+
+    pygame.draw.line(surface, color, last_pos, pos2, width)
+
+
 class Debug:
     points = []
     lines = []

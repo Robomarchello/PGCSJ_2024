@@ -10,6 +10,7 @@ class Button:
         text, 
         text_color, 
         btn_color, 
+        hover_color, 
         func,
         texture=None
     ):
@@ -19,13 +20,17 @@ class Button:
         self.text = text
 
         self.btn_color = btn_color
+        self.hover_color = hover_color
         self.text_color  = text_color
         self.func = func
 
         self.hovered = False
 
     def draw(self, surface):
-        pygame.draw.rect(surface, self.btn_color, self.rect, width=5)
+        if self.hovered:
+            pygame.draw.rect(surface, self.hover_color, self.rect, width=5, border_radius=10)
+        else:
+            pygame.draw.rect(surface, self.btn_color, self.rect, width=5, border_radius=10)
 
         # draw text
         render = self.font.render(self.text, False, self.text_color)

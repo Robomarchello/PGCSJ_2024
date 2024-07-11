@@ -3,7 +3,7 @@ import json
 import pygame
 from src.engine.objects import *
 from src.engine.asset_manager import AssetManager
-from src.engine.utils import Debug, collide_circles
+from src.engine.utils import Debug, collide_circles, draw_dashed_line
 from src.engine.camera import Camera
 from src.engine.constants import *
 from src.states.transition import TransitionState
@@ -62,7 +62,6 @@ class Level:
         self.text_visible = False
 
     def update(self, delta):   
-        focus = None   
         if self.object_handler.black_holes_collision(
             self.player.position, self.player.radius
         ):
@@ -89,7 +88,7 @@ class Level:
 
     def draw(self, surface):
         cam_level_bounds = Camera.displace_rect(self.level_bounds)
-        pygame.draw.rect(surface, (255, 0, 0), cam_level_bounds, 3)
+        self.draw_bounds(surface, cam_level_bounds)
         for collectible in self.collectibles:
             collectible.draw(surface)
 
@@ -105,6 +104,21 @@ class Level:
             self.finish_point.reacted = True
 
         self.restart_text(surface)
+
+    def draw_bounds(self, surface, rect):
+        draw_dashed_line(
+            surface, rect.topleft, rect.topright, 10, 3, 'white', 3
+        )
+        draw_dashed_line(
+            surface, rect.topright, rect.bottomright, 10, 3, 'white', 3
+        )
+        draw_dashed_line(
+            surface, rect.bottomright, rect.bottomleft, 10, 3, 'white', 3
+        )
+        draw_dashed_line(
+            surface, rect.bottomleft, rect.topleft, 10, 3, 'white', 3
+        )
+        #pygame.draw.rect(surface, (255, 0, 0), rect, 3)
 
     def restart_text(self, surface):
         font = AssetManager.fonts['font_24']
@@ -358,10 +372,10 @@ class Level:
             self.level_bounds = pygame.Rect(-10, -10, 1044, 788)
 
         # IMPORTANT BELOW
-        # self.launch_points.append(
-        #     LaunchPoint(self.player_position, self.player.radius * 1.3,
-        #                 self.player, self.controller)
-        # )
+        self.launch_points.append(
+            LaunchPoint(self.player_position, self.player.radius * 1.3,
+                        self.player, self.controller)
+        )
 
         self.object_handler.objects = self.objects
         self.object_handler.obstacles = self.obstacles
@@ -394,7 +408,13 @@ class LevelManager:
         self.crnt_level.in_bounds = self.crnt_level.level_bounds.collidepoint(
             self.player.position
         )
+        
+        Camera.focus.update(self.get_focus())
+        Debug.add_text(f'Level: {self.level_index}')
 
+    def get_focus(self):
+        # case for small levels
+        focus = None
         if self.crnt_level.in_bounds:
             focus = SCREEN_AREA.center
 
@@ -402,9 +422,11 @@ class LevelManager:
                 focus = self.player.position
         else:
             focus = self.player.position
-        
-        Camera.focus.update(focus)
-        Debug.add_text(f'Level: {self.level_index}')
+
+        # case for big levels
+        ...
+
+        return focus
 
     def get_levels(self, folder_path):
         levels = []

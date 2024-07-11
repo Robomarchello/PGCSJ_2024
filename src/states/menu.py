@@ -3,7 +3,7 @@ from pygame.locals import *
 from src.states.game import Game
 from src.engine import State, AssetManager
 from src.engine.constants import *
-from src.engine.gui import Button, PlayButton, LevelSelectionButton
+from src.engine.gui import Button, PlayButton, LevelSelectionButton, SettingsButton, ExitButton
 
 
 class Menu(State):
@@ -13,6 +13,15 @@ class Menu(State):
 
         self.play_button = PlayButton(self.play)
         self.level_select_button = LevelSelectionButton(self.level_selection)
+        self.settings_button = SettingsButton(self.to_settings)
+        self.exit_button = ExitButton(self.exit_app)
+
+        self.buttons = [
+            self.play_button,
+            self.level_select_button,
+            self.settings_button,
+            self.exit_button,
+        ]
 
     def on_start(self):
         print('start')
@@ -26,6 +35,13 @@ class Menu(State):
     def level_selection(self):
         self.manager.next_state = LevelSelection()
 
+    def to_settings(self):
+        print('imagine settings')
+
+    def exit_app(self):
+        pygame.quit()
+        raise SystemExit
+    
     def draw_title(self):
         font  = AssetManager.fonts['font_72']
         render = font.render(TITLE, True, 'white')
@@ -40,17 +56,16 @@ class Menu(State):
 
         self.draw_title()
 
-        self.play_button.draw(self.surface)
-        self.level_select_button.draw(self.surface)
+        for button in self.buttons:
+            button.draw(self.surface)
 
     def update(self, delta):
-        self.play_button.update()
-        self.level_select_button.update()
+        for button in self.buttons:
+            button.update()
 
     def handle_event(self, event):
-        self.play_button.handle_event(event)
-        self.level_select_button.handle_event(event)
-
+        for button in self.buttons:
+            button.handle_event(event)
 
 
 class LevelSelection(State):
