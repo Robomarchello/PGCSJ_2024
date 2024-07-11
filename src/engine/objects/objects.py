@@ -2,6 +2,8 @@ from dataclasses import dataclass
 import pygame
 from src.engine.constants import GRAVITY_CONST, SPEED_FACTOR
 from src.engine.camera import Camera
+from src.engine.asset_manager import AssetManager
+
 
 __all__ = ['BlackHole', 'OrbitingBlackHole', 
            'ForceZone', 'GravityInvertor',
@@ -14,18 +16,50 @@ class BlackHole:
         self.position = pygame.Vector2(position)
         self.mass = mass 
 
-        self.radius = 25 + abs(mass) * 0.15
+        self.radius = 30 + abs(mass) * 0.15
         self.color = pygame.Color(255, 255, 255)
+
+        self.small_black_hole = AssetManager.images['smol_blek_hole']
+        self.black_hole_texture = AssetManager.images['black_hole']
+
+        self.small_white_hole = AssetManager.images['smol_white_hole']
+        self.white_hole_texture = AssetManager.images['white_hole']
+
+        self.texture_rect = pygame.Rect(0, 0, self.radius * 2, self.radius * 2)
 
     @property
     def cam_pos(self):
         return Camera.displace_position(self.position)
 
     def draw(self, surface):
+        self.texture_rect.center = self.cam_pos
+        
         if self.mass > 0:
-            pygame.draw.circle(surface, self.color, self.cam_pos, self.radius)
-        else:
-            pygame.draw.circle(surface, self.color, self.cam_pos, self.radius, 5)
+            if self.radius <= 64:
+                scaled_texture = pygame.transform.scale(
+                    self.small_black_hole, self.texture_rect.size
+                )
+            else:
+                scaled_texture = pygame.transform.scale(
+                    self.black_hole_texture, self.texture_rect.size
+                )
+                
+            #surface.blit(scaled_texture, self.texture_rect.topleft)
+        elif self.mass < 0:
+            if self.radius <= 64:
+                scaled_texture = pygame.transform.scale(
+                    self.small_white_hole, self.texture_rect.size
+                )
+            else:
+                scaled_texture = pygame.transform.scale(
+                    self.white_hole_texture, self.texture_rect.size
+                )
+            
+        surface.blit(scaled_texture, self.texture_rect.topleft)
+
+        
+        #scaled_texture = pygame.transform.scale(self.small_black_hole, self.texture_rect.size)
+        #surface.blit(scaled_texture, self.texture_rect.topleft)
 
     def calculate_attraction(self, position_other, mass_other):
         diff = self.position - position_other

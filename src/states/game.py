@@ -19,7 +19,7 @@ class Game(State):
         rect = pygame.Rect(0, 0, 150, 150)
         rect.center = self.player.position
 
-        self.space_backgroud = SpaceBackground(100, AssetManager.images['star'])
+        self.space_backgroud = SpaceBackground(50)
 
         Camera.initialize(self.player)
 
@@ -78,4 +78,3 @@ class Game(State):
             if event.key == K_r:
                 self.transition.function = self.level.restart
                 self.transition.start(0.5)
-                #self.level.restart()

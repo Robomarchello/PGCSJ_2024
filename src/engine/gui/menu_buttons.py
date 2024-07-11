@@ -80,3 +80,42 @@ class ExitButton(Button):
         text_color = (255, 0, 0)
 
         super().__init__(rect, font, text, text_color, button_color, hover_color, func)
+
+
+class BackButton(Button):
+    def __init__(self, func):
+        rect = pygame.Rect(
+            0, 0,
+            SCREENSIZE[0] * 0.4,
+            SCREENSIZE[1] * 0.15,
+        )
+        rect.centerx = SCREEN_AREA.centerx
+        rect.bottom = 738
+
+        font = AssetManager.fonts['font_36']
+        text = 'back'
+
+        button_color = (105, 105, 105)
+        hover_color = (255, 0, 0)
+        text_color = (255, 0, 0)
+
+        super().__init__(rect, font, text, text_color, button_color, hover_color, func)
+
+
+class ChangeVolButton(Button):
+    def __init__(self, text, func):
+        rect = pygame.Rect(
+            0, 0,
+            SCREENSIZE[0] * 0.4,
+            SCREENSIZE[1] * 0.15,
+        )
+        rect.centerx = SCREEN_AREA.centerx
+        rect.top = 250
+
+        font = AssetManager.fonts['font_36']
+
+        button_color = (105, 105, 105)
+        hover_color = (0, 255, 0)
+        text_color = (255, 255, 255)
+
+        super().__init__(rect, font, text, text_color, button_color, hover_color, func)

@@ -1,18 +1,25 @@
+import math
 import pygame
 from pygame import Vector2
 from pygame.locals import MOUSEBUTTONDOWN, MOUSEBUTTONUP
 from src.engine.constants import SPEED_FACTOR, DEBUG_VEL, SCREEN_H
 from src.engine.camera import Camera
 from src.engine.utils import Debug
+from src.engine.asset_manager import AssetManager
 
 
 class Player:
-    radius = 25
+    radius = 32
 
     def __init__(self):
         self.position = Vector2(100, SCREEN_H / 2)
+        self.last_position = self.position.copy()
+
         self.velocity = Vector2(0, 0)
         self.acceleration = Vector2(0, 0)
+
+        self.image = AssetManager.images['player']
+        self.look_angle = 0
 
         self.mass = 1
 
@@ -30,15 +37,28 @@ class Player:
         self.velocity += self.acceleration * delta * SPEED_FACTOR
         self.position += self.velocity * delta * SPEED_FACTOR
 
-        ...
+        if self.velocity.y != 0:
+            # self.look_angle = math.degrees(math.atan(-self.velocity.y/self.velocity.x)) - 90
+            self.get_look_angle(self.velocity)
+
 
         self.acceleration *= 0 
 
+        self.last_position = self.position.copy()
+
+    def get_look_angle(self, vector):
+        self.look_angle = math.degrees(math.atan2(-vector.y, vector.x)) - 90
+        Debug.add_text(vector)
+
     def draw(self, surface):
-        #pygame.draw.circle(surface, 'red', self.position, self.radius)
+        rotated_img = pygame.transform.rotate(self.image, self.look_angle)
+        rotated_rect = rotated_img.get_rect(center=self.cam_pos)
 
-        pygame.draw.circle(surface, 'red', self.cam_pos, self.radius)
-
+        surface.blit(rotated_img, rotated_rect.topleft)
+        
+        # debug below
+        # pygame.draw.circle(surface, 'red', self.cam_pos, self.radius, 2)
+        
 
 class Controller:
     def __init__(self, player, rect, object_handler):
@@ -75,7 +95,7 @@ class Controller:
         if not self.player.freeze or self.holding:
             for position in self.prediction:
                 cam_pos = Camera.displace_position(position)
-                pygame.draw.circle(surface, 'green', cam_pos, 3)
+                pygame.draw.circle(surface, 'white', cam_pos, 3)
 
         if self.holding:
             pygame.draw.circle(surface, 'grey', self.mouse_pos, 10)
@@ -91,6 +111,8 @@ class Controller:
             magnitude = min(magnitude, self.max_speed)
 
             self.launch_force = norm_diff * magnitude
+
+            self.player.get_look_angle(self.launch_force)
 
         if self.holding:
             start_vel = self.player.velocity + self.launch_force
@@ -121,7 +143,7 @@ class Controller:
                 if self.cam_rect.collidepoint(self.mouse_pos):
                     if self.launch_point is not None:
                         self.holding = True
-                        
+
             if event.button == 3:
                 self.holding = False
                 

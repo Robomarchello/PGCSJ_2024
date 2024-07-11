@@ -400,7 +400,7 @@ class LevelManager:
         self.transition = transition
         self.transition.function = self.next_level
 
-        self.level_index = 0
+        self.level_index = 1
 
         self.crnt_level = None
 
@@ -450,3 +450,5 @@ class LevelManager:
             )
         self.level_index += 1
 
+    def save_progress(self):
+        pass

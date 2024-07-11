@@ -3,7 +3,7 @@ from pygame.locals import *
 from src.states.game import Game
 from src.engine import State, AssetManager
 from src.engine.constants import *
-from src.engine.gui import Button, PlayButton, LevelSelectionButton, SettingsButton, ExitButton
+from src.engine.gui import *
 
 
 class Menu(State):
@@ -36,7 +36,7 @@ class Menu(State):
         self.manager.next_state = LevelSelection()
 
     def to_settings(self):
-        print('imagine settings')
+        self.manager.next_state = Settings()
 
     def exit_app(self):
         pygame.quit()
@@ -97,3 +97,57 @@ class LevelSelection(State):
         if event.type == KEYDOWN:
             if event.key == K_ESCAPE:
                 self.manager.next_state = Menu()
+
+
+class Settings(State):
+    def __init__(self):
+        super().__init__()
+        self.surface = pygame.Surface(SCREENSIZE)
+
+        self.back_button = BackButton(self.to_menu)
+
+        self.buttons = [
+            self.back_button,
+        ]
+
+    def on_start(self):
+        print('start')
+    
+    def on_exit(self):
+        print('exit')
+
+    def to_menu(self):
+        self.manager.next_state = Menu()
+
+        for button in self.buttons:
+            button.draw(self.surface)
+
+    def update(self, delta):
+        for button in self.buttons:
+            button.update()
+
+    def draw(self):
+        self.surface.fill((0, 0, 0))
+
+        for button in self.buttons:
+            button.draw(self.surface)
+
+        self.draw_title()
+
+    def draw_title(self):
+        font  = AssetManager.fonts['font_72']
+        render = font.render('Settings', True, 'white')
+        rect = render.get_rect()
+        rect.centerx = SCREEN_W / 2
+        rect.top = 50
+
+        self.surface.blit(render, rect.topleft)
+
+    def handle_event(self, event):
+        if event.type == KEYDOWN:
+            if event.key == K_ESCAPE:
+                self.to_menu()
+        
+        for button in self.buttons:
+            button.handle_event(event)
+        

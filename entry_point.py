@@ -4,4 +4,4 @@ from src.states import Game, Menu
 
 
 if __name__ == '__main__':
-    asyncio.run(App(Menu()).loop())
+    asyncio.run(App(Game()).loop())

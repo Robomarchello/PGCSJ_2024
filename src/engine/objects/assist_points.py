@@ -2,6 +2,8 @@ import pygame
 from src.engine.constants import SPEED_FACTOR
 from src.engine.utils import collide_circles
 from src.engine.camera import Camera
+from src.engine.asset_manager import AssetManager
+
 
 
 class LaunchPoint:
@@ -44,12 +46,16 @@ class LaunchPoint:
 
 
 class FinishPoint:
+
     def __init__(self, position, radius, player):
         self.position = pygame.Vector2(position)
         self.radius = radius
 
         self.player = player
-        
+
+        self.image = AssetManager.images['planet']
+
+
         self.touched = False
 
         self.complete_timer = 1.0
@@ -88,3 +94,6 @@ class FinishPoint:
 
     def draw(self, surface):
         pygame.draw.circle(surface, 'yellow', self.cam_pos, self.radius)
+        
+        image_rect = self.image.get_rect(center=self.cam_pos)
+        surface.blit(self.image, image_rect.topleft)
