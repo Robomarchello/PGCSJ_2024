@@ -56,6 +56,8 @@ class ObjectHandler:
 
     def update(self, delta):
         for obj in self.objects:
+            if isinstance(obj, BlackHole):
+                obj.update(delta)
             if isinstance(obj, OrbitingBlackHole):
                 obj.update(delta)
 

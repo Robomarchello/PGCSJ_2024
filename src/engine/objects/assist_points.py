@@ -31,10 +31,10 @@ class LaunchPoint:
 
             self.controller.launch_point = self
 
-            pull_force = self.pull_to_force(self.player.position)
+            pull_force = self.pulling_force(self.player.position)
             self.player.position += pull_force * delta * SPEED_FACTOR
 
-    def pull_to_force(self, position): 
+    def pulling_force(self, position): 
         difference = pygame.Vector2(
             self.position[0] - position[0],
             self.position[1] - position[1]
@@ -46,7 +46,6 @@ class LaunchPoint:
 
 
 class FinishPoint:
-
     def __init__(self, position, radius, player):
         self.position = pygame.Vector2(position)
         self.radius = radius
@@ -55,6 +54,8 @@ class FinishPoint:
 
         self.image = AssetManager.images['planet']
 
+        self.rotation_timer = 0.0
+        self.angle = 0
 
         self.touched = False
 
@@ -76,7 +77,7 @@ class FinishPoint:
             self.player.freeze = True
             self.touched = True
 
-            pull_force = self.pull_to_force(self.player.position)
+            pull_force = self.pulling_force(self.player.position)
             self.player.position += pull_force * delta * SPEED_FACTOR
 
         if self.touched:
@@ -85,7 +86,10 @@ class FinishPoint:
             if self.timer < 0.0:
                 self.completed = True
 
-    def pull_to_force(self, position): 
+        self.rotation_timer += -delta
+        self.angle = self.rotation_timer
+
+    def pulling_force(self, position): 
         difference = pygame.Vector2(
             self.position[0] - position[0],
             self.position[1] - position[1]
@@ -93,7 +97,8 @@ class FinishPoint:
         return difference * 0.1
 
     def draw(self, surface):
-        pygame.draw.circle(surface, 'yellow', self.cam_pos, self.radius)
-        
-        image_rect = self.image.get_rect(center=self.cam_pos)
-        surface.blit(self.image, image_rect.topleft)
+        #pygame.draw.circle(surface, 'yellow', self.cam_pos, self.radius)
+
+        rotated_image = pygame.transform.rotate(self.image, self.angle)
+        image_rect = rotated_image.get_rect(center=self.cam_pos)
+        surface.blit(rotated_image, image_rect.topleft)
