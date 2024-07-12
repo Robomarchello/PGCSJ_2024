@@ -1,4 +1,3 @@
-import sys
 import os
 import json
 import pygame
@@ -70,6 +69,8 @@ class Level:
         ):
             self.player.velocity *= 0
             self.player.acceleration *= 0
+
+            self.player.explode()
 
             if not self.collided:
                 self.collided = True
@@ -155,6 +156,8 @@ class Level:
         self.player.freeze = True
         self.player.velocity *= 0
         self.player.acceleration *= 0
+        self.player.exploded = False
+        self.player.clear_emitters()
 
         self.collided = False
         Camera.focus = pygame.Vector2(512, 384)
@@ -406,7 +409,7 @@ class LevelManager:
         self.transition = transition
         self.transition.function = self.next_level
 
-        self.level_index = 10
+        self.level_index = 0
 
         self.crnt_level = None
 
@@ -454,6 +457,8 @@ class LevelManager:
             self.player, self.controller, 
             self.object_handler, self.levels[self.level_index], self
             )
+        
+        self.crnt_level.player.clear_emitters()
         
         self.progress[self.level_index] = True
         self.save_progress(SAVE_PATH)

@@ -62,18 +62,20 @@ class ObjectHandler:
                 obj.update(delta)
 
         forces = self.get_forces(self.player.position, self.player.mass)
-        self.player.acceleration += forces
 
-        collision = self.teleport_check(
-            self.player.position, 
-            10, self.player.velocity
-            )
-        if collision:
-            new_rect, new_vel = collision
-            self.player.position.update(new_rect.center)
-            self.player.velocity = new_vel
+        if not self.player.exploded:
+            self.player.acceleration += forces
 
-        self._update_obstacles(delta)
+            collision = self.teleport_check(
+                self.player.position, 
+                10, self.player.velocity
+                )
+            if collision:
+                new_rect, new_vel = collision
+                self.player.position.update(new_rect.center)
+                self.player.velocity = new_vel
+
+            self._update_obstacles(delta)   
 
     def _update_obstacles(self, delta):
         # update dynamic objects

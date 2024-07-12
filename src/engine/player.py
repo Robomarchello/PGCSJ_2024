@@ -6,6 +6,11 @@ from src.engine.constants import SPEED_FACTOR, DEBUG_VEL, SCREEN_H, PLATFORM
 from src.engine.camera import Camera
 from src.engine.utils import Debug
 from src.engine.asset_manager import AssetManager
+from src.engine.vfx.emitters import Emitter, JetEmitter
+
+
+rect = pygame.Rect(0, 0, 32, 32)
+
 
 
 class Player:
@@ -20,10 +25,22 @@ class Player:
 
         self.image = AssetManager.images['player'].convert_alpha()
         self.look_angle = 0
+        self.look_vec = pygame.Vector2(
+            math.cos(self.look_angle), -math.sin(self.look_angle)
+        )
+
+        self.explode_emitter = Emitter(
+            (0, 360), (1, 2), (4, 5), (0, 1), (245, 232, 199), (245, 232, 199), 
+            AssetManager.images['particle'], 130, rect, None
+        )
+        self.jet_emitter = JetEmitter()
 
         self.mass = 1
 
+        self.jet_location = pygame.Vector2()
+        
         self.freeze = True
+        self.exploded = False
 
     @property
     def cam_pos(self):
@@ -37,10 +54,18 @@ class Player:
         self.velocity += self.acceleration * delta * SPEED_FACTOR
         self.position += self.velocity * delta * SPEED_FACTOR
 
-        if self.velocity.y != 0:
-            # self.look_angle = math.degrees(math.atan(-self.velocity.y/self.velocity.x)) - 90
-            self.get_look_angle(self.velocity)
+        self.get_look_angle(self.velocity)
 
+        self.jet_location = self.position - self.look_vec * 30
+
+        self.explode_emitter.update(delta)
+        self.jet_emitter.update(delta, self.look_angle, self.jet_location,
+                                self.velocity.length())
+
+        if self.velocity.length() > 1:
+            self.jet_emitter.flying = True
+        else:
+            self.jet_emitter.flying = False
 
         self.acceleration *= 0 
 
@@ -48,17 +73,36 @@ class Player:
 
     def get_look_angle(self, vector):
         self.look_angle = math.degrees(math.atan2(-vector.y, vector.x)) - 90
+        if vector != (0, 0):
+            self.look_vec = vector.normalize()
+
         Debug.add_text(vector)
 
     def draw(self, surface):
+        self.jet_emitter.draw(surface)
+        self.explode_emitter.draw(surface)
+
         rotated_img = pygame.transform.rotate(self.image, self.look_angle)
         rotated_rect = rotated_img.get_rect(center=self.cam_pos)
 
-        surface.blit(rotated_img, rotated_rect.topleft)
+        if not self.exploded:
+            surface.blit(rotated_img, rotated_rect.topleft)
         
         # debug below
         # pygame.draw.circle(surface, 'red', self.cam_pos, self.radius, 2)
-        
+    
+    def explode(self):
+        if not self.exploded:
+            self.exploded = True
+
+            self.explode_emitter.emit_rect.center = self.position
+            self.explode_emitter.burst()
+
+
+    def clear_emitters(self):
+        self.jet_emitter.clear()
+        self.explode_emitter.clear()
+
 
 class Controller:
     def __init__(self, player, rect, object_handler):
@@ -89,6 +133,9 @@ class Controller:
         return Camera.displace_rect(self.rect)
 
     def draw(self, surface):
+        if self.player.exploded:
+            return
+        
         pygame.draw.circle(surface, 'blue', self.cam_rect.center, self.radius, 3)
         #pygame.draw.rect(surface, 'blue', self.cam_rect, 2)
         

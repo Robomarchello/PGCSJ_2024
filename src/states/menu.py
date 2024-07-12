@@ -1,4 +1,3 @@
-import sys
 import json
 import pygame
 from pygame.locals import *
@@ -84,7 +83,6 @@ class LevelSelection(State):
 
         self.bounds = [-100, 200]
 
-
         self.level_buttons = []
 
         if PLATFORM == 'emscripten':
@@ -142,7 +140,7 @@ class LevelSelection(State):
         self.surface.blit(render, rect.topleft)
 
     def update(self, delta):
-        friction = self.scroll_vel * -0.03
+        friction = self.scroll_vel * -0.05
         self.scroll_acc += friction
 
         if self.offset < self.bounds[0]:
@@ -166,7 +164,7 @@ class LevelSelection(State):
                 self.manager.next_state = Menu()
 
         if event.type == MOUSEWHEEL:
-            self.scroll_acc -= event.y * 5
+            self.scroll_acc -= event.y * 8
 
         for button in self.level_buttons:
             button.handle_event(event)
