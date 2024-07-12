@@ -1,13 +1,14 @@
 import pygame
-from pygame.locals import KEYDOWN, K_r
+from pygame.locals import KEYDOWN, K_r, K_ESCAPE
 from src.engine import State, Debug, AssetManager
 from src.engine.constants import *
 from src.engine.player import Player, Controller
 from src.engine.objects import ObjectHandler
 from src.engine.level import Level, LevelManager
 from src.engine.camera import Camera
-from src.states.transition import TransitionFade
 from src.engine.space import SpaceBackground
+from src.states.transition import TransitionFade
+import src.states as states
 
 
 class Game(State):
@@ -32,6 +33,8 @@ class Game(State):
             LEVELS_PATH, self.player, self.controller, 
             self.object_handler, self.transition
         )
+
+        self.level_manager.progress_init('src/assets/other/save.json')
     
         self.level_manager.next_level()
         self.level = self.level_manager.crnt_level
@@ -69,6 +72,8 @@ class Game(State):
         self.level.update(delta)
         self.level_manager.update(delta)
 
+        self.space_backgroud.update(delta)
+
         self.transition.update(delta)
 
     def handle_event(self, event):
@@ -78,3 +83,6 @@ class Game(State):
             if event.key == K_r:
                 self.transition.function = self.level.restart
                 self.transition.start(0.5)
+
+            if event.key == K_ESCAPE:
+                self.manager.next_state = states.Menu()

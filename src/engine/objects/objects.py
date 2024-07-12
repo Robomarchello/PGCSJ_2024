@@ -20,11 +20,11 @@ class BlackHole:
         self.radius = 30 + abs(mass) * 0.15
         self.color = pygame.Color(255, 255, 255)
 
-        self.small_black_hole = AssetManager.images['smol_blek_hole']
-        self.black_hole_texture = AssetManager.images['black_hole']
+        self.small_black_hole = AssetManager.images['smol_blek_hole'].convert_alpha()
+        self.black_hole_texture = AssetManager.images['black_hole'].convert_alpha()
 
-        self.small_white_hole = AssetManager.images['smol_white_hole']
-        self.white_hole_texture = AssetManager.images['white_hole']
+        self.small_white_hole = AssetManager.images['smol_white_hole'].convert_alpha()
+        self.white_hole_texture = AssetManager.images['white_hole'].convert_alpha()
 
         self.texture_rect = pygame.Rect(0, 0, self.radius * 2, self.radius * 2)
         

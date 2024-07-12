@@ -2,7 +2,7 @@ import math
 import pygame
 from pygame import Vector2
 from pygame.locals import MOUSEBUTTONDOWN, MOUSEBUTTONUP
-from src.engine.constants import SPEED_FACTOR, DEBUG_VEL, SCREEN_H
+from src.engine.constants import SPEED_FACTOR, DEBUG_VEL, SCREEN_H, PLATFORM
 from src.engine.camera import Camera
 from src.engine.utils import Debug
 from src.engine.asset_manager import AssetManager
@@ -18,7 +18,7 @@ class Player:
         self.velocity = Vector2(0, 0)
         self.acceleration = Vector2(0, 0)
 
-        self.image = AssetManager.images['player']
+        self.image = AssetManager.images['player'].convert_alpha()
         self.look_angle = 0
 
         self.mass = 1
@@ -106,7 +106,10 @@ class Controller:
         if self.holding and self.player.cam_pos != self.mouse_pos:
             self.difference = self.player.cam_pos - self.mouse_pos
             norm_diff = self.difference.normalize()
+
             magnitude = self.difference.magnitude() * 0.02  # 0.03
+            if PLATFORM == 'emscripten':
+                magnitude = self.difference.magnitude() * 0.05
             magnitude = max(self.min_speed, magnitude)
             magnitude = min(magnitude, self.max_speed)
 

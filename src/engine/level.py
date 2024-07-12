@@ -1,12 +1,15 @@
+import sys
 import os
 import json
 import pygame
+from pathlib import Path
 from src.engine.objects import *
 from src.engine.asset_manager import AssetManager
 from src.engine.utils import Debug, collide_circles, draw_dashed_line
 from src.engine.camera import Camera
 from src.engine.constants import *
 from src.states.transition import TransitionState
+
 
 
 class Level:
@@ -41,7 +44,7 @@ class Level:
            BlackHole((350 + 300, 380 + 50), 75)
         )
 
-        self.finish_point = FinishPoint((820, SCREENSIZE[1] // 2 - 150), 25, self.player)
+        self.finish_point = FinishPoint((820, SCREENSIZE[1] // 2 - 150), 35, self.player)
 
         # level creation
         #self.save_level('src/levels/level14.json', False)
@@ -392,6 +395,9 @@ class LevelManager:
     def __init__(self, levels_folder, player, controller, object_handler, transition):
         self.levels = self.get_levels(levels_folder)
 
+        self.progress = [False] * len(self.levels)
+        self.progress[0] = True
+
         self.levels_folder = levels_folder
         self.player = player
         self.controller = controller
@@ -400,7 +406,7 @@ class LevelManager:
         self.transition = transition
         self.transition.function = self.next_level
 
-        self.level_index = 1
+        self.level_index = 10
 
         self.crnt_level = None
 
@@ -448,7 +454,31 @@ class LevelManager:
             self.player, self.controller, 
             self.object_handler, self.levels[self.level_index], self
             )
+        
+        self.progress[self.level_index] = True
+        self.save_progress(SAVE_PATH)
         self.level_index += 1
 
-    def save_progress(self):
-        pass
+    def progress_init(self, file_path):
+        my_file = Path(file_path)
+        if not my_file.is_file():
+            self.progress = [False] * len(self.levels)
+            self.progress[0] = True
+        else:
+            self.get_progress(SAVE_PATH)
+
+        self.save_progress(file_path)
+
+    def get_progress(self, file_path):
+        my_file = Path(file_path)
+        if not my_file.is_file():
+            self.progress_init()
+        
+        with open(file_path, 'r') as file:
+            data = json.load(file)
+
+        self.progress = data
+
+    def save_progress(self, file_path):
+        with open(file_path, 'w') as file:
+            json.dump(self.progress, file)

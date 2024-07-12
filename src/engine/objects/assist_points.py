@@ -52,7 +52,7 @@ class FinishPoint:
 
         self.player = player
 
-        self.image = AssetManager.images['planet']
+        self.image = AssetManager.images['planet'].convert_alpha()
 
         self.rotation_timer = 0.0
         self.angle = 0
@@ -97,8 +97,6 @@ class FinishPoint:
         return difference * 0.1
 
     def draw(self, surface):
-        #pygame.draw.circle(surface, 'yellow', self.cam_pos, self.radius)
-
         rotated_image = pygame.transform.rotate(self.image, self.angle)
         image_rect = rotated_image.get_rect(center=self.cam_pos)
         surface.blit(rotated_image, image_rect.topleft)
