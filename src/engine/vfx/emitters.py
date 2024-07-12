@@ -1,3 +1,4 @@
+import math
 import random
 import pygame
 from src.engine.utils import Debug
@@ -188,3 +189,88 @@ class JetEmitter(Emitter):
                 )
                 self.particles.append(particle)
                 self.timer = self.emit_timer
+
+
+class BlackHoleEmitter(Emitter):
+    def __init__(self, position, radius, mass):
+        self.look_range = (-10, 10)
+        speed_range = (0.1, 0.2)
+        life_range = (0.5, 1)
+        rotation_range = (-1, 1)
+        color1 = pygame.Color(67, 85, 133)
+        color2 = pygame.Color(67, 85, 133)
+
+        self.emit_timer = 0.05
+        self.timer = self.emit_timer
+        self.flying = False
+
+        self.mass = mass
+        self.speed = mass * 0.05
+
+        particle_num = 10
+        if self.mass > 0:
+            emit_rect = pygame.Rect(0, 0, radius * 2 + 60, radius * 2 + 60)
+        else:
+            emit_rect = pygame.Rect(0, 0, radius, radius)
+
+        emit_rect.center = position
+
+        texture = AssetManager.images['particle']#.convert_alpha()
+        texture.set_colorkey((0, 0, 0))
+
+        super().__init__(
+            self.look_range, 
+            speed_range, 
+            life_range, 
+            rotation_range, 
+            color1, 
+            color2, 
+            texture, 
+            particle_num, 
+            emit_rect
+        )
+
+    def update_rect(self, position):
+        self.emit_rect.center = position
+
+    def update(self, delta):
+        for particle in self.particles:
+            self._update_particle(particle, delta)
+        
+        self.timer -= delta
+        if self.timer < 0:
+            particle = self.new_particle(
+                self.life_range, 
+                self.rotation_range,
+                self.color1,
+                self.color2,
+                self.texture
+            )
+            self.particles.append(particle)
+            self.timer = self.emit_timer
+
+    def new_particle(
+        self,
+        life_range: tuple[float, float],
+        rotation_range: tuple[float, float],
+        color1,
+        color2,
+        texture,
+        ) -> Particle:
+        
+        position = [
+            random.randint(0, self.emit_rect.width) + self.emit_rect.x,
+            random.randint(0, self.emit_rect.height) + self.emit_rect.y
+        ]
+        diff = pygame.Vector2(self.emit_rect.center) - position
+        angle = math.degrees(math.atan2(-diff.y, diff.x))
+        if self.mass > 0:
+            life_time = (diff.length() / self.speed) * 0.016
+        else:
+            life_time = random.uniform(*life_range)
+        texture_rotation = random.randint(0, 360)
+        rotation_change = random.randint(*rotation_range)
+
+        particle = Particle(position, angle, self.speed, life_time, texture_rotation, rotation_change, color1, color2, texture)
+
+        return particle

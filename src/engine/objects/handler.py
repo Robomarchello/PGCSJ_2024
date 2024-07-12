@@ -3,6 +3,7 @@ import pygame
 from src.engine.constants import SPEED_FACTOR
 from src.engine.utils import collide_circles
 from src.engine.objects.objects import *
+from src.engine.objects.obstacles import Asteroid
 
 
 class ObjectHandler:
@@ -94,7 +95,7 @@ class ObjectHandler:
 
             obstacle.update(delta)
 
-    def black_holes_collision(self, position, radius):
+    def death_collision(self, position, radius):
         for obj in self.objects:
             if isinstance(obj, BlackHole):
                 collision = collide_circles(
@@ -111,7 +112,16 @@ class ObjectHandler:
                 )
                 if collision:
                     return True
-        
+
+        for obstacle in self.obstacles:
+            if isinstance(obstacle, Asteroid):
+                collision = collide_circles(
+                    obstacle.position, obstacle.radius,
+                    position, radius
+                )
+                if collision:
+                    return True
+
         return False
 
     def predict_player(self, time, position, start_vel, start_accel, count):
@@ -144,7 +154,7 @@ class ObjectHandler:
                 last_pos = pygame.Vector2(new_rect.center)
                 velocity = new_vel
 
-            if self.black_holes_collision(last_pos, radius):
+            if self.death_collision(last_pos, radius):
                 return positions
 
             positions.append(last_pos.copy())

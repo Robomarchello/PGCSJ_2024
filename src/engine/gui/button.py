@@ -1,5 +1,6 @@
 import pygame
 from pygame.locals import MOUSEBUTTONDOWN
+from src.engine.asset_manager import AssetManager
 
 
 class Button:
@@ -25,6 +26,8 @@ class Button:
         self.func = func
 
         self.hovered = False
+        self.hover_sound = AssetManager.sounds['hover_sound']
+        self.last_hover = self.hovered
 
     def draw(self, surface):
         if self.hovered:
@@ -41,6 +44,11 @@ class Button:
     def update(self):
         mouse_pos = pygame.mouse.get_pos()
         self.hovered = self.rect.collidepoint(mouse_pos)
+
+        if self.last_hover == False and self.hovered == True:
+            self.hover_sound.play()
+
+        self.last_hover = self.hovered
 
     def handle_event(self, event):
         if event.type == MOUSEBUTTONDOWN:

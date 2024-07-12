@@ -64,7 +64,7 @@ class Level:
         self.text_visible = False
 
     def update(self, delta):   
-        if self.object_handler.black_holes_collision(
+        if self.object_handler.death_collision(
             self.player.position, self.player.radius
         ):
             self.player.velocity *= 0
@@ -409,7 +409,7 @@ class LevelManager:
         self.transition = transition
         self.transition.function = self.next_level
 
-        self.level_index = 0
+        self.level_index = 8
 
         self.crnt_level = None
 
@@ -463,6 +463,9 @@ class LevelManager:
         self.progress[self.level_index] = True
         self.save_progress(SAVE_PATH)
         self.level_index += 1
+
+        asteroid = Asteroid((512, 200), (2.5, 0), 1, 20)
+        self.crnt_level.obstacles.append(asteroid)
 
     def progress_init(self, file_path):
         my_file = Path(file_path)

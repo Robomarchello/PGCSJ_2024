@@ -10,10 +10,10 @@ class PlayButton(Button):
         rect = pygame.Rect(
             0, 0,
             SCREENSIZE[0] * 0.4,
-            SCREENSIZE[1] * 0.15,
+            SCREENSIZE[1] * 0.13,
         )
         rect.centerx = SCREEN_AREA.centerx
-        rect.top = 250
+        rect.top = 250 - 50
 
         font = AssetManager.fonts['font_36']
         text = 'Play'
@@ -30,10 +30,10 @@ class LevelSelectionButton(Button):
         rect = pygame.Rect(
             0, 0,
             SCREENSIZE[0] * 0.4,
-            SCREENSIZE[1] * 0.15,
+            SCREENSIZE[1] * 0.13,
         )
         rect.centerx = SCREEN_AREA.centerx
-        rect.top = 400
+        rect.top = 400 - 60
 
         font = AssetManager.fonts['font_36']
         text = 'Level Selection'
@@ -50,10 +50,10 @@ class SettingsButton(Button):
         rect = pygame.Rect(
             0, 0,
             SCREENSIZE[0] * 0.4,
-            SCREENSIZE[1] * 0.15,
+            SCREENSIZE[1] * 0.13,
         )
         rect.centerx = SCREEN_AREA.centerx
-        rect.top = 550
+        rect.top = 550 - 70
 
         font = AssetManager.fonts['font_36']
         text = 'Settings'
@@ -68,13 +68,15 @@ class SettingsButton(Button):
 class ExitButton(Button):
     def __init__(self, func):
         rect = pygame.Rect(
-            25, 25,
-            100,
-            100,
+            0, 0,
+            SCREENSIZE[0] * 0.4,
+            SCREENSIZE[1] * 0.13,
         )
+        rect.centerx = SCREEN_AREA.centerx
+        rect.top = 700 - 80
 
         font = AssetManager.fonts['font_36']
-        text = ':('
+        text = 'Exit'
 
         button_color = (105, 105, 105)
         hover_color = (255, 0, 0)

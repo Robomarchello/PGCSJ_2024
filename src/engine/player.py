@@ -1,3 +1,4 @@
+import random
 import math
 import pygame
 from pygame import Vector2
@@ -24,13 +25,20 @@ class Player:
         self.acceleration = Vector2(0, 0)
 
         self.image = AssetManager.images['player'].convert_alpha()
+        self.jet_sound = AssetManager.sounds['jet']
+        self.jet_channel = pygame.mixer.Channel(0)
+        self.explosion_sounds = [
+            AssetManager.sounds['explosion_1'],
+            AssetManager.sounds['explosion_2'],
+        ]
+
         self.look_angle = 0
         self.look_vec = pygame.Vector2(
             math.cos(self.look_angle), -math.sin(self.look_angle)
         )
 
         self.explode_emitter = Emitter(
-            (0, 360), (1, 2), (4, 5), (0, 1), (245, 232, 199), (245, 232, 199), 
+            (0, 360), (1, 2), (3, 4), (0, 1), (245, 232, 199), (245, 232, 199), 
             AssetManager.images['particle'], 130, rect, None
         )
         self.jet_emitter = JetEmitter()
@@ -41,6 +49,7 @@ class Player:
         
         self.freeze = True
         self.exploded = False
+        self.flying_last = False
 
     @property
     def cam_pos(self):
@@ -62,10 +71,17 @@ class Player:
         self.jet_emitter.update(delta, self.look_angle, self.jet_location,
                                 self.velocity.length())
 
+
         if self.velocity.length() > 1:
             self.jet_emitter.flying = True
         else:
             self.jet_emitter.flying = False
+            self.jet_channel.fadeout(100)
+
+        if self.flying_last == False and self.jet_emitter.flying == True:
+            self.jet_channel.play(self.jet_sound, -1)
+
+        self.flying_last = self.jet_emitter.flying
 
         self.acceleration *= 0 
 
@@ -94,6 +110,9 @@ class Player:
     def explode(self):
         if not self.exploded:
             self.exploded = True
+
+            random_sound = random.choice(self.explosion_sounds)
+            random_sound.play()
 
             self.explode_emitter.emit_rect.center = self.position
             self.explode_emitter.burst()
@@ -136,7 +155,7 @@ class Controller:
         if self.player.exploded:
             return
         
-        pygame.draw.circle(surface, 'blue', self.cam_rect.center, self.radius, 3)
+        pygame.draw.circle(surface, (245, 232, 199), self.cam_rect.center, self.radius, 3)
         #pygame.draw.rect(surface, 'blue', self.cam_rect, 2)
         
         if not self.player.freeze or self.holding:
@@ -180,12 +199,16 @@ class Controller:
             keys = pygame.key.get_pressed()
             if keys[pygame.K_a]:
                 self.player.position.x -= DEBUG_VEL * delta * SPEED_FACTOR
+                #self.launch_point.position[0] -= DEBUG_VEL * delta * SPEED_FACTOR
             if keys[pygame.K_d]:
                 self.player.position.x += DEBUG_VEL * delta * SPEED_FACTOR
+                #self.launch_point.position[0] += DEBUG_VEL * delta * SPEED_FACTOR
             if keys[pygame.K_w]:
                 self.player.position.y -= DEBUG_VEL * delta * SPEED_FACTOR 
+                #self.launch_point.position[1] -= DEBUG_VEL * delta * SPEED_FACTOR 
             if keys[pygame.K_s]:
                 self.player.position.y += DEBUG_VEL * delta * SPEED_FACTOR
+                #self.launch_point.position[1] += DEBUG_VEL * delta * SPEED_FACTOR
 
     def handle_event(self, event):
         if event.type == MOUSEBUTTONDOWN:

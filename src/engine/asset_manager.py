@@ -6,6 +6,7 @@ from pathlib import Path
 from .constants import *
 
 pygame.init()
+pygame.mixer.init()
 
 
 class AssetManager():
@@ -16,8 +17,9 @@ class AssetManager():
 
     @classmethod
     def load_assets(cls, assets_path):
-        cls.images = cls.load_images(assets_path + '/images')
-        cls.sounds = cls.load_sounds(assets_path + '/sfx')
+        cls.images = cls.load_images(assets_path + 'images')
+        cls.sounds = cls.load_sounds(assets_path + 'sfx')
+
         cls.fonts = {}
 
     @classmethod
@@ -85,11 +87,15 @@ class AssetManager():
             filepath = path + '/' + name
 
             if name.endswith(('.ogg', '.wav')):
-                sound = pygame.mixer.Sound(filepath)
+                try:
+                    sound = pygame.mixer.Sound(filepath)
 
-                key = Path(filepath).stem
-                sounds[key] = sound 
-                print(f'{name} loaded.')
+                    key = Path(filepath).stem
+                    sounds[key] = sound 
+                    print(f'{name} loaded.')
+                except Exception as e:
+                    print(f'{e}, {filepath}')
+
 
         return sounds
 

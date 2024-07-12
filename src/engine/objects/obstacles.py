@@ -1,6 +1,7 @@
 import pygame
 from src.engine.constants import SPEED_FACTOR
 from src.engine.camera import Camera
+from src.engine.asset_manager import AssetManager
 
 
 class Asteroid:
@@ -9,6 +10,9 @@ class Asteroid:
         self.velocity = pygame.Vector2(velocity)
         self.acceleration = pygame.Vector2()
         self.force = pygame.Vector2()
+
+        self.texture = AssetManager.images['asteroid']
+        self.texture_rect = self.texture.get_rect()
 
         self.mass = mass
         self.radius = radius
@@ -29,3 +33,6 @@ class Asteroid:
     
     def draw(self, surface):
         pygame.draw.circle(surface, 'grey', self.cam_pos, self.radius)
+
+        self.texture_rect.center = self.cam_pos
+        surface.blit(self.texture, self.texture_rect.topleft)

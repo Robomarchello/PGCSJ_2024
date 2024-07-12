@@ -63,6 +63,10 @@ class FinishPoint:
         self.timer = self.complete_timer
         self.completed = False
         self.reacted = False
+
+        # sounds
+        self.last_change = False
+        self.sound = AssetManager.sounds['finished1']
         
     @property
     def cam_pos(self):
@@ -88,6 +92,10 @@ class FinishPoint:
 
         self.rotation_timer += -delta
         self.angle = self.rotation_timer
+
+        if self.last_change == False and collision == True:
+            self.sound.play()
+        self.last_change = collision
 
     def pulling_force(self, position): 
         difference = pygame.Vector2(

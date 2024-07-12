@@ -81,7 +81,7 @@ class LevelSelection(State):
         self.scroll_vel = 0
         self.scroll_acc = 0
 
-        self.bounds = [-100, 200]
+        self.bounds = [-100, 250]
 
         self.level_buttons = []
 
@@ -102,13 +102,19 @@ class LevelSelection(State):
             button = LevelButton(str(lvl_num), crnt_pos.copy(), self.selected_level)
             self.level_buttons.append(button)
 
-            crnt_pos[0] += x_offset        
+            crnt_pos[0] += x_offset 
+
+        self.back_button = BackButton(self.to_menu) 
+        self.back_button.rect.top = 850 - self.offset      
 
     def selected_level(self, level):
         game = Game()
         game.level_manager.level_index = int(level)
         game.level_manager.next_level()
         self.manager.next_state = game
+
+    def to_menu(self):
+        self.manager.next_state = Menu()
 
     def draw(self):
         self.surface.fill((0, 0, 0))
@@ -118,8 +124,9 @@ class LevelSelection(State):
 
         for button in self.level_buttons:
             button.draw(self.surface)
-
+        self.back_button.draw(self.surface)
         self.draw_title()
+        self.draw_hint()
 
     def draw_title(self):
         font  = AssetManager.fonts['font_72']
@@ -127,6 +134,15 @@ class LevelSelection(State):
         rect = render.get_rect()
         rect.centerx = SCREEN_W / 2
         rect.top = 50 - self.offset
+
+        self.surface.blit(render, rect.topleft)
+
+    def draw_hint(self):
+        font  = AssetManager.fonts['font_24']
+        render = font.render('Use mouse scroll', True, 'grey')
+        rect = render.get_rect()
+        rect.centerx = SCREEN_W / 2
+        rect.top = 175 - self.offset
 
         self.surface.blit(render, rect.topleft)
 
@@ -157,6 +173,9 @@ class LevelSelection(State):
         for button in self.level_buttons:
             button.update_offset(self.offset)
             button.update()
+        
+        self.back_button.rect.top = 850 - self.offset
+        self.back_button.update()
 
     def handle_event(self, event):
         if event.type == KEYDOWN:
@@ -168,6 +187,7 @@ class LevelSelection(State):
 
         for button in self.level_buttons:
             button.handle_event(event)
+        self.back_button.handle_event(event)
 
     def on_start(self):
         if PLATFORM == 'emscripten':
@@ -210,9 +230,6 @@ class Settings(State):
 
     def to_menu(self):
         self.manager.next_state = Menu()
-
-        for button in self.buttons:
-            button.draw(self.surface)
 
     def update(self, delta):
         for button in self.buttons:

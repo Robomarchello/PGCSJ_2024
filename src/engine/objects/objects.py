@@ -4,7 +4,7 @@ import pygame
 from src.engine.constants import GRAVITY_CONST, SPEED_FACTOR
 from src.engine.camera import Camera
 from src.engine.asset_manager import AssetManager
-
+from src.engine.vfx.emitters import BlackHoleEmitter
 
 __all__ = ['BlackHole', 'OrbitingBlackHole', 
            'ForceZone', 'GravityInvertor',
@@ -27,6 +27,8 @@ class BlackHole:
         self.white_hole_texture = AssetManager.images['white_hole'].convert_alpha()
 
         self.texture_rect = pygame.Rect(0, 0, self.radius * 2, self.radius * 2)
+
+        self.emitter = BlackHoleEmitter(self.position, self.radius, self.mass)
         
         self.pulsing_timer = 0.0
         self.pulsing = 1 + math.cos(self.pulsing_timer) * 0.1
@@ -60,13 +62,17 @@ class BlackHole:
                 scaled_texture = pygame.transform.scale(
                     self.white_hole_texture, scaled_rect.size
                 )
-   
+    
+        self.emitter.draw(surface)
         surface.blit(scaled_texture, scaled_rect.topleft)
 
     def update(self, delta):
         self.pulsing_timer += delta * 3
 
         self.pulsing = 1 + math.cos(self.pulsing_timer) * 0.1
+
+        self.emitter.update_rect(self.position)
+        self.emitter.update(delta)
 
     def calculate_attraction(self, position_other, mass_other):
         diff = self.position - position_other

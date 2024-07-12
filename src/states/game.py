@@ -43,7 +43,7 @@ class Game(State):
         print('start')
     
     def on_exit(self):
-        print('exit')
+        self.player.jet_channel.stop()
 
     def draw(self):
         self.surface.fill((0, 0, 0))
