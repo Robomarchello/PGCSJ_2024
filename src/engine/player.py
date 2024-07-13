@@ -111,6 +111,8 @@ class Player:
         if not self.exploded:
             self.exploded = True
 
+            Camera.shake(0.3, 5)
+
             random_sound = random.choice(self.explosion_sounds)
             random_sound.play()
 

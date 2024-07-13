@@ -133,10 +133,11 @@ class LevelButton(Button):
 
         super().__init__(rect, font, text, self.text_color, button_color, hover_color, func)
 
-    def update_offset(self, offset):
-        self.offset = offset
+    def update_offset(self, x_offset, y_offset):
+        self.offset = y_offset
         self.offset_rect = self.rect.copy()
-        self.offset_rect.y -= offset
+        self.offset_rect.x -= x_offset
+        self.offset_rect.y -= y_offset
 
     def update(self):
         mouse_pos = pygame.mouse.get_pos()
@@ -162,12 +163,19 @@ class LevelButton(Button):
             self.lock_rect.center = self.offset_rect.center
             surface.blit(self.lock_img, self.lock_rect.topleft)
 
+        if self.last_hover == False and self.hovered == True:
+            self.hover_sound.play()
+
+        self.last_hover = self.hovered
 
     def handle_event(self, event):
         if event.type == MOUSEBUTTONDOWN:
             if event.button == 1:
                 if self.hovered and self.finished:
                     self.func(self.level)
+                else:
+                    self.func(None, True)
+
 
 
 class ChangeVolButton(Button):

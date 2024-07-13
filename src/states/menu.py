@@ -2,6 +2,7 @@ import json
 import pygame
 from pygame.locals import *
 from src.states.game import Game
+from src.engine.utils import get_shake
 from src.engine import State, AssetManager
 from src.engine.constants import *
 from src.engine.gui import *
@@ -85,7 +86,11 @@ class LevelSelection(State):
 
         self.level_buttons = []
 
+        self.back_button = BackButton(self.to_menu) 
+        self.back_button.rect.top = 850 - self.offset      
+
         if PLATFORM == 'emscripten':
+            self.back_button.rect.top = 300 - self.offset
             return
 
         levels_num = 15
@@ -93,6 +98,11 @@ class LevelSelection(State):
         x_offset = 200
         y_offset = 200
         crnt_pos = pygame.Vector2(50, 100)
+
+        self.x_shake = 0
+        self.shake_timer = 0.0
+
+        self.no_sound = AssetManager.sounds['no']
         
         for lvl_num in range(levels_num):
             if lvl_num % x_num == 0:
@@ -104,10 +114,13 @@ class LevelSelection(State):
 
             crnt_pos[0] += x_offset 
 
-        self.back_button = BackButton(self.to_menu) 
-        self.back_button.rect.top = 850 - self.offset      
-
-    def selected_level(self, level):
+    def selected_level(self, level, just_shake=False):
+        if just_shake:
+            self.no_sound.play()
+            self.shake_timer = 0.2
+        
+            return
+        
         game = Game()
         game.level_manager.level_index = int(level)
         game.level_manager.next_level()
@@ -132,7 +145,7 @@ class LevelSelection(State):
         font  = AssetManager.fonts['font_72']
         render = font.render('Level Selection', True, 'white')
         rect = render.get_rect()
-        rect.centerx = SCREEN_W / 2
+        rect.centerx = SCREEN_W / 2 - self.x_shake
         rect.top = 50 - self.offset
 
         self.surface.blit(render, rect.topleft)
@@ -141,7 +154,7 @@ class LevelSelection(State):
         font  = AssetManager.fonts['font_24']
         render = font.render('Use mouse scroll', True, 'grey')
         rect = render.get_rect()
-        rect.centerx = SCREEN_W / 2
+        rect.centerx = SCREEN_W / 2 - self.x_shake
         rect.top = 175 - self.offset
 
         self.surface.blit(render, rect.topleft)
@@ -150,7 +163,7 @@ class LevelSelection(State):
         font  = AssetManager.fonts['font_36']
         render = font.render('level selection for web version \n will be post jam version;)', True, 'white')
         rect = render.get_rect()
-        rect.centerx = SCREEN_W / 2
+        rect.centerx = SCREEN_W / 2 - self.x_shake
         rect.top = 200 - self.offset
 
         self.surface.blit(render, rect.topleft)
@@ -171,8 +184,15 @@ class LevelSelection(State):
         self.scroll_acc = 0 
 
         for button in self.level_buttons:
-            button.update_offset(self.offset)
+            button.update_offset(self.x_shake, self.offset)
             button.update()
+
+        if self.shake_timer > 0:
+            self.shake_timer -= delta
+
+            self.x_shake = get_shake(5)[0]
+        else:
+            self.x_shake = 0
         
         self.back_button.rect.top = 850 - self.offset
         self.back_button.update()

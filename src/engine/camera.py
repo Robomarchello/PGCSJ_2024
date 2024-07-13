@@ -2,12 +2,12 @@ import pygame
 from pygame import Vector2
 from src.engine.utils import Debug
 from src.engine.constants import *
+from src.engine.utils import get_shake
 
 
-# TODO: take player's velocity, launch_direction into account, allow freecam
 class Camera:
     # for every object, separate the physics position and player's view
-    # I think zooming is possible, but will cause a lot of problems
+    # I think zooming would be cool, takes time though
     displacement = Vector2()
     pos = Vector2() 
     offset = Vector2(SCREEN_W // 2, SCREEN_H // 2)
@@ -15,6 +15,9 @@ class Camera:
     bounds: pygame.Rect = None
 
     focus: Vector2 | None = None
+
+    shake_timer = 0
+    shake_strength = 0
     
     player = None
     secondary_focus: Vector2 | None = None
@@ -22,6 +25,11 @@ class Camera:
     @classmethod
     def initialize(cls, player):
         cls.player = player
+
+    @classmethod
+    def shake(cls, time, strength):
+        cls.shake_timer = time
+        cls.shake_strength = strength
 
     @classmethod
     def origin_lock(cls):
@@ -50,7 +58,7 @@ class Camera:
             cls.pos = cls.displacement - cls.offset
         else:
             pass
-        
+    
         if cls.secondary_focus is not None:
             diff = pygame.Vector2(
                 cls.player.position.x - cls.secondary_focus[0],
@@ -66,6 +74,11 @@ class Camera:
             cls.rect.topleft = cls.pos
             cls.rect.clamp_ip(cls.bounds)
             cls.pos.update(cls.rect.topleft)
+
+        if cls.shake_timer > 0:
+            cls.shake_timer -= delta
+            
+            cls.pos += get_shake(cls.shake_strength)
 
     @classmethod
     def displace_position(cls, position: Vector2):

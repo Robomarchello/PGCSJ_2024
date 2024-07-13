@@ -1,5 +1,5 @@
 import pygame
-from pygame.locals import KEYDOWN, K_r, K_ESCAPE
+from pygame.locals import *
 from src.engine import State, Debug, AssetManager
 from src.engine.constants import *
 from src.engine.player import Player, Controller
