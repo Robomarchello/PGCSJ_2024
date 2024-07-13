@@ -1,7 +1,7 @@
 import pygame
 from pathlib import Path
 
-TITLE = 'Game Title'
+TITLE = 'Mediocre Game with Golf-Like Gameplay in Space!'
 SCREENSIZE = SCREEN_W, SCREEN_H = (1024, 768)
 SCREEN_AREA = pygame.Rect(0, 0, SCREEN_W, SCREEN_H)
 FPS = 480
@@ -18,6 +18,8 @@ SAVE_PATH = 'src/assets/other/save.json'
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
+
+VOLUME = 0.6
 
 # Debug font path and size
 DEBUG_FONT = ABS_DIR + '/src/assets/other/debug_font.ttf'

@@ -84,7 +84,7 @@ class Emitter:
         ]
         angle = random.uniform(*angle_range)
         speed = random.uniform(*speed_range)
-        life_time = random.randrange(*life_range)
+        life_time = random.uniform(*life_range)
         texture_rotation = random.randint(0, 360)
         rotation_change = random.randint(*rotation_range)
 
@@ -109,7 +109,6 @@ class Emitter:
 
         particle.texture_rotation += particle.rotation_change * delta * SPEED_FACTOR
 
-
         particle.velocity += particle.acceleration * delta * SPEED_FACTOR
         particle.position += particle.velocity * delta * SPEED_FACTOR
         
@@ -120,7 +119,7 @@ class Emitter:
         rotated_texture_rect = rotated_texture.get_rect(center=particle.texture_rect.center)
         texture = pygame.Surface(rotated_texture.get_size())
         texture.fill(particle.crnt_color)
-        texture.blit(rotated_texture, (0, 0), special_flags=pygame.BLEND_MULT)
+        texture.blit(rotated_texture, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
 
         rotated_texture_rect.center = particle.cam_pos
         surface.blit(texture, rotated_texture_rect.topleft) # special_flags=self.blend_mode

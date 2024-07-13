@@ -173,20 +173,21 @@ class LevelButton(Button):
             if event.button == 1:
                 if self.hovered and self.finished:
                     self.func(self.level)
-                else:
+                elif not self.finished:
                     self.func(None, True)
 
 
 
 class ChangeVolButton(Button):
-    def __init__(self, text, func):
+    def __init__(self, position, text, func, change_value):
         rect = pygame.Rect(
             0, 0,
-            SCREENSIZE[0] * 0.4,
-            SCREENSIZE[1] * 0.15,
+            100,
+            100,
         )
-        rect.centerx = SCREEN_AREA.centerx
-        rect.top = 250
+        rect.topleft = position
+
+        self.change_value = change_value
 
         font = AssetManager.fonts['font_36']
 
@@ -195,3 +196,9 @@ class ChangeVolButton(Button):
         text_color = (255, 255, 255)
 
         super().__init__(rect, font, text, text_color, button_color, hover_color, func)
+
+    def handle_event(self, event):
+        if event.type == MOUSEBUTTONDOWN:
+            if event.button == 1:
+                if self.hovered:
+                    self.func(self.change_value)

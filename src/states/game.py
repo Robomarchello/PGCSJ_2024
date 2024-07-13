@@ -40,7 +40,7 @@ class Game(State):
         self.level = self.level_manager.crnt_level
 
     def on_start(self):
-        print('start')
+        pass
     
     def on_exit(self):
         self.player.jet_channel.stop()
@@ -61,6 +61,10 @@ class Game(State):
         Debug.add_text(self.manager.clock.get_fps())
         Camera.debug_draw()
 
+        if self.level_manager.level_index == 31:
+            self.surface.blit(
+                AssetManager.images['end_screen'], (0, 0)
+            )
 
     def update(self, delta):
         self.level = self.level_manager.crnt_level

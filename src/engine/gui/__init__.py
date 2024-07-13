@@ -4,6 +4,6 @@ from .menu_buttons import *
 __all__ = [
     'Button', 'PlayButton', 'LevelSelectionButton',
     'SettingsButton', 'ExitButton', 'BackButton',
-    'LevelButton'
+    'LevelButton', 'ChangeVolButton'
 ]
 

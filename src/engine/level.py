@@ -409,7 +409,7 @@ class LevelManager:
         self.transition = transition
         self.transition.function = self.next_level
 
-        self.level_index = 26
+        self.level_index = 0
 
         self.crnt_level = None
 

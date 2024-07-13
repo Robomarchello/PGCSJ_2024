@@ -5,6 +5,7 @@ from src.states.game import Game
 from src.engine.utils import get_shake
 from src.engine import State, AssetManager
 from src.engine.constants import *
+import src.engine.constants as c
 from src.engine.gui import *
 import src.states as states
 
@@ -15,6 +16,8 @@ class Menu(State):
     def __init__(self):
         super().__init__()
         self.surface = pygame.Surface(SCREENSIZE)
+
+        AssetManager.set_volume(c.VOLUME)
 
         self.play_button = PlayButton(self.play)
         self.level_select_button = LevelSelectionButton(self.level_selection)
@@ -29,10 +32,10 @@ class Menu(State):
         ]
 
     def on_start(self):
-        print('start')
+        pass
     
     def on_exit(self):
-        print('exit')
+        pass
 
     def play(self):
         self.manager.next_state = states.Game()
@@ -48,7 +51,7 @@ class Menu(State):
         raise SystemExit
     
     def draw_title(self):
-        font  = AssetManager.fonts['font_72']
+        font  = AssetManager.fonts['font_24']
         render = font.render(TITLE, True, 'white')
         rect = render.get_rect()
         rect.centerx = SCREEN_W / 2
@@ -89,9 +92,6 @@ class LevelSelection(State):
         self.back_button = BackButton(self.to_menu) 
         
 
-        if PLATFORM == 'emscripten':
-            self.back_button.rect.top = 300 - self.offset
-            return
 
         levels_num = 30
         x_num = 5
@@ -103,7 +103,12 @@ class LevelSelection(State):
         self.shake_timer = 0.0
 
         self.no_sound = AssetManager.sounds['no']
-        
+
+
+        if PLATFORM == 'emscripten':
+            self.back_button.rect.top = 300 - self.offset
+            return
+
         for lvl_num in range(levels_num):
             if lvl_num % x_num == 0:
                 crnt_pos[0] = 50
@@ -167,7 +172,7 @@ class LevelSelection(State):
         render = font.render('level selection for web version \n will be post jam version;)', True, 'white')
         rect = render.get_rect()
         rect.centerx = SCREEN_W / 2 - self.x_shake
-        rect.top = 200 - self.offset
+        rect.top = 250 - self.offset
 
         self.surface.blit(render, rect.topleft)
 
@@ -196,8 +201,11 @@ class LevelSelection(State):
             self.x_shake = get_shake(5)[0]
         else:
             self.x_shake = 0
-        
-        self.back_button.rect.top = self.crnt_pos[1] + 125 - self.offset
+
+        if PLATFORM == 'emscripten':
+            self.back_button.rect.top = 300 - self.offset
+        else:
+            self.back_button.rect.top = self.crnt_pos[1] + 125 - self.offset
         self.back_button.update()
 
     def handle_event(self, event):
@@ -231,7 +239,7 @@ class LevelSelection(State):
         self.progress = data
     
     def on_exit(self):
-        print('exit')
+        pass
 
 
 class Settings(State):
@@ -241,15 +249,26 @@ class Settings(State):
 
         self.back_button = BackButton(self.to_menu)
 
+        add_vol_btn = ChangeVolButton((200, 300), '<', self.change_volume, -0.1)
+        sub_vol_btn = ChangeVolButton((1024-300, 300), '>', self.change_volume, 0.1)
         self.buttons = [
             self.back_button,
+            add_vol_btn,
+            sub_vol_btn
         ]
 
+    def change_volume(self, value):
+        new_vol = c.VOLUME + value
+        if not new_vol < 0 and not new_vol > 1.0:
+            c.VOLUME = new_vol 
+            AssetManager.set_volume(c.VOLUME)
+            AssetManager.sounds['no_vol_check'].play()
+
     def on_start(self):
-        print('start')
+        pass
     
     def on_exit(self):
-        print('exit')
+        pass
 
     def to_menu(self):
         self.manager.next_state = Menu()
@@ -265,6 +284,7 @@ class Settings(State):
             button.draw(self.surface)
 
         self.draw_title()
+        self.draw_vol_text()
 
     def draw_title(self):
         font  = AssetManager.fonts['font_72']
@@ -272,6 +292,15 @@ class Settings(State):
         rect = render.get_rect()
         rect.centerx = SCREEN_W / 2
         rect.top = 50
+
+        self.surface.blit(render, rect.topleft)
+
+    def draw_vol_text(self):
+        font  = AssetManager.fonts['font_36']
+        render = font.render(f'Volume: {round(c.VOLUME, 3)}', True, 'white')
+        rect = render.get_rect()
+        rect.centerx = SCREEN_W / 2
+        rect.top = 315
 
         self.surface.blit(render, rect.topleft)
 

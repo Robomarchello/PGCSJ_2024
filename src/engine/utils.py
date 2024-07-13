@@ -84,6 +84,9 @@ class Debug:
     lines = []
     texts = []
 
+    konami = [1073741906, 1073741906, 1073741905, 1073741905, 1073741904, 1073741903, 1073741904, 1073741903, 98, 97]
+    keys_pressed = []
+
     visible = False
 
     font: pygame.Font = AssetManager.load_font(DEBUG_FONT, DEBUG_SIZE)
@@ -151,10 +154,12 @@ class Debug:
     @classmethod
     def handle_event(cls, event):
         if event.type == KEYDOWN:
-            if event.key == K_g:
+            cls.keys_pressed.append(event.key)
+            if len(cls.keys_pressed) > len(cls.konami):
+                cls.keys_pressed.pop(0)
+            
+            if cls.keys_pressed == cls.konami:
                 if cls.visible:
                     cls.visible = False
                 else:
                     cls.visible = True 
-
-

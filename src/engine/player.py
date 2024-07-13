@@ -38,7 +38,7 @@ class Player:
         )
 
         self.explode_emitter = Emitter(
-            (0, 360), (1, 2), (10, 11), (0, 1), (245, 232, 199), (245, 232, 199), 
+            (0, 360), (1, 2), (2.5, 3.5), (0, 1), (245, 232, 199), (5, 24, 75), 
             AssetManager.images['particle'], 130, rect, None
         )
         self.jet_emitter = JetEmitter()
@@ -197,20 +197,20 @@ class Controller:
 
         self.rect.center = self.player.position
 
-        if self.debug_movement:
+        if self.debug_movement and Debug.visible:
             keys = pygame.key.get_pressed()
             if keys[pygame.K_a]:
                 self.player.position.x -= DEBUG_VEL * delta * SPEED_FACTOR
-                #self.launch_point.position[0] -= DEBUG_VEL * delta * SPEED_FACTOR
+
             if keys[pygame.K_d]:
                 self.player.position.x += DEBUG_VEL * delta * SPEED_FACTOR
-                #self.launch_point.position[0] += DEBUG_VEL * delta * SPEED_FACTOR
+
             if keys[pygame.K_w]:
                 self.player.position.y -= DEBUG_VEL * delta * SPEED_FACTOR 
-                #self.launch_point.position[1] -= DEBUG_VEL * delta * SPEED_FACTOR 
+
             if keys[pygame.K_s]:
                 self.player.position.y += DEBUG_VEL * delta * SPEED_FACTOR
-                #self.launch_point.position[1] += DEBUG_VEL * delta * SPEED_FACTOR
+
 
     def handle_event(self, event):
         if event.type == MOUSEBUTTONDOWN:
