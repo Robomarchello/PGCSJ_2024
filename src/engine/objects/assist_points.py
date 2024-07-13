@@ -77,7 +77,7 @@ class FinishPoint:
             self.position, self.radius,
             self.player.position, self.player.radius
         )
-        if collision and not self.completed:
+        if collision and not self.completed and not self.player.exploded:
             self.player.freeze = True
             self.touched = True
 

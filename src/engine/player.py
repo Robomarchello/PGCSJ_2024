@@ -38,7 +38,7 @@ class Player:
         )
 
         self.explode_emitter = Emitter(
-            (0, 360), (1, 2), (3, 4), (0, 1), (245, 232, 199), (245, 232, 199), 
+            (0, 360), (1, 2), (10, 11), (0, 1), (245, 232, 199), (245, 232, 199), 
             AssetManager.images['particle'], 130, rect, None
         )
         self.jet_emitter = JetEmitter()
@@ -108,7 +108,7 @@ class Player:
         # pygame.draw.circle(surface, 'red', self.cam_pos, self.radius, 2)
     
     def explode(self):
-        if not self.exploded:
+        if not self.exploded and not self.freeze:
             self.exploded = True
 
             Camera.shake(0.3, 5)

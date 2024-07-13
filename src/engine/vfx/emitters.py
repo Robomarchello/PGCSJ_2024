@@ -95,12 +95,16 @@ class Emitter:
     def _update_particle(self, particle, delta):
         friction = 0.005 * particle.velocity
         particle.acceleration += friction
-
-        progress = 1 - (particle.crnt_life / particle.life)
+        
+        try:
+            progress = 1 - (particle.crnt_life / particle.life)
+        except:
+            print("I don't care about float division")
+            progress = 0.9
         particle.crnt_color = particle.color1.lerp(particle.color2, progress)
 
         particle.crnt_life -= delta
-        if particle.crnt_life < 0:
+        if particle.crnt_life <= 0:
             self.particles.remove(particle)
 
         particle.texture_rotation += particle.rotation_change * delta * SPEED_FACTOR

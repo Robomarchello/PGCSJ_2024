@@ -409,7 +409,7 @@ class LevelManager:
         self.transition = transition
         self.transition.function = self.next_level
 
-        self.level_index = 14
+        self.level_index = 26
 
         self.crnt_level = None
 
@@ -464,8 +464,8 @@ class LevelManager:
         self.save_progress(SAVE_PATH)
         self.level_index += 1
 
-        asteroid = Asteroid((512, 200), (2.5, 0), 1, 20)
-        self.crnt_level.obstacles.append(asteroid)
+        #asteroid = Asteroid((512, 200), (2.5, 0), 1, 20)
+        #self.crnt_level.obstacles.append(asteroid)
 
     def progress_init(self, file_path):
         my_file = Path(file_path)

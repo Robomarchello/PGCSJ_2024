@@ -82,21 +82,21 @@ class LevelSelection(State):
         self.scroll_vel = 0
         self.scroll_acc = 0
 
-        self.bounds = [-100, 250]
+        self.bounds = [-100, 550]
 
         self.level_buttons = []
 
         self.back_button = BackButton(self.to_menu) 
-        self.back_button.rect.top = 850 - self.offset      
+        
 
         if PLATFORM == 'emscripten':
             self.back_button.rect.top = 300 - self.offset
             return
 
-        levels_num = 15
+        levels_num = 30
         x_num = 5
         x_offset = 200
-        y_offset = 200
+        y_offset = 150
         crnt_pos = pygame.Vector2(50, 100)
 
         self.x_shake = 0
@@ -113,6 +113,9 @@ class LevelSelection(State):
             self.level_buttons.append(button)
 
             crnt_pos[0] += x_offset 
+
+        self.crnt_pos = crnt_pos
+        self.back_button.rect.top = crnt_pos[1] + 125 - self.offset      
 
     def selected_level(self, level, just_shake=False):
         if just_shake:
@@ -194,7 +197,7 @@ class LevelSelection(State):
         else:
             self.x_shake = 0
         
-        self.back_button.rect.top = 850 - self.offset
+        self.back_button.rect.top = self.crnt_pos[1] + 125 - self.offset
         self.back_button.update()
 
     def handle_event(self, event):
