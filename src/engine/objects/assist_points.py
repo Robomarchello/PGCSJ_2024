@@ -66,7 +66,7 @@ class FinishPoint:
 
         # sounds
         self.last_change = False
-        self.sound = AssetManager.sounds['finished1']
+        self.sound = AssetManager.sounds['finished']
         
     @property
     def cam_pos(self):

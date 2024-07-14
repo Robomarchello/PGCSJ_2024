@@ -1,5 +1,6 @@
 import pygame
 from pygame.locals import *
+from src.engine.asset_manager import AssetManager
 
 
 class Screen:
@@ -12,6 +13,7 @@ class Screen:
         self.window_size = screen_size
         self.window = pygame.display.set_mode(self.window_size, *self.FLAGS)
         pygame.display.set_caption(title)
+        pygame.display.set_icon(AssetManager.images['player'])
 
         self.draw_surface = self.window.copy()
 

@@ -203,7 +203,7 @@ class LevelSelection(State):
             self.x_shake = 0
 
         if PLATFORM == 'emscripten':
-            self.back_button.rect.top = 300 - self.offset
+            self.back_button.rect.top = 500 - self.offset
         else:
             self.back_button.rect.top = self.crnt_pos[1] + 125 - self.offset
         self.back_button.update()
@@ -233,8 +233,6 @@ class LevelSelection(State):
 
         for i in range(len(self.level_buttons)):
             self.level_buttons[i].finished = data[i]
-
-        print('yea')
 
         self.progress = data
     
