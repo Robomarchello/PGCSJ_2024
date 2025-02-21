@@ -1,9 +1,9 @@
 from typing import Dict
 import json
 import os
-import pygame
 from pathlib import Path
-from .constants import *
+import pygame
+from src.engine.constants import FONTS_JSON_PATH
 
 pygame.init()
 pygame.mixer.init()
@@ -17,13 +17,14 @@ class AssetManager():
 
     @classmethod
     def load_assets(cls, assets_path):
+        '''Load assets folder: images, sounds, fonts'''
         cls.images = cls.load_images(assets_path + 'images')
         cls.sounds = cls.load_sounds(assets_path + 'sfx')
-
-        cls.fonts = {}
+        AssetManager.load_fonts_json(FONTS_JSON_PATH)
 
     @classmethod
     def load_image(cls, file_path) -> pygame.Surface:
+        '''Load single image'''
         image = pygame.image.load(file_path).convert_alpha()
         name = Path(file_path).stem
         cls.images[name] = image
@@ -32,6 +33,7 @@ class AssetManager():
     
     @classmethod
     def load_sound(cls, file_path) -> pygame.mixer.Sound:
+        '''load single sound'''
         sound = pygame.mixer.Sound(file_path)
         name = Path(file_path).stem
         cls.sounds[name] = sound
@@ -40,10 +42,11 @@ class AssetManager():
 
     @classmethod
     def load_font(cls, file_path, size) -> pygame.Font:
+        '''load single font'''
         name = Path(file_path).stem
         key = f'{name}_{size}'
         
-        # font loaded, so ignore
+        # if font loaded - ignore
         if cls.fonts.get(key):
             return
         
@@ -62,7 +65,6 @@ class AssetManager():
                 size = font['size']
 
                 cls.load_font(path, size)
-                print(f"Font Path: {path}, Font Size: {size}")
 
     @classmethod
     def load_images(cls, path):
@@ -76,9 +78,16 @@ class AssetManager():
                     image = image.convert_alpha()
                 name = Path(file_path).stem
                 images[name] = image
-                print(name, image)
 
         return images
+    
+    @classmethod
+    def convert_alpha_all(cls):
+        if not pygame.display.get_active():
+            raise Exception("Can't be converted, no active window")
+        
+        for image in cls.images:
+            cls.images[image] = cls.images[image].convert_alpha()
     
     @classmethod
     def load_sounds(cls, path):
@@ -87,15 +96,9 @@ class AssetManager():
             filepath = path + '/' + name
 
             if name.endswith(('.ogg', '.wav')):
-                try:
-                    sound = pygame.mixer.Sound(filepath)
-
-                    key = Path(filepath).stem
-                    sounds[key] = sound 
-                    print(f'{name} loaded.')
-                except Exception as e:
-                    print(f'{e}, {filepath}')
-
+                sound = pygame.mixer.Sound(filepath)
+                key = Path(filepath).stem
+                sounds[key] = sound 
 
         return sounds
 

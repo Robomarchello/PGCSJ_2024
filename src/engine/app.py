@@ -2,12 +2,10 @@ import asyncio
 import pygame
 from pygame.locals import *
 from .constants import *
-from .asset_manager import AssetManager
-AssetManager.load_assets(ASSETS_PATH)
-AssetManager.load_fonts_json(FONTS_JSON_PATH)
 from .state_machine import StateMachine, State
 from .screen import Screen
 from .utils import Debug
+from src.engine.asset_manager import AssetManager
 
 
 class App(StateMachine):
@@ -15,7 +13,9 @@ class App(StateMachine):
         super().__init__(initial_state)
 
         self.clock = pygame.time.Clock()
-        self.screen = Screen(SCREENSIZE, TITLE)        
+        self.screen = Screen(SCREENSIZE, TITLE) 
+        
+        AssetManager.convert_alpha_all()
 
     async def loop(self):
         while True:

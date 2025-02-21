@@ -154,7 +154,7 @@ class JetEmitter(Emitter):
         particle_num = 10
         emit_rect = pygame.Rect(0, 0, 5, 5)
 
-        texture = AssetManager.images['particle']#.convert_alpha()
+        texture = AssetManager.images['particle']
         texture.set_colorkey((0, 0, 0))
 
         super().__init__(
@@ -218,7 +218,7 @@ class BlackHoleEmitter(Emitter):
 
         emit_rect.center = position
 
-        texture = AssetManager.images['particle']#.convert_alpha()
+        texture = AssetManager.images['particle']
         texture.set_colorkey((0, 0, 0))
 
         super().__init__(

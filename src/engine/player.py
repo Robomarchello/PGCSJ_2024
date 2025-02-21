@@ -9,9 +9,7 @@ from src.engine.utils import Debug
 from src.engine.asset_manager import AssetManager
 from src.engine.vfx.emitters import Emitter, JetEmitter
 
-
 rect = pygame.Rect(0, 0, 32, 32)
-
 
 
 class Player:
@@ -24,7 +22,7 @@ class Player:
         self.velocity = Vector2(0, 0)
         self.acceleration = Vector2(0, 0)
 
-        self.image = AssetManager.images['player'].convert_alpha()
+        self.image = AssetManager.images['player']
         self.jet_sound = AssetManager.sounds['jet']
         self.jet_channel = pygame.mixer.Channel(0)
         self.explosion_sounds = [

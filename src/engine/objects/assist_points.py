@@ -52,7 +52,7 @@ class FinishPoint:
 
         self.player = player
 
-        self.image = AssetManager.images['planet'].convert_alpha()
+        self.image = AssetManager.images['planet']
 
         self.rotation_timer = 0.0
         self.angle = 0

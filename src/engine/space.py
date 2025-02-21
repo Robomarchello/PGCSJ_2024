@@ -10,10 +10,10 @@ class SpaceBackground:
         self.stars_num = stars_num
         
         self.texture_pos = pygame.Vector2(0, 0)
-        self.space_texture = AssetManager.images['background_space_scaled'].convert()
+        self.space_texture = AssetManager.images['background_space_scaled']
 
         self.move_factor = 0.7
-        self.stars_layer = AssetManager.images['background_stars_scaled'].convert()
+        self.stars_layer = AssetManager.images['background_stars_scaled']
         self.stars_layer.set_colorkey((255, 0, 0))
 
         self.move_vec = pygame.Vector2(0.1, 0.05)
