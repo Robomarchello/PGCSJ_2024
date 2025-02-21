@@ -1,6 +1,5 @@
 import pygame
-from pygame.locals import *
-from .constants import SCREENSIZE
+from src.engine.constants import SCREENSIZE
 
 
 class StateMachine:

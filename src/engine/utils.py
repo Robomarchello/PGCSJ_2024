@@ -5,8 +5,8 @@ import math
 import pygame
 import random
 from pygame.locals import KEYDOWN, K_g
-from .constants import *
-from .asset_manager import AssetManager
+from src.engine.constants import *
+from src.engine.asset_manager import AssetManager
 
 
 def load_spritesheet(image, sprite_size) -> List[pygame.Surface]:
@@ -21,7 +21,6 @@ def load_spritesheet(image, sprite_size) -> List[pygame.Surface]:
             sprites.append(sprite.copy())
 
     return sprites
-
 
 def get_shake(strength):
     shake = (
@@ -50,11 +49,10 @@ def collide_circles(position1, radius1, position2, radius2):
     )
     length = math.sqrt(difference[0] ** 2 + difference[1] ** 2)
 
-    if length - radius1 - radius2 < 0:
+    if length < radius1 + radius2:
         return True
     else:
         return False
-    
 
 def draw_dashed_line(surface, pos1, pos2, dash_len, blank_len, color, width=1):
     diff = pygame.Vector2(
@@ -154,12 +152,12 @@ class Debug:
     @classmethod
     def handle_event(cls, event):
         if event.type == KEYDOWN:
+            if event.key == K_g:
+                cls.visible = not cls.visible
+            
             cls.keys_pressed.append(event.key)
             if len(cls.keys_pressed) > len(cls.konami):
                 cls.keys_pressed.pop(0)
             
             if cls.keys_pressed == cls.konami:
-                if cls.visible:
-                    cls.visible = False
-                else:
-                    cls.visible = True 
+                cls.visible = not cls.visible

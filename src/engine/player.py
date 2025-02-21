@@ -69,7 +69,6 @@ class Player:
         self.jet_emitter.update(delta, self.look_angle, self.jet_location,
                                 self.velocity.length())
 
-
         if self.velocity.length() > 1:
             self.jet_emitter.flying = True
         else:

@@ -1,5 +1,6 @@
 import pygame
 from pygame import Vector2
+
 from src.engine.utils import Debug
 from src.engine.constants import *
 from src.engine.utils import get_shake

@@ -6,7 +6,7 @@ SCREENSIZE = SCREEN_W, SCREEN_H = (1024, 768)
 SCREEN_AREA = pygame.Rect(0, 0, SCREEN_W, SCREEN_H)
 FPS = 480
 
-# to compencate small delta time values
+# to compensate small delta time values
 SPEED_FACTOR = 60
 GRAVITY_CONST = 60
 

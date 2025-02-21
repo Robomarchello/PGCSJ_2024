@@ -1,10 +1,11 @@
 import asyncio
 import pygame
 from pygame.locals import *
-from .constants import *
-from .state_machine import StateMachine, State
-from .screen import Screen
-from .utils import Debug
+
+from src.engine.constants import *
+from src.engine.state_machine import StateMachine, State
+from src.engine.screen import Screen
+from src.engine.utils import Debug
 from src.engine.asset_manager import AssetManager
 
 
@@ -21,7 +22,7 @@ class App(StateMachine):
         while True:
             self.handle_events()
             
-            delta = self.get_delta()
+            delta = self.clock.get_time() / 1000
 
             self.update(delta)
             self.draw(self.screen.draw_surface)
@@ -45,9 +46,3 @@ class App(StateMachine):
 
             Debug.handle_event(event)
             self.active_state.handle_event(event)
-
-
-    def get_delta(self):
-        delta_time = self.clock.get_time() / 1000
-
-        return delta_time
