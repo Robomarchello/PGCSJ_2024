@@ -1,11 +1,10 @@
-from dataclasses import dataclass
 import pygame
 from src.engine.constants import SPEED_FACTOR
 from src.engine.utils import collide_circles
-from src.engine.objects.objects import *
-from src.engine.objects.obstacles import Asteroid
+from src.engine.objects import *
 
 
+# physics sytem
 class ObjectHandler:
     # performs physical and other calculations
     def __init__(self, player, objects, obstacles):
@@ -20,6 +19,7 @@ class ObjectHandler:
         '''
         forces = pygame.Vector2(0, 0)
         for obj in self.objects:
+            # use match case
             if isinstance(obj, BlackHole):
                 gravity_force = obj.calculate_attraction(
                     position, mass

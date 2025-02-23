@@ -75,7 +75,7 @@ class Player:
             self.jet_emitter.flying = False
             self.jet_channel.fadeout(100)
 
-        if self.flying_last == False and self.jet_emitter.flying == True:
+        if not self.flying_last and self.jet_emitter.flying:
             self.jet_channel.play(self.jet_sound, -1)
 
         self.flying_last = self.jet_emitter.flying

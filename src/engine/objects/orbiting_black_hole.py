@@ -1,0 +1,20 @@
+import pygame
+from src.engine.constants import SPEED_FACTOR
+from src.engine.objects.black_hole import BlackHole
+
+
+class OrbitingBlackHole(BlackHole):
+    def __init__(self, origin, position, mass, rot_speed):
+        super().__init__(position, mass)
+
+        self.origin = pygame.Vector2(origin)
+        self.rot_speed = rot_speed
+
+    # def draw additional circle
+
+    def update(self, delta):
+        vec = self.position - self.origin
+        vec.rotate_ip(self.rot_speed * delta * SPEED_FACTOR)
+
+        new_position = vec + self.origin
+        self.position = new_position
