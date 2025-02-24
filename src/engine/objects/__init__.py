@@ -1,3 +1,4 @@
+from .object import Object
 from .black_hole import BlackHole
 from .orbiting_black_hole import OrbitingBlackHole
 from .asteroid import Asteroid
@@ -9,7 +10,7 @@ from .launch_point import LaunchPoint
 from .finish_point import FinishPoint
 from .handler import ObjectHandler
 
-__all__ = ['BlackHole', 'OrbitingBlackHole', 'Asteroid', 
+__all__ = ['Object', 'BlackHole', 'OrbitingBlackHole', 'Asteroid', 
            'ForceZone', 'GravityInvertor', 
            'Collectible', 'Portal', 'PortalPair', 
            'LaunchPoint', 'FinishPoint', 'ObjectHandler', 
