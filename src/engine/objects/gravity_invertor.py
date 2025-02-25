@@ -1,3 +1,5 @@
+# not used yet
+
 class GravityInvertor:
     def __init__(self, position, timer, object_handler):
         self.position = position

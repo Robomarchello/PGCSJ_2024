@@ -8,10 +8,9 @@ from .collectible import Collectible
 from .portals import Portal, PortalPair
 from .launch_point import LaunchPoint
 from .finish_point import FinishPoint
-from .handler import ObjectHandler
 
 __all__ = ['Object', 'BlackHole', 'OrbitingBlackHole', 'Asteroid', 
            'ForceZone', 'GravityInvertor', 
            'Collectible', 'Portal', 'PortalPair', 
-           'LaunchPoint', 'FinishPoint', 'ObjectHandler', 
+           'LaunchPoint', 'FinishPoint' 
 ]

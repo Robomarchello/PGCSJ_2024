@@ -1,7 +1,7 @@
 import pygame
 from src.engine.constants import SPEED_FACTOR
 from src.engine.asset_manager import AssetManager
-from src.engine.objects.object import Object
+from src.engine.objects import Object
 
 
 class Asteroid(Object):

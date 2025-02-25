@@ -8,19 +8,18 @@ from src.engine.camera import Camera
 from src.engine.utils import Debug
 from src.engine.asset_manager import AssetManager
 from src.engine.vfx.emitters import Emitter, JetEmitter
+from src.engine.objects import Object
 
-rect = pygame.Rect(0, 0, 32, 32)
 
 
-class Player:
+
+class Player(Object):
     radius = 32
 
     def __init__(self):
-        self.position = Vector2(100, SCREEN_H / 2)
-        self.last_position = self.position.copy()
+        position = Vector2(100, SCREEN_H / 2) # <- doesn't make sense
 
-        self.velocity = Vector2(0, 0)
-        self.acceleration = Vector2(0, 0)
+        super().__init__(position, velocity=0, mass=1)
 
         self.image = AssetManager.images['player']
         self.jet_sound = AssetManager.sounds['jet']
@@ -35,13 +34,12 @@ class Player:
             math.cos(self.look_angle), -math.sin(self.look_angle)
         )
 
+        emitter_rect = pygame.Rect(0, 0, 32, 32)
         self.explode_emitter = Emitter(
             (0, 360), (1, 2), (2.5, 3.5), (0, 1), (245, 232, 199), (5, 24, 75), 
-            AssetManager.images['particle'], 130, rect, None
+            AssetManager.images['particle'], 130, emitter_rect, None
         )
         self.jet_emitter = JetEmitter()
-
-        self.mass = 1
 
         self.jet_location = pygame.Vector2()
         
@@ -49,15 +47,12 @@ class Player:
         self.exploded = False
         self.flying_last = False
 
-    @property
-    def cam_pos(self):
-        return self.position - Camera.pos
-
     def update(self, delta):
         Debug.add_text(f'player_pos: {self.position}')
         if self.freeze:
             self.velocity *= 0
             self.acceleration *= 0  
+        
         self.velocity += self.acceleration * delta * SPEED_FACTOR
         self.position += self.velocity * delta * SPEED_FACTOR
 
@@ -81,8 +76,6 @@ class Player:
         self.flying_last = self.jet_emitter.flying
 
         self.acceleration *= 0 
-
-        self.last_position = self.position.copy()
 
     def get_look_angle(self, vector):
         self.look_angle = math.degrees(math.atan2(-vector.y, vector.x)) - 90
@@ -115,7 +108,6 @@ class Player:
 
             self.explode_emitter.emit_rect.center = self.position
             self.explode_emitter.burst()
-
 
     def clear_emitters(self):
         self.jet_emitter.clear()

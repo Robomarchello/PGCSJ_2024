@@ -1,22 +1,19 @@
 import pygame
 from src.engine.constants import SPEED_FACTOR
 from src.engine.utils import collide_circles
-from src.engine.camera import Camera
+from src.engine.objects import Object
 
 
-class LaunchPoint:
+class LaunchPoint(Object):
     def __init__(self, position, radius, player, controller):
-        self.position = position
+        super().__init__(position)
+
         self.radius = radius
 
         self.player = player
         self.controller = controller
         
         self.used = False
-
-    @property
-    def cam_pos(self):
-        return Camera.displace_position(self.position)
 
     def update(self, delta):
         collision = collide_circles(

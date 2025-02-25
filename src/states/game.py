@@ -3,7 +3,7 @@ from pygame.locals import *
 from src.engine import State, Debug, AssetManager
 from src.engine.constants import *
 from src.engine.objects.player import Player, Controller
-from src.engine.objects import ObjectHandler
+from src.engine.handler import ObjectHandler
 from src.engine.level import Level, LevelManager
 from src.engine.camera import Camera
 from src.engine.space import SpaceBackground

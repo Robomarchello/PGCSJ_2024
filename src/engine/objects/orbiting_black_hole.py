@@ -1,6 +1,6 @@
 import pygame
 from src.engine.constants import SPEED_FACTOR
-from src.engine.objects.black_hole import BlackHole
+from src.engine.objects import BlackHole
 
 
 class OrbitingBlackHole(BlackHole):

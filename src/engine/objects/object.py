@@ -9,6 +9,7 @@ class Object(Base):
         self.position = pygame.Vector2(position) # real position
         self.velocity = pygame.Vector2(velocity)
         self.acceleration = pygame.Vector2()
+        # self.force = pygame.Vector2() then a = f/m
 
         self.mass = mass
 

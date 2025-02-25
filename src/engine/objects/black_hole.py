@@ -3,15 +3,10 @@ import pygame
 from src.engine.constants import GRAVITY_CONST
 from src.engine.asset_manager import AssetManager
 from src.engine.vfx.emitters import BlackHoleEmitter
-from src.engine.objects.object import Object
+from src.engine.objects import Object
 
 
 class BlackHole(Object):
-    small_black_hole = AssetManager.images['smol_blek_hole']
-    black_hole_texture = AssetManager.images['black_hole']
-    small_white_hole = AssetManager.images['smol_white_hole']
-    white_hole_texture = AssetManager.images['white_hole']
-
     def __init__(self, position, mass):
         super().__init__(position, mass=mass)
 
@@ -39,15 +34,15 @@ class BlackHole(Object):
     def _determine_texture(self):
         if self.mass > 0:
             if self.radius <= 64:
-                return self.small_black_hole
+                return AssetManager.images['smol_blek_hole']
             else:
-                return self.black_hole_texture
+                return AssetManager.images['black_hole']
                 
         elif self.mass < 0:
             if self.radius <= 64:
-                return self.small_white_hole
+                return AssetManager.images['smol_white_hole']
             else:
-                return self.white_hole_texture
+                return AssetManager.images['white_hole']
 
     def update(self, delta):
         self.pulsing_timer += delta * 3 # meh constant
@@ -57,13 +52,13 @@ class BlackHole(Object):
         self.emitter.update_rect(self.position)
         self.emitter.update(delta)
 
-    def calculate_attraction(self, other_object: Object):
+    def calculate_attraction(self, position_other, mass_other): # other_object: Object):
         '''Calculate gravitation force between two objects'''
-        diff = self.position - other_object.position
+        diff = self.position - position_other
         if diff == (0, 0):
             return pygame.Vector2()
         direction = diff.normalize()
         distance = diff.magnitude()
-        gravity_force = (GRAVITY_CONST * other_object.mass * self.mass) / distance ** 2
+        gravity_force = (GRAVITY_CONST * mass_other * self.mass) / distance ** 2
         
         return direction * gravity_force

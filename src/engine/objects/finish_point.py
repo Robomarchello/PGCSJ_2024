@@ -1,13 +1,14 @@
 import pygame
 from src.engine.constants import SPEED_FACTOR
 from src.engine.utils import collide_circles
-from src.engine.camera import Camera
 from src.engine.asset_manager import AssetManager
+from src.engine.objects import Object
 
 
-class FinishPoint:
+class FinishPoint(Object):
     def __init__(self, position, radius, player):
-        self.position = pygame.Vector2(position)
+        super().__init__(position)
+
         self.radius = radius
 
         self.player = player
@@ -28,10 +29,6 @@ class FinishPoint:
         self.last_change = False
         self.sound = AssetManager.sounds['finished']
         
-    @property
-    def cam_pos(self):
-        return Camera.displace_position(self.position) 
-
     def update(self, delta):
         collision = collide_circles(
             self.position, self.radius,

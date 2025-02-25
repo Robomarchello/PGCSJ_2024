@@ -1,3 +1,12 @@
+"""
+Idea:
+logic here can be changed, 
+to ensure that assets will load at any time.
+Right now i don't like that I have to call load_assets() before everything 
+I saw someone use lru_cache which is kinda smart.
+Something similar can be done.
+Now I think there are more convinient ways indeed
+"""
 from typing import Dict
 import json
 import os
