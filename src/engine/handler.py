@@ -15,27 +15,20 @@ class ObjectHandler:
 
     def get_forces(self, position, mass):
         '''
-        Calculate forces that self.objects act on a body (position, mass)
+        Calculate force that objects act on (position, mass)
         '''
         forces = pygame.Vector2(0, 0)
         for obj in self.objects:
-            # use match case
-            if isinstance(obj, BlackHole):
+            if isinstance(obj, BlackHole): # Includes OrbitingBlackHole 
                 gravity_force = obj.calculate_attraction(
                     position, mass
                 )
                 forces += gravity_force
 
-            if isinstance(obj, OrbitingBlackHole):
-                gravity_force = obj.calculate_attraction(
-                    position, mass
-                )
-                forces += gravity_force
-
-            if isinstance(obj, ForceZone):
+            elif isinstance(obj, ForceZone):
                 if obj.rect.collidepoint(position):
                     forces += obj.force
-
+                    
         return forces
 
     def teleport_check(self, position, radius, velocity):
@@ -56,9 +49,7 @@ class ObjectHandler:
 
     def update(self, delta):
         for obj in self.objects:
-            if isinstance(obj, BlackHole):
-                obj.update(delta)
-            if isinstance(obj, OrbitingBlackHole):
+            if isinstance(obj, BlackHole): 
                 obj.update(delta)
 
         forces = self.get_forces(self.player.position, self.player.mass)
@@ -103,15 +94,7 @@ class ObjectHandler:
                 )
                 if collision:
                     return True
-
-            if isinstance(obj, OrbitingBlackHole):
-                collision = collide_circles(
-                    obj.position, obj.radius,
-                    position, radius
-                )
-                if collision:
-                    return True
-
+                
         for obstacle in self.obstacles:
             if isinstance(obstacle, Asteroid):
                 collision = collide_circles(
