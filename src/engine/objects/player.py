@@ -9,8 +9,7 @@ from src.engine.utils import Debug
 from src.engine.asset_manager import AssetManager
 from src.engine.vfx.emitters import Emitter, JetEmitter
 from src.engine.objects import Object
-
-
+from src.engine.handler import ObjectHandler
 
 
 class Player(Object):
@@ -115,7 +114,7 @@ class Player(Object):
 
 
 class Controller:
-    def __init__(self, player, rect, object_handler):
+    def __init__(self, player, rect, object_handler: ObjectHandler):
         self.player = player
         self.rect = rect
 
@@ -179,9 +178,13 @@ class Controller:
         else:
             start_vel = self.player.velocity.copy()
             
-        start_acc = self.player.acceleration.copy()
         self.prediction = self.object_handler.predict_player(
-            0.016, self.player.position, start_vel, start_acc, self.preview_balls
+            time=0.016, 
+            position=self.player.position, 
+            start_vel=start_vel,
+            mass=self.player.mass,
+            radius=self.player.radius, 
+            count=self.preview_balls
             )[::3]
 
         self.rect.center = self.player.position
@@ -199,7 +202,6 @@ class Controller:
 
             if keys[pygame.K_s]:
                 self.player.position.y += DEBUG_VEL * delta * SPEED_FACTOR
-
 
     def handle_event(self, event):
         if event.type == MOUSEBUTTONDOWN:

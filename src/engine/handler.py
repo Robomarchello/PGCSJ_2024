@@ -13,30 +13,32 @@ class ObjectHandler:
         self.objects = objects
         self.obstacles = obstacles
 
-    def get_forces(self, position, mass):
+    def get_forces(self, obj: Object):
         '''
         Calculate force that objects act on (position, mass)
         '''
         forces = pygame.Vector2(0, 0)
-        for obj in self.objects:
-            if isinstance(obj, BlackHole): # Includes OrbitingBlackHole 
-                gravity_force = obj.calculate_attraction(
-                    position, mass
-                )
+        for other_obj in self.objects:
+            if isinstance(other_obj, BlackHole): # Includes OrbitingBlackHole 
+                gravity_force = other_obj.calculate_attraction(obj)
                 forces += gravity_force
 
-            elif isinstance(obj, ForceZone):
-                if obj.rect.collidepoint(position):
-                    forces += obj.force
+            elif isinstance(other_obj, ForceZone):
+                if other_obj.rect.collidepoint(obj.position):
+                    forces += other_obj.force
                     
         return forces
 
-    def teleport_check(self, position, radius, velocity):
-        for obj in self.objects:
-            if isinstance(obj, PortalPair):
-                rect = pygame.Rect(0, 0, radius * 2, radius * 2)
-                rect.center = position
-                collision = obj.on_collision(rect, velocity)
+    def teleport_check(self, obj: Object):
+        if not hasattr(obj, "radius"):
+            raise AttributeError(
+                f"Object of type {type(obj).__name__} must have a 'radius' attribute."
+            )
+        for other_obj in self.objects:
+            if isinstance(other_obj, PortalPair):
+                rect = pygame.Rect(0, 0, obj.radius * 2, obj.radius * 2)
+                rect.center = obj.position
+                collision = other_obj.on_collision(rect, obj.velocity)
 
                 return collision
 
@@ -52,15 +54,12 @@ class ObjectHandler:
             if isinstance(obj, BlackHole): 
                 obj.update(delta)
 
-        forces = self.get_forces(self.player.position, self.player.mass)
+        forces = self.get_forces(self.player)
 
         if not self.player.exploded:
             self.player.acceleration += forces
 
-            collision = self.teleport_check(
-                self.player.position, 
-                10, self.player.velocity
-                )
+            collision = self.teleport_check(self.player)
             if collision:
                 new_rect, new_vel = collision
                 self.player.position.update(new_rect.center)
@@ -71,7 +70,7 @@ class ObjectHandler:
     def _update_obstacles(self, delta):
         # update dynamic objects
         for obstacle in self.obstacles:
-            forces = self.get_forces(obstacle.position, obstacle.mass)
+            forces = self.get_forces(obstacle)
             obstacle.force += forces
 
             collision = self.teleport_check(
@@ -85,66 +84,56 @@ class ObjectHandler:
 
             obstacle.update(delta)
 
-    def death_collision(self, position, radius):
-        for obj in self.objects:
-            if isinstance(obj, BlackHole):
+    def death_collision(self, obj: Object):
+        if not hasattr(obj, "radius"):
+            raise AttributeError(
+                f"Object of type {type(obj).__name__} must have a 'radius' attribute."
+            )
+        for other_obj in self.objects:
+            if isinstance(other_obj, BlackHole):
                 collision = collide_circles(
-                    obj.position, obj.radius,
-                    position, radius
+                    other_obj.position, other_obj.radius, obj.position, obj.radius
                 )
                 if collision:
                     return True
-                
         for obstacle in self.obstacles:
             if isinstance(obstacle, Asteroid):
                 collision = collide_circles(
-                    obstacle.position, obstacle.radius,
-                    position, radius
+                    obstacle.position, obstacle.radius, obj.position, obj.radius
                 )
                 if collision:
                     return True
-
         return False
 
-    def predict_player(self, time, position, start_vel, start_accel, count):
+    def predict_player(self, time, position, start_vel, mass, radius, count):
         '''
         get the position of player 
         after given time interval and prediction count
         '''
         positions = [position.copy()]
-        velocity = pygame.Vector2(start_vel)
-        acceleration = pygame.Vector2(start_accel)
-        radius = self.player.radius
+
+        prediction_obj = PredictionObject(
+            position, start_vel, mass, radius
+        )
 
         for _ in range(count):
-            last_pos = positions[-1]
-            forces = self.get_forces(last_pos, self.player.mass)
-
-            acceleration += forces    
-
-            velocity += acceleration * time * SPEED_FACTOR
-            last_pos += velocity * time * SPEED_FACTOR
-            acceleration *= 0 
+            forces = self.get_forces(prediction_obj)
+            prediction_obj.force += forces    
+            prediction_obj.update(time)
 
             # portal stuff
-            collision = self.teleport_check(
-                last_pos, 
-                10, velocity
-                )
+            collision = self.teleport_check(prediction_obj)
             if collision:
                 new_rect, new_vel = collision
-                last_pos = pygame.Vector2(new_rect.center)
-                velocity = new_vel
+                prediction_obj.position = pygame.Vector2(new_rect.center)
+                prediction_obj.velocity = new_vel
 
-            if self.death_collision(last_pos, radius):
+            if self.death_collision(prediction_obj):
                 return positions
 
-            positions.append(last_pos.copy())
+            positions.append(prediction_obj.position.copy())
 
-        if count == 1:
-            return last_pos
-        else:
-            return positions
+        return positions
         
     def read_objects(self, file_path):
         pass

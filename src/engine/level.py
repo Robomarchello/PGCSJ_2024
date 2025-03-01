@@ -63,9 +63,7 @@ class Level:
         self.text_visible = False
 
     def update(self, delta):   
-        if self.object_handler.death_collision(
-            self.player.position, self.player.radius
-        ):
+        if self.object_handler.death_collision(self.player):
             self.player.velocity *= 0
             self.player.acceleration *= 0
 

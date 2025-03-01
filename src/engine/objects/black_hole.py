@@ -52,13 +52,13 @@ class BlackHole(Object):
         self.emitter.update_rect(self.position)
         self.emitter.update(delta)
 
-    def calculate_attraction(self, position_other, mass_other): # other_object: Object):
+    def calculate_attraction(self, obj: Object):
         '''Calculate gravitation force between two objects'''
-        diff = self.position - position_other
+        diff = self.position - obj.position
         if diff == (0, 0):
             return pygame.Vector2()
         direction = diff.normalize()
         distance = diff.magnitude()
-        gravity_force = (GRAVITY_CONST * mass_other * self.mass) / distance ** 2
+        gravity_force = (GRAVITY_CONST * obj.mass * self.mass) / distance ** 2
         
         return direction * gravity_force
