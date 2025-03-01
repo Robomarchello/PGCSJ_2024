@@ -117,7 +117,7 @@ class Emitter:
     def _draw_particle(self, particle, surface):
         rotated_texture = self.cached_texture_rot[int(particle.texture_rotation) % 360 - 1]
         rotated_texture_rect = rotated_texture.get_rect(center=particle.texture_rect.center)
-        texture = pygame.Surface(rotated_texture.get_size())
+        texture = pygame.Surface(rotated_texture_rect.size)
         texture.fill(particle.crnt_color)
         texture.blit(rotated_texture, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
 

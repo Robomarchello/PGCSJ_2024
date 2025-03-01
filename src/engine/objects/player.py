@@ -52,8 +52,7 @@ class Player(Object):
             self.velocity *= 0
             self.acceleration *= 0  
         
-        self.velocity += self.acceleration * delta * SPEED_FACTOR
-        self.position += self.velocity * delta * SPEED_FACTOR
+        self.motion_logic(delta)
 
         self.get_look_angle(self.velocity)
 
@@ -73,8 +72,6 @@ class Player(Object):
             self.jet_channel.play(self.jet_sound, -1)
 
         self.flying_last = self.jet_emitter.flying
-
-        self.acceleration *= 0 
 
     def get_look_angle(self, vector):
         self.look_angle = math.degrees(math.atan2(-vector.y, vector.x)) - 90

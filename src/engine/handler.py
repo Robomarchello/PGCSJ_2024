@@ -1,5 +1,4 @@
 import pygame
-from src.engine.constants import SPEED_FACTOR
 from src.engine.utils import collide_circles
 from src.engine.objects import *
 
@@ -57,7 +56,7 @@ class ObjectHandler:
         forces = self.get_forces(self.player)
 
         if not self.player.exploded:
-            self.player.acceleration += forces
+            self.player.force += forces
 
             collision = self.teleport_check(self.player)
             if collision:
@@ -73,10 +72,7 @@ class ObjectHandler:
             forces = self.get_forces(obstacle)
             obstacle.force += forces
 
-            collision = self.teleport_check(
-                obstacle.position, 
-                10, obstacle.velocity
-                )
+            collision = self.teleport_check(obstacle)
             if collision:
                 new_rect, new_vel = collision
                 obstacle.position = pygame.Vector2(new_rect.center)
