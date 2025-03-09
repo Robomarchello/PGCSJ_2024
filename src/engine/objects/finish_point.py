@@ -54,6 +54,11 @@ class FinishPoint(Object):
             self.sound.play()
         self.last_change = collision
 
+    def draw(self, surface):
+        rotated_image = pygame.transform.rotate(self.image, self.angle)
+        image_rect = rotated_image.get_rect(center=self.cam_pos)
+        surface.blit(rotated_image, image_rect.topleft)
+
     def pulling_force(self, position): 
         difference = pygame.Vector2(
             self.position[0] - position[0],
@@ -61,7 +66,17 @@ class FinishPoint(Object):
         )
         return difference * 0.1
 
-    def draw(self, surface):
-        rotated_image = pygame.transform.rotate(self.image, self.angle)
-        image_rect = rotated_image.get_rect(center=self.cam_pos)
-        surface.blit(rotated_image, image_rect.topleft)
+    def serialize(self):
+        return {
+            'type': 'FinishPoint',
+            'position': self.position,
+            'radius': self.radius
+        }
+
+    @classmethod
+    def deserialize(cls, data: dict, player):
+        return cls(
+            position=data['position'],
+            radius=data['radius'],
+            player=player
+            )

@@ -21,3 +21,21 @@ class Asteroid(Object):
 
         self.texture_rect.center = self.cam_pos
         surface.blit(self.texture, self.texture_rect.topleft)
+
+    def serialize(self):
+        return {
+            'type': 'Asteroid',
+            'position': self.position,
+            'velocity': self.velocity,
+            'mass': self.mass,
+            'radius': self.radius
+        }
+    
+    @classmethod
+    def deserialize(cls, data: dict):
+        return cls(
+            position=data['position'],
+            velocity=data['velocity'],
+            mass=data['mass'],
+            radius=data['radius'],
+            )

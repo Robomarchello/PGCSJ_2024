@@ -8,7 +8,6 @@ from src.engine.utils import get_shake
 
 class Camera:
     # for every object, separate the physics position and player's view
-    # I think zooming would be cool, takes time though
     displacement = Vector2()
     pos = Vector2() 
     offset = Vector2(SCREEN_W // 2, SCREEN_H // 2)

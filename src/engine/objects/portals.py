@@ -21,11 +21,28 @@ class Portal:
         pygame.draw.rect(surface, self.color, cam_rect)
         pygame.draw.rect(surface, 'white', cam_hit_rect)
 
+    def serialize(self):
+        return {
+            'rect': self.rect,
+            'hitrect': self.hitrect,
+            'normal': self.normal,
+            'color': self.color,
+        }
+    
+    @classmethod
+    def deserialize(cls, data):
+        return cls(
+            rect=data['rect'],
+            hitrect=data['hitrect'],
+            normal=data['normal'],
+            color=data['color']
+        )
+
 
 class PortalPair:
     def __init__(self, portal_1, portal_2):
-        self.portal_1 = portal_1
-        self.portal_2 = portal_2
+        self.portal_1: Portal = portal_1
+        self.portal_2: Portal = portal_2
 
     def update(self, delta):
         pass
@@ -59,3 +76,16 @@ class PortalPair:
             return rect_after, vel_after
 
         return False
+    
+    def serialize(self):
+        return {
+            'portal_1': self.portal_1.serialize(),
+            'portal_2': self.portal_2.serialize()
+        }
+
+    @classmethod
+    def deserialize(cls, data):
+        return cls(
+            Portal.deserialize(data['portal1']),
+            Portal.deserialize(data['portal2'])
+        )

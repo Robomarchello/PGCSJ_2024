@@ -38,3 +38,19 @@ class LaunchPoint(Object):
 
     def draw(self, surface):
         pygame.draw.circle(surface, 'grey', self.cam_pos, self.radius)
+
+    def serialize(self):
+        return {
+            'type': 'LaunchPoint',
+            'position': self.position,
+            'radius': self.radius,
+        }
+
+    @classmethod
+    def deserialize(cls, data: dict, player, controller):
+        return cls(
+            position=data['position'],
+            radius=data['radius'],
+            player=player,
+            controller=controller
+            )

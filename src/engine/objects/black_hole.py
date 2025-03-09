@@ -62,3 +62,17 @@ class BlackHole(Object):
         gravity_force = (GRAVITY_CONST * obj.mass * self.mass) / distance ** 2
         
         return direction * gravity_force
+    
+    def serialize(self):
+        return {
+            'type': 'BlackHole',
+            'position': self.position,
+            'mass': self.mass,
+        }
+
+    @classmethod
+    def deserialize(cls, data: dict):
+        return cls(
+            position=data['position'],
+            mass=data['mass'],
+            )

@@ -50,7 +50,7 @@ class Player(Object):
         Debug.add_text(f'player_pos: {self.position}')
         if self.freeze:
             self.velocity *= 0
-            self.acceleration *= 0  
+            self.force *= 0
         
         self.motion_logic(delta)
 

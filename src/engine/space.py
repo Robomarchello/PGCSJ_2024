@@ -1,4 +1,3 @@
-import random
 import pygame
 from src.engine.constants import SPEED_FACTOR, SCREEN_W, SCREEN_H
 from src.engine.camera import Camera

@@ -18,3 +18,21 @@ class OrbitingBlackHole(BlackHole):
 
         new_position = vec + self.origin
         self.position = new_position
+
+    def serialize(self):
+        return {
+            'type': 'OrbitingBlackHole',
+            'origin': self.origin,
+            'position': self.position,
+            'mass': self.mass,
+            'rot_speed': self.rot_speed
+        }
+    
+    @classmethod
+    def deserialize(cls, data: dict, player, controller):
+        return cls(
+            position=data['position'],
+            radius=data['radius'],
+            player=player,
+            controller=controller
+            )

@@ -27,3 +27,19 @@ class Collectible(Object):
         else:
             surface.blit(self.texture_picked, cam_rect.topleft)
         #surface.blit(self.texture, self.rect.topleft)
+
+    def serialize(self):
+        return {
+            'type': 'Collectible',
+            'position': self.position,
+            'texture_key': self.texture_key,
+            'texture_key_picked': self.texture_key_picked
+        }
+    
+    @classmethod
+    def deserialize(cls, data: dict):
+        return cls(
+            position=data['position'],
+            texture_key=data['texture_key'],
+            texture_key_picked=data['texture_key_picked'],
+            )

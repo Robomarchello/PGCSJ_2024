@@ -3,6 +3,7 @@ from src.engine.camera import Camera
 from src.engine.base import Base
 from src.engine.constants import SPEED_FACTOR
 
+
 # base class for all objects
 class Object(Base):
     def __init__(self, position, velocity=0, mass=1):
@@ -15,6 +16,10 @@ class Object(Base):
 
         self.sprite = None #Sprite(image) when implemented
 
+    @property
+    def cam_pos(self):
+        return self.position - Camera.pos
+    
     def motion_logic(self, delta):
         self.acceleration = self.force / self.mass
         
@@ -23,6 +28,9 @@ class Object(Base):
 
         self.force *= 0
 
-    @property
-    def cam_pos(self):
-        return self.position - Camera.pos
+    def serialize(self):
+        pass
+
+    @classmethod
+    def deserialize(cls):
+        pass
