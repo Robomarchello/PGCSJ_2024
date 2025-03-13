@@ -23,7 +23,7 @@ class ForceZone:
     def serialize(self):
         return {
             'type': 'ForceZone',
-            'force': self.force,
+            'force': tuple(self.force),
             'rect': tuple(self.rect),
             'timer': self.timer
         }

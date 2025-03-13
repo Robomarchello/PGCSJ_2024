@@ -25,8 +25,8 @@ class Asteroid(Object):
     def serialize(self):
         return {
             'type': 'Asteroid',
-            'position': self.position,
-            'velocity': self.velocity,
+            'position': tuple(self.position),
+            'velocity': tuple(self.velocity),
             'mass': self.mass,
             'radius': self.radius
         }

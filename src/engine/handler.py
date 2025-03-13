@@ -53,10 +53,8 @@ class ObjectHandler:
             if isinstance(obj, BlackHole): 
                 obj.update(delta)
 
-        forces = self.get_forces(self.player)
-
         if not self.player.exploded:
-            self.player.force += forces
+            self.player.force += self.get_forces(self.player)
 
             collision = self.teleport_check(self.player)
             if collision:
@@ -69,8 +67,7 @@ class ObjectHandler:
     def _update_obstacles(self, delta):
         # update dynamic objects
         for obstacle in self.obstacles:
-            forces = self.get_forces(obstacle)
-            obstacle.force += forces
+            obstacle.force += self.get_forces(obstacle)
 
             collision = self.teleport_check(obstacle)
             if collision:
@@ -108,9 +105,7 @@ class ObjectHandler:
         '''
         positions = [position.copy()]
 
-        prediction_obj = PredictionObject(
-            position, start_vel, mass, radius
-        )
+        prediction_obj = PredictionObject(position, start_vel, mass, radius)
 
         for _ in range(count):
             forces = self.get_forces(prediction_obj)

@@ -90,3 +90,4 @@ class Game(State):
 
             if event.key == K_ESCAPE:
                 self.manager.next_state = states.Menu()
+                self.level_manager.save_progress(SAVE_PATH)

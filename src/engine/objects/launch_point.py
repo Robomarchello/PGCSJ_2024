@@ -42,7 +42,7 @@ class LaunchPoint(Object):
     def serialize(self):
         return {
             'type': 'LaunchPoint',
-            'position': self.position,
+            'position': tuple(self.position),
             'radius': self.radius,
         }
 

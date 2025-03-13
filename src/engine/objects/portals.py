@@ -25,7 +25,7 @@ class Portal:
         return {
             'rect': self.rect,
             'hitrect': self.hitrect,
-            'normal': self.normal,
+            'normal': tuple(self.normal),
             'color': self.color,
         }
     

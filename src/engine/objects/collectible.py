@@ -31,7 +31,7 @@ class Collectible(Object):
     def serialize(self):
         return {
             'type': 'Collectible',
-            'position': self.position,
+            'position': tuple(self.position),
             'texture_key': self.texture_key,
             'texture_key_picked': self.texture_key_picked
         }

@@ -2,6 +2,7 @@ import os
 import json
 from pathlib import Path
 import pygame
+from collections import defaultdict
 
 from src.engine.objects import *
 from src.engine.asset_manager import AssetManager
@@ -11,6 +12,15 @@ from src.engine.constants import *
 
 
 class Level:
+    obj_classes = {
+        'BlackHole': BlackHole,
+        'OrbitingBlackHole': OrbitingBlackHole,
+        'ForceZone': ForceZone,
+        'Asteroid': Asteroid,
+        'Collectible': Collectible,
+        'LaunchPoint': LaunchPoint
+    }
+
     def __init__(self, player, controller, object_handler, level_manager=None):
         self.player = player
         self.controller = controller
@@ -48,9 +58,6 @@ class Level:
         #self.save_level('src/levels/level14.json', False)
         #self.load_level('src/levels/level13.json')
 
-        self.object_handler.objects = self.objects
-        self.object_handler.obstacles = self.obstacles
-        
         Camera.focus = pygame.Vector2(SCREEN_AREA.center) #  self.player.position
         Camera.offset = pygame.Vector2(SCREEN_AREA.center)
         
@@ -72,18 +79,20 @@ class Level:
             if not self.collided:
                 self.collided = True
 
-            # Camera.secondary_focus = pygame.Vector2(self.finish_point.position)
-        
         for collectible in self.collectibles:
             if collide_circles(self.player.position, self.player.radius,
                                collectible.position, collectible.radius):
-                if not collectible.picked_up:
-                    collectible.picked_up = True
+                collectible.picked_up = True
         
         for launch_point in self.launch_points:
             launch_point.update(delta)
 
         self.finish_point.update(delta)
+
+        if self.finish_point.completed and not self.finish_point.reacted:
+            self.next_level()
+
+            self.finish_point.reacted = True
 
         self.time_restart_text(delta)
 
@@ -97,12 +106,6 @@ class Level:
             launch_point.draw(surface)
 
         self.finish_point.draw(surface)
-        
-        if self.finish_point.completed and not self.finish_point.reacted:
-            if self.level_manager is not None:
-                self.next_level()
-
-            self.finish_point.reacted = True
 
         self.restart_text(surface)
 
@@ -119,7 +122,6 @@ class Level:
         draw_dashed_line(
             surface, rect.bottomleft, rect.topleft, 10, 3, 'white', 3
         )
-        #pygame.draw.rect(surface, (255, 0, 0), rect, 3)
 
     def restart_text(self, surface):
         font = AssetManager.fonts['font_24']
@@ -147,110 +149,50 @@ class Level:
     def restart(self):
         # like why should I reset everything 
         # if I can just load the whole level
-        if self.path is not None:
-            self.load_level(self.path)
+        self.load_level(self.path)
 
-        self.player.freeze = True
-        self.player.velocity *= 0
-        self.player.acceleration *= 0
-        self.player.exploded = False
-        self.player.clear_emitters()
+        self.player.reset()
 
         self.collided = False
-        Camera.focus = pygame.Vector2(512, 384)
+        Camera.focus.update(SCREEN_W // 2, SCREEN_H // 2)
 
     def save_level(self, path, save=False):
         level_dict = {}
 
         # save objects
-        level_dict['objects'] = {}
-        obj_dict = level_dict['objects']
-        obj_id = 0
+        level_dict['objects'] = defaultdict(list)
         for obj in self.objects:
-            if isinstance(obj, BlackHole) and not isinstance(obj, OrbitingBlackHole):
-                key = f'black_hole_{obj_id}'
-                obj_dict[key] = {}
-                obj_dict[key]['position'] = tuple(obj.position)
-                obj_dict[key]['mass'] = obj.mass
+            data = obj.serialize()
+            group = data['type'] + 's'
 
-            if isinstance(obj, OrbitingBlackHole):
-                key = f'orbiting_black_hole_{obj_id}'
-                obj_dict[key] = {}
-                obj_dict[key]['origin'] = tuple(obj.origin)
-                obj_dict[key]['position'] = tuple(obj.position)
-                obj_dict[key]['mass'] = obj.mass
-                obj_dict[key]['rot_speed'] = obj.rot_speed
-
-            if isinstance(obj, ForceZone):
-                key = f'force_zone_{obj_id}'
-                obj_dict[key] = {}
-                obj_dict[key]['force'] = tuple(obj.force)
-                obj_dict[key]['rect'] = obj.rect
-                obj_dict[key]['timer'] = obj.timer
-
-            if isinstance(obj, PortalPair):
-                key = f'portal_pair_{obj_id}'
-                obj_dict[key] = {}
-                # looks kinda annoying
-                obj_dict[key]['portal1']['rect'] = obj.portal_1.rect
-                obj_dict[key]['portal1']['hitrect'] = obj.portal_1.hitrect
-                obj_dict[key]['portal1']['normal'] = tuple(obj.portal_1.normal)
-                obj_dict[key]['portal1']['color'] = obj.portal_1.color
-
-                obj_dict[key]['portal2']['rect'] = obj.portal_2.rect
-                obj_dict[key]['portal2']['hitrect'] = obj.portal_2.hitrect
-                obj_dict[key]['portal2']['normal'] = tuple(obj.portal_2.normal)
-                obj_dict[key]['portal2']['color'] = obj.portal_2.color
-
-            obj_id += 1
+            level_dict['objects'][group].append(data)
 
         # save obstacles
-        obs_id = 0
-        level_dict['obstacles'] = {}
-        obs_dict = level_dict['obstacles']
+        level_dict['obstacles'] = defaultdict(list)
         for obstacle in self.obstacles:
-            if isinstance(obstacle, Asteroid):
-                key = f'asteroid_{obs_id}' 
-                obs_dict[key] = {}
+            data = obstacle.serialize()
+            group = data['type'] + 's'
 
-                obs_dict[key]['position'] = tuple(obstacle.position)
-                obs_dict[key]['velocity'] = tuple(obstacle.velocity)
-                obs_dict[key]['mass'] = obstacle.mass
-                obs_dict[key]['radius'] = obstacle.radius
-        
-            obs_id += 1
+            level_dict['obstacles'][group].append(data)
 
         # save collectibles
-        level_dict['collectibles'] = {}
-        collectible_id = 0
-        collectibles_dict = level_dict['collectibles']
+        level_dict['collectibles'] = defaultdict(list)
         for collectible in self.collectibles:
-            key = f'collectible_{collectible_id}'
-            collectibles_dict[key] = {}
-            #position, texture=None, texture_picked=None
-            collectibles_dict[key]['position'] = tuple(collectible.position)
-            collectibles_dict[key]['texture_key'] = collectible.texture_key
-            collectibles_dict[key]['texture_key_picked'] = collectible.texture_key_picked
+            data = collectible.serialize()
+            group = data['type'] + 's'
 
-            collectible_id += 1
+            level_dict['collectibles'][group].append(data)
 
         # save launch points
-        level_dict['launch_points'] = {}
-        lp_id = 0
-        lp_dict = level_dict['launch_points']
+        level_dict['launch_points'] = defaultdict(list)
         for launch_point in self.launch_points:
-            key = f'launch_point_{lp_id}'
-            lp_dict[key] = {}
+            data = launch_point.serialize()
+            group = data['type'] + 's'
 
-            lp_dict[key]['position'] = tuple(launch_point.position)
-            lp_dict[key]['radius'] = launch_point.radius
-
-            lp_id += 1
+            level_dict['launch_points'][group].append(data)
 
         # save finish point
-        level_dict['finish_point'] = {}
-        level_dict['finish_point']['position'] = tuple(self.finish_point.position)
-        level_dict['finish_point']['radius'] = self.finish_point.radius 
+        level_dict['finish_point'] = self.finish_point.serialize()
 
         level_dict['level_bounds'] = tuple(self.level_bounds)
 
@@ -265,102 +207,49 @@ class Level:
                 json.dump(level_dict, file)
 
     def load_level(self, path):
-        self.objects = []
+        self.path = path
+
         with open(path, 'r') as file:
             level_dict = json.load(file)
 
-        if self.path is None:
-            self.path = path
-
         # read objects
+        self.objects = []
         obj_dict = level_dict['objects']
-        for obj_key in obj_dict:
-            if obj_key.startswith('black_hole'):
-                read_object = BlackHole(
-                    obj_dict[obj_key]['position'],
-                    obj_dict[obj_key]['mass']
+        for group in obj_dict.values():
+            for data in group:
+                self.objects.append(
+                    self.obj_classes[data['type']].deserialize(data)
                 )
-                self.objects.append(read_object)
-
-            if obj_key.startswith('orbiting_black_hole'):
-                read_object = OrbitingBlackHole(
-                    obj_dict[obj_key]['origin'],
-                    obj_dict[obj_key]['position'],
-                    obj_dict[obj_key]['mass'],
-                    obj_dict[obj_key]['rot_speed'],
-                )
-                self.objects.append(read_object)
-                
-            if obj_key.startswith('force_zone'):
-                read_object = ForceZone(
-                    obj_dict[obj_key]['force'],
-                    obj_dict[obj_key]['rect'],
-                    obj_dict[obj_key]['timer'],
-                )
-                self.objects.append(read_object)
-
-            if obj_key.startswith('portal_pair'):                
-                portal_1 = Portal(
-                    obj_dict[obj_key]['portal1']['rect'],
-                    obj_dict[obj_key]['portal1']['hitrect'],
-                    obj_dict[obj_key]['portal1']['normal'],
-                    obj_dict[obj_key]['portal1']['color'],
-                )
-                portal_2 = Portal(
-                    obj_dict[obj_key]['portal2']['rect'],
-                    obj_dict[obj_key]['portal2']['hitrect'],
-                    obj_dict[obj_key]['portal2']['normal'],
-                    obj_dict[obj_key]['portal2']['color'],
-                )
-                
-                read_object = PortalPair(portal_1, portal_2)
-
-                self.objects.append(read_object)
 
         # read obstacles
         self.obstacles = []
         obs_dict = level_dict['obstacles']
-        for obs_key in obs_dict:
-            if obs_key.startswith('asteroid'):
-                read_object = Asteroid(
-                    obs_dict[obs_key]['position'],
-                    obs_dict[obs_key]['velocity'],
-                    obs_dict[obs_key]['mass'],
-                    obs_dict[obs_key]['radius']
+        for group in obs_dict.values():
+            for data in group:
+                self.obstacles.append(
+                    self.obj_classes[data['type']].deserialize(data)
                 )
-                self.obstacles.append(read_object)
     
         # read collectibles
         self.collectibles = []
         collectibles_dict = level_dict['collectibles']
-        for collectible_key in collectibles_dict:
-            read_object = Collectible(
-                collectibles_dict[collectible_key]['position'],
-                collectibles_dict[collectible_key]['texture_key'],
-                collectibles_dict[collectible_key]['texture_key_picked']
-            )
-
-            self.collectibles.append(read_object)
+        for group in collectibles_dict:
+            for data in group:
+                self.collectibles.append(
+                    self.obj_classes[data['type']].deserialize(data)
+                )
 
         # read launch points
         self.launch_points = []
         lp_dict = level_dict['launch_points']
-        for lp_key in lp_dict:
-            read_object = LaunchPoint(
-                lp_dict[lp_key]['position'], 
-                lp_dict[lp_key]['radius'],
-                self.player,
-                self.controller
-            )
-
-            self.launch_points.append(read_object)
+        for group in lp_dict.values():
+            for data in group:
+                self.launch_points.append(
+                    self.obj_classes[data['type']].deserialize(data, self.player, self.controller)
+                )
 
         # read finish point
-        self.finish_point = FinishPoint(
-            level_dict['finish_point']['position'],
-            level_dict['finish_point']['radius'],
-            self.player
-        )
+        self.finish_point = FinishPoint.deserialize(level_dict['finish_point'], self.player)
 
         self.player_position = level_dict['player_position']
         self.player.position.update(self.player_position)
@@ -368,17 +257,7 @@ class Level:
         if level_dict.get('controller_max_speed'):
             self.player.controller = level_dict['controller_max_speed']
 
-        # level bounds
-        if level_dict['level_bounds'] is not None:
-            self.level_bounds = pygame.Rect(level_dict['level_bounds'])
-        else:
-            self.level_bounds = pygame.Rect(-10, -10, 1044, 788)
-
-        # IMPORTANT BELOW
-        self.launch_points.append(
-            LaunchPoint(self.player_position, self.player.radius * 1.3,
-                        self.player, self.controller)
-        )
+        self.level_bounds = pygame.Rect(level_dict['level_bounds'])
 
         self.object_handler.objects = self.objects
         self.object_handler.obstacles = self.obstacles
@@ -420,7 +299,6 @@ class LevelManager:
 
     def get_focus(self):
         # case for small levels
-        focus = None
         if self.crnt_level.in_bounds:
             focus = SCREEN_AREA.center
 
@@ -436,7 +314,11 @@ class LevelManager:
 
     def get_levels(self, folder_path):
         levels = []
-        for name in os.listdir(folder_path):
+        files = os.listdir(folder_path)
+        # making sure it's sorted same in all systems
+        files.sort()
+
+        for name in files:
             if name.endswith('.json'):
                 levels.append(folder_path + name)
         
@@ -458,21 +340,10 @@ class LevelManager:
         self.crnt_level.player.clear_emitters()
         
         self.progress[self.level_index] = True
-        self.save_progress(SAVE_PATH)
         self.level_index += 1
 
         #asteroid = Asteroid((512, 200), (2.5, 0), 1, 20)
         #self.crnt_level.obstacles.append(asteroid)
-
-    def progress_init(self, file_path):
-        my_file = Path(file_path)
-        if not my_file.is_file():
-            self.progress = [False] * len(self.levels)
-            self.progress[0] = True
-        else:
-            self.get_progress(SAVE_PATH)
-
-        self.save_progress(file_path)
 
     def get_progress(self, file_path):
         my_file = Path(file_path)
@@ -483,6 +354,16 @@ class LevelManager:
             data = json.load(file)
 
         self.progress = data
+
+    def progress_init(self, file_path):
+        my_file = Path(file_path)
+        if my_file.is_file():
+            self.get_progress(SAVE_PATH)
+        else:
+            self.progress = [False] * len(self.levels)
+            self.progress[0] = True
+
+        self.save_progress(file_path)
 
     def save_progress(self, file_path):
         with open(file_path, 'w') as file:

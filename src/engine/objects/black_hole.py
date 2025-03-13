@@ -66,7 +66,7 @@ class BlackHole(Object):
     def serialize(self):
         return {
             'type': 'BlackHole',
-            'position': self.position,
+            'position': tuple(self.position),
             'mass': self.mass,
         }
 

@@ -8,4 +8,3 @@ if __name__ == '__main__':
     AssetManager.load_assets(ASSETS_PATH)
 
     asyncio.run(App(Game()).loop())
-

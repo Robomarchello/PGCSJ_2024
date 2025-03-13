@@ -22,17 +22,17 @@ class OrbitingBlackHole(BlackHole):
     def serialize(self):
         return {
             'type': 'OrbitingBlackHole',
-            'origin': self.origin,
-            'position': self.position,
+            'origin': tuple(self.origin),
+            'position': tuple(self.position),
             'mass': self.mass,
             'rot_speed': self.rot_speed
         }
     
     @classmethod
-    def deserialize(cls, data: dict, player, controller):
+    def deserialize(cls, data: dict):
         return cls(
+            origin=data['origin'],
             position=data['position'],
-            radius=data['radius'],
-            player=player,
-            controller=controller
+            mass=data['mass'],
+            rot_speed=data['rot_speed']
             )

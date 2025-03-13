@@ -105,6 +105,13 @@ class Player(Object):
             self.explode_emitter.emit_rect.center = self.position
             self.explode_emitter.burst()
 
+    def reset(self):
+        self.freeze = True
+        self.velocity *= 0
+        self.acceleration *= 0
+        self.exploded = False
+        self.clear_emitters()
+
     def clear_emitters(self):
         self.jet_emitter.clear()
         self.explode_emitter.clear()
