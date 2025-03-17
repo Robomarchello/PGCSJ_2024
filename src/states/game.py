@@ -4,7 +4,7 @@ from src.engine import State, Debug, AssetManager
 from src.engine.constants import *
 from src.engine.objects.player import Player, Controller
 from src.engine.handler import ObjectHandler
-from src.engine.level import Level, LevelManager
+from src.engine.level import LevelManager
 from src.engine.camera import Camera
 from src.engine.space import SpaceBackground
 from src.states.transition import TransitionFade
@@ -85,7 +85,7 @@ class Game(State):
 
         if event.type == KEYDOWN:
             if event.key == K_r:
-                self.transition.function = self.level.restart
+                self.transition.function = self.level_manager.restart_level
                 self.transition.start(0.5)
 
             if event.key == K_ESCAPE:

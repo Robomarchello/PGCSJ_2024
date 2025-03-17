@@ -77,6 +77,21 @@ def draw_dashed_line(surface, pos1, pos2, dash_len, blank_len, color, width=1):
     pygame.draw.line(surface, color, last_pos, pos2, width)
 
 
+def draw_dashed_rect(surface, rect, dash_len, blank_len, color, width=1):
+    draw_dashed_line(
+        surface, rect.topleft, rect.topright, dash_len, blank_len, color, width
+    )
+    draw_dashed_line(
+        surface, rect.topright, rect.bottomright, dash_len, blank_len, color, width
+    )
+    draw_dashed_line(
+        surface, rect.bottomright, rect.bottomleft, dash_len, blank_len, color, width
+    )
+    draw_dashed_line(
+        surface, rect.bottomleft, rect.topleft, dash_len, blank_len, color, width
+    )
+
+
 class Debug:
     points = []
     lines = []
