@@ -8,6 +8,7 @@ from src.engine.asset_manager import AssetManager
 from src.engine.utils import collide_circles, draw_dashed_rect
 from src.engine.camera import Camera
 from src.engine.constants import *
+from src.engine.enums import FinishPointState
 
 
 class LevelLoader:
@@ -175,10 +176,10 @@ class Level:
 
         self.finish_point.update(delta)
 
-        if self.finish_point.completed and not self.finish_point.reacted:
+        if self.finish_point.crnt_state == FinishPointState.COMPLETED:
             self.level_manager.transition_next_level()
-
-            self.finish_point.reacted = True
+            
+            self.finish_point._change_state(FinishPointState.REACTED)
 
         self.time_restart_text(delta)
 

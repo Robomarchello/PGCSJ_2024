@@ -22,18 +22,15 @@ class LaunchPoint(Object):
         )
         if collision and not self.used:
             self.player.freeze = True
-            self.controller.shot = True
 
             self.controller.launch_point = self
 
             pull_force = self.pulling_force(self.player.position)
             self.player.position += pull_force * delta * SPEED_FACTOR
 
-    def pulling_force(self, position): 
-        difference = pygame.Vector2(
-            self.position[0] - position[0],
-            self.position[1] - position[1]
-        )
+    def pulling_force(self, position: pygame.Vector2): 
+        difference = self.position - position
+        
         return difference * 0.18
 
     def draw(self, surface):

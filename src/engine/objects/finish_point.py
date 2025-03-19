@@ -3,6 +3,7 @@ from src.engine.constants import SPEED_FACTOR
 from src.engine.utils import collide_circles
 from src.engine.asset_manager import AssetManager
 from src.engine.objects import Object
+from src.engine.enums import FinishPointState
 
 
 class FinishPoint(Object):
@@ -10,66 +11,64 @@ class FinishPoint(Object):
         super().__init__(position)
 
         self.radius = radius
-
         self.player = player
 
-        self.image = AssetManager.images['planet']
-
-        self.rotation_timer = 0.0
-        self.angle = 0
-
-        self.touched = False
+        self.rotation = 0.0
 
         self.complete_timer = 1.0
         self.timer = self.complete_timer
-        self.completed = False
-        self.reacted = False
+
+        self.crnt_state = FinishPointState.IDLE
+
+        # images
+        self.image = AssetManager.images['planet']
 
         # sounds
         self.last_change = False
         self.sound = AssetManager.sounds['finished']
-        
+
+    def _change_state(self, new_state):
+        '''Handles state transitions.'''
+        if self.crnt_state != new_state:
+            self.crnt_state = new_state
+            if new_state == FinishPointState.TOUCHING:
+                self.sound.play()
+                self.player.freeze = True
+
     def update(self, delta):
         collision = collide_circles(
             self.position, self.radius,
             self.player.position, self.player.radius
         )
-        if collision and not self.completed and not self.player.exploded:
-            self.player.freeze = True
-            self.touched = True
 
+        if self.crnt_state == FinishPointState.IDLE:
+            if collision and not self.player.exploded:
+                self._change_state(FinishPointState.TOUCHING)
+
+        elif self.crnt_state == FinishPointState.TOUCHING:
             pull_force = self.pulling_force(self.player.position)
             self.player.position += pull_force * delta * SPEED_FACTOR
-
-        if self.touched:
             self.timer -= delta
 
             if self.timer < 0.0:
-                self.completed = True
+                self._change_state(FinishPointState.COMPLETED)
 
-        self.rotation_timer += -delta
-        self.angle = self.rotation_timer
-
-        if not self.last_change and collision:
-            self.sound.play()
-        self.last_change = collision
+        self.rotation -= delta
 
     def draw(self, surface):
-        rotated_image = pygame.transform.rotate(self.image, self.angle)
+        rotated_image = pygame.transform.rotate(self.image, self.rotation)
         image_rect = rotated_image.get_rect(center=self.cam_pos)
         surface.blit(rotated_image, image_rect.topleft)
 
-    def pulling_force(self, position): 
-        difference = pygame.Vector2(
-            self.position[0] - position[0],
-            self.position[1] - position[1]
-        )
+    def pulling_force(self, position: pygame.Vector2): 
+        difference = self.position - position
+        
         return difference * 0.1
 
     def serialize(self):
         return {
             'type': 'FinishPoint',
-            'position': self.position,
+            'position': tuple(self.position),
             'radius': self.radius
         }
 
