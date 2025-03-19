@@ -20,6 +20,14 @@ class Player(Object):
 
         super().__init__(position, velocity=0, mass=1)
 
+        self.look_angle = 0
+        self.look_vec = pygame.Vector2()
+
+        self.freeze = True
+        self.exploded = False
+        self.flying_last = False
+
+        # sounds
         self.image = AssetManager.images['player']
         self.jet_sound = AssetManager.sounds['jet']
         self.jet_channel = pygame.mixer.Channel(0)
@@ -28,24 +36,15 @@ class Player(Object):
             AssetManager.sounds['explosion_2'],
         ]
 
-        self.look_angle = 0
-        self.look_vec = pygame.Vector2(
-            math.cos(self.look_angle), -math.sin(self.look_angle)
-        )
-
+        # particles
         emitter_rect = pygame.Rect(0, 0, 32, 32)
         self.explode_emitter = Emitter(
             (0, 360), (1, 2), (2.5, 3.5), (0, 1), (245, 232, 199), (5, 24, 75), 
             AssetManager.images['particle'], 130, emitter_rect, None
         )
         self.jet_emitter = JetEmitter()
-
         self.jet_location = pygame.Vector2()
         
-        self.freeze = True
-        self.exploded = False
-        self.flying_last = False
-
     def update(self, delta):
         Debug.add_text(f'player_pos: {self.position}')
         if self.freeze:
@@ -73,12 +72,10 @@ class Player(Object):
 
         self.flying_last = self.jet_emitter.flying
 
-    def get_look_angle(self, vector):
-        self.look_angle = math.degrees(math.atan2(-vector.y, vector.x)) - 90
+    def get_look_angle(self, vector): 
+        self.look_angle = math.degrees(math.atan2(-vector.y, vector.x))
         if vector != (0, 0):
             self.look_vec = vector.normalize()
-
-        Debug.add_text(vector)
 
     def draw(self, surface):
         self.jet_emitter.draw(surface)
@@ -107,9 +104,9 @@ class Player(Object):
 
     def reset(self):
         self.freeze = True
+        self.exploded = False
         self.velocity *= 0
         self.acceleration *= 0
-        self.exploded = False
         self.clear_emitters()
 
     def clear_emitters(self):
