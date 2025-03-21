@@ -16,9 +16,7 @@ class Player(Object):
     radius = 32
 
     def __init__(self):
-        position = Vector2(100, SCREEN_H / 2) # <- doesn't make sense
-
-        super().__init__(position, velocity=0, mass=1)
+        super().__init__(position=Vector2(), velocity=0, mass=1)
 
         self.look_angle = 0
         self.look_vec = pygame.Vector2()
