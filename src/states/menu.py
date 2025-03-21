@@ -1,6 +1,7 @@
-import json
 import pygame
 from pygame.locals import *
+
+from src.engine.save_manager import SaveManager
 from src.states.game import Game
 from src.engine.utils import get_shake
 from src.engine import State, AssetManager
@@ -90,8 +91,6 @@ class LevelSelection(State):
         self.level_buttons = []
 
         self.back_button = BackButton(self.to_menu) 
-        
-
 
         levels_num = 30
         x_num = 5
@@ -103,11 +102,6 @@ class LevelSelection(State):
         self.shake_timer = 0.0
 
         self.no_sound = AssetManager.sounds['no']
-
-
-        if PLATFORM == 'emscripten':
-            self.back_button.rect.top = 300 - self.offset
-            return
 
         for lvl_num in range(levels_num):
             if lvl_num % x_num == 0:
@@ -140,9 +134,6 @@ class LevelSelection(State):
     def draw(self):
         self.surface.fill((0, 0, 0))
         
-        if PLATFORM == 'emscripten':
-            self.draw_unsupported()
-
         for button in self.level_buttons:
             button.draw(self.surface)
         self.back_button.draw(self.surface)
@@ -202,10 +193,7 @@ class LevelSelection(State):
         else:
             self.x_shake = 0
 
-        if PLATFORM == 'emscripten':
-            self.back_button.rect.top = 500 - self.offset
-        else:
-            self.back_button.rect.top = self.crnt_pos[1] + 125 - self.offset
+        self.back_button.rect.top = self.crnt_pos[1] + 125 - self.offset
         self.back_button.update()
 
     def handle_event(self, event):
@@ -221,21 +209,9 @@ class LevelSelection(State):
         self.back_button.handle_event(event)
 
     def on_start(self):
-        if PLATFORM == 'emscripten':
-            return
-        
-        my_file = Path(SAVE_PATH)
-        if not my_file.is_file():
-            return
-        
-        with open(SAVE_PATH, 'r') as file:
-            data = json.load(file)
-
         for i in range(len(self.level_buttons)):
-            self.level_buttons[i].finished = data[i]
+            self.level_buttons[i].finished = SaveManager.data['levels_completed'][i]
 
-        self.progress = data
-    
     def on_exit(self):
         pass
 

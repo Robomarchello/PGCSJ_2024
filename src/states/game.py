@@ -1,6 +1,7 @@
 import pygame
 from pygame.locals import *
 from src.engine import State, Debug, AssetManager
+from src.engine.save_manager import SaveManager
 from src.engine.constants import *
 from src.engine.objects.player import Player, Controller
 from src.engine.handler import ObjectHandler
@@ -34,8 +35,7 @@ class Game(State):
             self.object_handler, self.transition
         )
 
-        self.level_manager.progress_init('src/assets/other/save.json')
-    
+        SaveManager.get_save(self.level_manager.level_count)
         self.level_manager.next_level()
         self.level = self.level_manager.crnt_level
 
@@ -90,4 +90,4 @@ class Game(State):
 
             if event.key == K_ESCAPE:
                 self.manager.next_state = states.Menu()
-                self.level_manager.save_progress(SAVE_PATH)
+                SaveManager.save_data()
