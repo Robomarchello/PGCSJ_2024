@@ -9,8 +9,8 @@ class Collectible(Object):
         self.texture_key = texture_key
         self.texture_key_picked = texture_key_picked
 
-        self.texture = AssetManager.images[texture_key]
-        self.texture_picked = AssetManager.images[texture_key_picked]
+        self.texture = AssetManager.images[texture_key].convert_alpha()
+        self.texture_picked = AssetManager.images[texture_key_picked].convert_alpha()
 
         self.rect = self.texture.get_rect(center=self.position)
         self.radius = self.rect.width / 2

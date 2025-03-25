@@ -91,14 +91,6 @@ class AssetManager():
         return images
     
     @classmethod
-    def convert_alpha_all(cls):
-        if not pygame.display.get_active():
-            raise Exception("Can't be converted, no active window")
-        
-        for image in cls.images:
-            cls.images[image] = cls.images[image].convert_alpha()
-    
-    @classmethod
     def load_sounds(cls, path):
         sounds = {}
         for name in os.listdir(path):

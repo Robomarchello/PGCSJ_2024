@@ -26,7 +26,7 @@ class Player(Object):
         self.flying_last = False
 
         # sounds
-        self.image = AssetManager.images['player']
+        self.image = AssetManager.images['player'].convert_alpha()
         self.jet_sound = AssetManager.sounds['jet']
         self.jet_channel = pygame.mixer.Channel(0)
         self.explosion_sounds = [
@@ -38,7 +38,7 @@ class Player(Object):
         emitter_rect = pygame.Rect(0, 0, 32, 32)
         self.explode_emitter = Emitter(
             (0, 360), (1, 2), (2.5, 3.5), (0, 1), (245, 232, 199), (5, 24, 75), 
-            AssetManager.images['particle'], 130, emitter_rect, None
+            AssetManager.images['particle'].convert_alpha(), 130, emitter_rect, None
         )
         self.jet_emitter = JetEmitter()
         self.jet_location = pygame.Vector2()

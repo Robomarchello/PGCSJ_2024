@@ -6,7 +6,7 @@ from src.engine.objects import Object
 class Asteroid(Object):
     def __init__(self, position, velocity, mass, radius):
         super().__init__(position, velocity, mass)
-        self.texture = AssetManager.images['asteroid']
+        self.texture = AssetManager.images['asteroid'].convert_alpha()
         self.texture_rect = self.texture.get_rect()
 
         self.radius = radius

@@ -39,7 +39,7 @@ class State:
         self.surface = pygame.Surface(SCREENSIZE)
         self.manager: StateMachine | None = None
 
-    def draw(self, screen):
+    def draw(self):
         pass
 
     def update(self, delta=1):

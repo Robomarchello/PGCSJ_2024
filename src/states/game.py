@@ -63,7 +63,7 @@ class Game(State):
 
         if self.level_manager.level_index == 31:
             self.surface.blit(
-                AssetManager.images['end_screen'], (0, 0)
+                AssetManager.images['end_screen'].convert(), (0, 0)
             )
 
     def update(self, delta):

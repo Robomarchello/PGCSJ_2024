@@ -34,15 +34,15 @@ class BlackHole(Object):
     def _determine_texture(self):
         if self.mass > 0:
             if self.radius <= 64:
-                return AssetManager.images['smol_blek_hole']
+                return AssetManager.images['smol_blek_hole'].convert_alpha()
             else:
-                return AssetManager.images['black_hole']
+                return AssetManager.images['black_hole'].convert_alpha()
                 
         elif self.mass < 0:
             if self.radius <= 64:
-                return AssetManager.images['smol_white_hole']
+                return AssetManager.images['smol_white_hole'].convert_alpha()
             else:
-                return AssetManager.images['white_hole']
+                return AssetManager.images['white_hole'].convert_alpha()
 
     def update(self, delta):
         self.pulsing_timer += delta * 3 # meh constant

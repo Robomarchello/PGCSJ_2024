@@ -21,7 +21,7 @@ class FinishPoint(Object):
         self.crnt_state = FinishPointState.IDLE
 
         # images
-        self.image = AssetManager.images['planet']
+        self.image = AssetManager.images['planet'].convert_alpha()
 
         # sounds
         self.last_change = False
