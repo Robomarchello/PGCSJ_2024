@@ -125,7 +125,7 @@ class LevelSelection(State):
         
         game = Game()
         game.level_manager.level_index = int(level)
-        game.level_manager.next_level()
+        game.level_manager.start_level()
         self.manager.next_state = game
 
     def to_menu(self):

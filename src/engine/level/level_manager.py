@@ -64,8 +64,8 @@ class LevelManager:
                 levels.append(folder_path + name)
         
         return levels
-
-    def next_level(self):
+    
+    def start_level(self):
         if self.level_index >= len(self.levels):
             return
         
@@ -79,28 +79,18 @@ class LevelManager:
             self.object_handler, self
             )
         
-        self.player.clear_emitters()
-        SaveManager.data['levels_completed'][self.level_index] = True
-
-        self.level_index += 1
+        self.player.reset()
 
         #asteroid = Asteroid((512, 200), (2.5, 0), 1, 20)
         #self.crnt_level.obstacles.append(asteroid)
+
+    def next_level(self):
+        SaveManager.data['levels_completed'][self.level_index] = True
+
+        self.level_index += 1        
+        self.start_level()
 
     def transition_next_level(self):
         transition = self.transition
         transition.function = self.next_level
         transition.start(1.5)
-
-    def restart_level(self):
-        self.crnt_level = LevelLoader.load_level(
-            path=self.levels[self.level_index],
-            player=self.player,
-            controller=self.controller,
-            object_handler=self.object_handler,
-            level_manager=self)
-
-        self.player.reset()
-
-        self.collided = False
-        Camera.focus.update(SCREEN_W // 2, SCREEN_H // 2)

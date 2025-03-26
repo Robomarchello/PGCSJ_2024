@@ -36,7 +36,7 @@ class Game(State):
         )
 
         SaveManager.get_save(self.level_manager.level_count)
-        self.level_manager.next_level()
+        self.level_manager.start_level()
         self.level = self.level_manager.crnt_level
 
     def on_start(self):
@@ -85,7 +85,8 @@ class Game(State):
 
         if event.type == KEYDOWN:
             if event.key == K_r:
-                self.transition.function = self.level_manager.restart_level
+                # Level restart
+                self.transition.function = self.level_manager.start_level
                 self.transition.start(0.5)
 
             if event.key == K_p:
