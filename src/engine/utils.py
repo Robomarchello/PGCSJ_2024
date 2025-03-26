@@ -100,13 +100,13 @@ class Debug:
     konami = [1073741906, 1073741906, 1073741905, 1073741905, 1073741904, 1073741903, 1073741904, 1073741903, 98, 97]
     keys_pressed = []
 
-    visible = False
+    enabled = False
 
     font: pygame.Font = AssetManager.load_font(DEBUG_FONT, DEBUG_SIZE)
 
     @classmethod
     def draw_queue(cls, screen):
-        if not cls.visible:
+        if not cls.enabled:
             cls.points = []
             cls.lines = []
             cls.texts = []
@@ -168,11 +168,11 @@ class Debug:
     def handle_event(cls, event):
         if event.type == KEYDOWN:
             if event.key == K_g:
-                cls.visible = not cls.visible
+                cls.enabled = not cls.enabled
             
             cls.keys_pressed.append(event.key)
             if len(cls.keys_pressed) > len(cls.konami):
                 cls.keys_pressed.pop(0)
             
             if cls.keys_pressed == cls.konami:
-                cls.visible = not cls.visible
+                cls.enabled = not cls.enabled

@@ -6,7 +6,6 @@ from src.engine.constants import *
 from src.engine.state_machine import StateMachine, State
 from src.engine.screen import Screen
 from src.engine.utils import Debug
-from src.engine.asset_manager import AssetManager
 
 
 class App(StateMachine):
@@ -16,8 +15,6 @@ class App(StateMachine):
         self.clock = pygame.time.Clock()
         self.screen = Screen(SCREENSIZE, TITLE) 
         
-        AssetManager.convert_alpha_all()
-
     async def loop(self):
         while True:
             self.handle_events()

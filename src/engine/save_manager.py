@@ -15,7 +15,7 @@ class SaveManager:
     def get_save(cls, level_count=None):
         '''Retrieve or initialize game save data'''
         if cls._save_exists():
-            cls.load_data()
+            cls._load_data()
         else:
             if level_count is None:
                 raise ValueError('Specify the level_count in order to save file')
@@ -34,7 +34,7 @@ class SaveManager:
         cls.data['levels_completed'][0] = True
 
     @classmethod
-    def load_data(cls):
+    def _load_data(cls):
         '''load game save from storage'''
         if PLATFORM == 'emscripten':
             cls.data = json.loads(cls.window.localStorage.getItem('game_data'))
@@ -50,3 +50,9 @@ class SaveManager:
         else:
             with open(SAVE_PATH, 'w') as file:
                 json.dump(cls.data, file)
+
+    @classmethod
+    def erase_data(cls, level_count):
+        '''Reset game data to the start'''
+        cls._initialize_save(level_count)
+        cls.save_data()

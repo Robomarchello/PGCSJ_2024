@@ -1,6 +1,6 @@
 from src.engine.app import App
-from src.states import Game, LoadAssets
+from src.states import Game, LoadState
 import asyncio
 
 if __name__ == '__main__':
-    asyncio.run(App(LoadAssets(next_state=Game)).loop())
+    asyncio.run(App(LoadState(next_state=Game)).loop())

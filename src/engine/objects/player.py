@@ -188,7 +188,7 @@ class Controller:
 
         self.rect.center = self.player.position
 
-        if self.debug_movement and Debug.visible:
+        if self.debug_movement and Debug.enabled:
             keys = pygame.key.get_pressed()
             if keys[pygame.K_a]:
                 self.player.position.x -= DEBUG_VEL * delta * SPEED_FACTOR

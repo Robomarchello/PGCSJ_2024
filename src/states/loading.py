@@ -5,7 +5,7 @@ from src.engine.constants import SCREENSIZE, ASSETS_PATH
 from src.engine.asset_manager import AssetManager
 
 
-class LoadAssets(State):
+class LoadState(State):
     '''
     This makes sure that display will initialize before using any of the image assets in the game. 
     Needed for usage of pygame.image.convert().

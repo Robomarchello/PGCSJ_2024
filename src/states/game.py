@@ -88,6 +88,10 @@ class Game(State):
                 self.transition.function = self.level_manager.restart_level
                 self.transition.start(0.5)
 
+            if event.key == K_p:
+                if Debug.enabled:
+                    SaveManager.erase_data(self.level_manager.level_count)
+                
             if event.key == K_ESCAPE:
                 self.manager.next_state = states.Menu()
                 SaveManager.save_data()
