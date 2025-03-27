@@ -4,7 +4,7 @@ from src.engine import State, Debug, AssetManager
 from src.engine.save_manager import SaveManager
 from src.engine.constants import *
 from src.engine.objects.player import Player, Controller
-from src.engine.handler import ObjectHandler
+from src.engine.physics_handler import PhysicsHandler
 from src.engine.level import LevelManager
 from src.engine.camera import Camera
 from src.engine.space import SpaceBackground
@@ -27,12 +27,12 @@ class Game(State):
 
         self.transition = TransitionFade(2)
 
-        self.object_handler = ObjectHandler(self.player, [], [])
-        self.controller = Controller(self.player, rect, self.object_handler)
-        # self.level = Level(self.player, self.controller, self.object_handler)
+        self.physics_handler = PhysicsHandler(self.player, [], [])
+        self.controller = Controller(self.player, rect, self.physics_handler)
+        # self.level = Level(self.player, self.controller, self.physics_handler)
         self.level_manager = LevelManager(
             LEVELS_PATH, self.player, self.controller, 
-            self.object_handler, self.transition
+            self.physics_handler, self.transition
         )
 
         SaveManager.get_save(self.level_manager.level_count)
@@ -50,7 +50,7 @@ class Game(State):
 
         self.space_backgroud.draw(self.surface)
 
-        self.object_handler.draw(self.surface)
+        self.physics_handler.draw(self.surface)
         self.level.draw(self.surface)
 
         self.controller.draw(self.surface)
@@ -72,7 +72,7 @@ class Game(State):
 
         self.player.update(delta)
         self.controller.update(delta)
-        self.object_handler.update(delta)
+        self.physics_handler.update(delta)
         self.level.update(delta)
         self.level_manager.update(delta)
 

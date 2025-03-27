@@ -1,12 +1,12 @@
 # not used yet
 
 class GravityInvertor:
-    def __init__(self, position, timer, object_handler):
+    def __init__(self, position, timer, physics_handler):
         self.position = position
 
         self.timer = timer
         self.crnt_timer = timer
-        self.object_handler = object_handler
+        self.physics_handler = physics_handler
         
     def draw(self, surface):
         pass

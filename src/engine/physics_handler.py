@@ -4,7 +4,7 @@ from src.engine.objects import *
 
 
 # physics sytem
-class ObjectHandler:
+class PhysicsHandler:
     # performs physical and other calculations
     def __init__(self, player, objects, obstacles):
         self.player = player

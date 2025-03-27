@@ -9,7 +9,7 @@ from src.engine.utils import Debug
 from src.engine.asset_manager import AssetManager
 from src.engine.vfx.emitters import Emitter, JetEmitter
 from src.engine.objects import Object
-from src.engine.handler import ObjectHandler
+from src.engine.physics_handler import PhysicsHandler
 
 
 class Player(Object):
@@ -63,7 +63,7 @@ class Player(Object):
             self.jet_emitter.flying = True
         else:
             self.jet_emitter.flying = False
-            self.jet_channel.fadeout(100)
+            self.jet_channel.fadeout(100) # could cause the bug
 
         if not self.flying_last and self.jet_emitter.flying:
             self.jet_channel.play(self.jet_sound, -1)
@@ -113,13 +113,13 @@ class Player(Object):
 
 
 class Controller:
-    def __init__(self, player, rect, object_handler: ObjectHandler):
+    def __init__(self, player, rect, physics_handler: PhysicsHandler):
         self.player = player
         self.rect = rect
 
         self.radius = rect.width / 2
 
-        self.object_handler = object_handler
+        self.physics_handler = physics_handler
         self.prediction = []
 
         self.preview_balls = 51 # 300
@@ -177,7 +177,7 @@ class Controller:
         else:
             start_vel = self.player.velocity.copy()
             
-        self.prediction = self.object_handler.predict_player(
+        self.prediction = self.physics_handler.predict_player(
             time=0.016, 
             position=self.player.position, 
             start_vel=start_vel,

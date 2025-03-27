@@ -75,8 +75,8 @@ class LevelLoader:
                 json.dump(level_dict, file)
 
     @classmethod
-    def load_level(cls, path, player, controller, object_handler, level_manager):
-        level = Level(player, controller, object_handler, level_manager)
+    def load_level(cls, path, player, controller, physics_handler, level_manager):
+        level = Level(player, controller, physics_handler, level_manager)
 
         with open(path, 'r') as file:
             level_dict = json.load(file)
@@ -118,17 +118,17 @@ class LevelLoader:
 
         level.level_bounds = pygame.Rect(level_dict['level_bounds'])
 
-        object_handler.objects = level.objects
-        object_handler.obstacles = level.obstacles
+        physics_handler.objects = level.objects
+        physics_handler.obstacles = level.obstacles
         
         return level
 
 
 class Level:
-    def __init__(self, player, controller, object_handler, level_manager):
+    def __init__(self, player, controller, physics_handler, level_manager):
         self.player = player
         self.controller = controller
-        self.object_handler = object_handler
+        self.physics_handler = physics_handler
         self.level_manager = level_manager
 
         self.objects = []
@@ -157,7 +157,7 @@ class Level:
         self.text_visible = False
 
     def update(self, delta):   
-        if self.object_handler.death_collision(self.player):
+        if self.physics_handler.death_collision(self.player):
             self.player.velocity *= 0
             self.player.acceleration *= 0
 

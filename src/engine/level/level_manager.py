@@ -8,7 +8,7 @@ from src.engine.constants import *
 
 
 class LevelManager:
-    def __init__(self, levels_folder, player, controller, object_handler, transition):
+    def __init__(self, levels_folder, player, controller, physics_handler, transition):
         self.levels = self.get_levels(levels_folder)
         self.level_count = len(self.levels)
 
@@ -18,7 +18,7 @@ class LevelManager:
         self.levels_folder = levels_folder
         self.player = player
         self.controller = controller
-        self.object_handler = object_handler
+        self.physics_handler = physics_handler
 
         self.transition = transition
         self.transition.function = self.next_level
@@ -76,7 +76,7 @@ class LevelManager:
         self.crnt_level = LevelLoader.load_level(
             self.levels[self.level_index],
             self.player, self.controller, 
-            self.object_handler, self
+            self.physics_handler, self
             )
         
         self.player.reset()
