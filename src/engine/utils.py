@@ -8,6 +8,8 @@ from pygame.locals import KEYDOWN, K_g
 from src.engine.constants import *
 from src.engine.asset_manager import AssetManager
 
+def clamp(value, min_, max_):
+    return min(max(min_, value), max_)
 
 def load_spritesheet(image, sprite_size) -> List[pygame.Surface]:
     image_size = image.get_size()

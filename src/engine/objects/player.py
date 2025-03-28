@@ -1,14 +1,17 @@
 import random
 import math
+
 import pygame
 from pygame import Vector2
 from pygame.locals import MOUSEBUTTONDOWN, MOUSEBUTTONUP
-from src.engine.constants import SPEED_FACTOR, DEBUG_VEL, SCREEN_H, PLATFORM
+
+from src.engine.constants import SPEED_FACTOR, DEBUG_VEL, PLATFORM
+from src.engine.base import Base
 from src.engine.camera import Camera
-from src.engine.utils import Debug
+from src.engine.utils import Debug, clamp
 from src.engine.asset_manager import AssetManager
 from src.engine.vfx.emitters import Emitter, JetEmitter
-from src.engine.objects import Object
+from src.engine.objects import Object, LaunchPoint
 from src.engine.physics_handler import PhysicsHandler
 
 
@@ -25,7 +28,7 @@ class Player(Object):
         self.exploded = False
         self.flying_last = False
 
-        # sounds
+        # assets
         self.image = AssetManager.images['player'].convert_alpha()
         self.jet_sound = AssetManager.sounds['jet']
         self.jet_channel = pygame.mixer.Channel(0)
@@ -42,38 +45,6 @@ class Player(Object):
         )
         self.jet_emitter = JetEmitter()
         self.jet_location = pygame.Vector2()
-        
-    def update(self, delta):
-        Debug.add_text(f'player_pos: {self.position}')
-        if self.freeze:
-            self.velocity *= 0
-            self.force *= 0
-        
-        self.motion_logic(delta)
-
-        self.get_look_angle(self.velocity)
-
-        self.jet_location = self.position - self.look_vec * 30
-
-        self.explode_emitter.update(delta)
-        self.jet_emitter.update(delta, self.look_angle, self.jet_location,
-                                self.velocity.length())
-
-        if self.velocity.length() > 1:
-            self.jet_emitter.flying = True
-        else:
-            self.jet_emitter.flying = False
-            self.jet_channel.fadeout(100) # could cause the bug
-
-        if not self.flying_last and self.jet_emitter.flying:
-            self.jet_channel.play(self.jet_sound, -1)
-
-        self.flying_last = self.jet_emitter.flying
-
-    def get_look_angle(self, vector): 
-        self.look_angle = math.degrees(math.atan2(-vector.y, vector.x))
-        if vector != (0, 0):
-            self.look_vec = vector.normalize()
 
     def draw(self, surface):
         self.jet_emitter.draw(surface)
@@ -87,7 +58,40 @@ class Player(Object):
         
         # debug below
         # pygame.draw.circle(surface, 'red', self.cam_pos, self.radius, 2)
+
+    def update(self, delta):
+        Debug.add_text(f'player_pos: {self.position}')
+        if self.freeze:
+            self.velocity *= 0
+            self.force *= 0
+        
+        self.motion_logic(delta)
+        self.set_look_angle(self.velocity)
+        self._update_emitters(delta)
+        self._handle_jet_sound()
+
+    def set_look_angle(self, vector): 
+        self.look_angle = math.degrees(math.atan2(-vector.y, vector.x))
+        if vector != (0, 0):
+            self.look_vec = vector.normalize()
     
+    def _update_emitters(self, delta):
+        self.jet_location = self.position - self.look_vec * 30
+        self.explode_emitter.update(delta)
+        self.jet_emitter.update(delta, self.look_angle, self.jet_location, self.velocity.length())
+
+    def _handle_jet_sound(self):
+        if self.velocity.length() > 1:
+            self.jet_emitter.flying = True
+        else:
+            self.jet_emitter.flying = False
+            self.jet_channel.fadeout(100) # could cause the bug
+
+        if not self.flying_last and self.jet_emitter.flying:
+            self.jet_channel.play(self.jet_sound, -1)
+
+        self.flying_last = self.jet_emitter.flying
+
     def explode(self):
         if not self.exploded and not self.freeze:
             self.exploded = True
@@ -105,29 +109,26 @@ class Player(Object):
         self.exploded = False
         self.velocity *= 0
         self.acceleration *= 0
-        self.clear_emitters()
+        self._clear_emitters()
 
-    def clear_emitters(self):
+    def _clear_emitters(self):
         self.jet_emitter.clear()
         self.explode_emitter.clear()
 
 
-class Controller:
-    def __init__(self, player, rect, physics_handler: PhysicsHandler):
+class Controller(Base):
+    def __init__(self, player: Player, rect: pygame.Rect, physics_handler: PhysicsHandler):
         self.player = player
         self.rect = rect
-
         self.radius = rect.width / 2
 
         self.physics_handler = physics_handler
-        self.prediction = []
 
         self.preview_balls = 51 # 300
 
         self.holding = False
-        self.difference = pygame.Vector2(0, 0)  
 
-        self.launch_point = None
+        self.launch_point: LaunchPoint = None
         self.launch_force = pygame.Vector2()
         self.min_speed = 1
         self.max_speed = 7
@@ -145,62 +146,27 @@ class Controller:
             return
         
         pygame.draw.circle(surface, (245, 232, 199), self.cam_rect.center, self.radius, 3)
-        #pygame.draw.rect(surface, 'blue', self.cam_rect, 2)
         
+        self.draw_trajectory(surface)
+
+    def update(self, delta):
+        self.mouse_pos = pygame.mouse.get_pos()
+
+        self._handle_mouse_input()
+        self.rect.center = self.player.position
+
+        if self.debug_movement and Debug.enabled:
+            self._debug_movement(delta)
+
+    def draw_trajectory(self, surface):
         if not self.player.freeze or self.holding:
-            for position in self.prediction:
+            points = self._get_trajectory()
+            for position in points:
                 cam_pos = Camera.displace_position(position)
                 pygame.draw.circle(surface, 'white', cam_pos, 3)
 
         if self.holding:
             pygame.draw.circle(surface, 'grey', self.mouse_pos, 10)
-
-    def update(self, delta):
-        self.mouse_pos = pygame.mouse.get_pos()
-
-        if self.holding and self.player.cam_pos != self.mouse_pos:
-            self.difference = self.player.cam_pos - self.mouse_pos
-            norm_diff = self.difference.normalize()
-
-            magnitude = self.difference.magnitude() * 0.02  # 0.03
-            if PLATFORM == 'emscripten':
-                magnitude = self.difference.magnitude() * 0.05
-            magnitude = max(self.min_speed, magnitude)
-            magnitude = min(magnitude, self.max_speed)
-
-            self.launch_force = norm_diff * magnitude
-
-            self.player.get_look_angle(self.launch_force)
-
-        if self.holding:
-            start_vel = self.player.velocity + self.launch_force
-        else:
-            start_vel = self.player.velocity.copy()
-            
-        self.prediction = self.physics_handler.predict_player(
-            time=0.016, 
-            position=self.player.position, 
-            start_vel=start_vel,
-            mass=self.player.mass,
-            radius=self.player.radius, 
-            count=self.preview_balls
-            )[::3]
-
-        self.rect.center = self.player.position
-
-        if self.debug_movement and Debug.enabled:
-            keys = pygame.key.get_pressed()
-            if keys[pygame.K_a]:
-                self.player.position.x -= DEBUG_VEL * delta * SPEED_FACTOR
-
-            if keys[pygame.K_d]:
-                self.player.position.x += DEBUG_VEL * delta * SPEED_FACTOR
-
-            if keys[pygame.K_w]:
-                self.player.position.y -= DEBUG_VEL * delta * SPEED_FACTOR 
-
-            if keys[pygame.K_s]:
-                self.player.position.y += DEBUG_VEL * delta * SPEED_FACTOR
 
     def handle_event(self, event):
         if event.type == MOUSEBUTTONDOWN:
@@ -222,3 +188,50 @@ class Controller:
                     self.launch_point = None
 
                 self.holding = False
+
+    # --- Private Methods ---
+
+    def _get_trajectory(self):
+        if self.holding:
+            start_vel = self.launch_force
+        else:
+            start_vel = self.player.velocity
+        
+        return self.physics_handler.predict_player(
+            time=0.016, 
+            position=self.player.position, 
+            start_vel=start_vel,
+            mass=self.player.mass,
+            radius=self.player.radius, 
+            count=self.preview_balls
+        )[::3]
+
+    def _debug_movement(self, delta):
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_a]:
+            self.player.position.x -= DEBUG_VEL * delta * SPEED_FACTOR
+        if keys[pygame.K_d]:
+            self.player.position.x += DEBUG_VEL * delta * SPEED_FACTOR
+        if keys[pygame.K_w]:
+            self.player.position.y -= DEBUG_VEL * delta * SPEED_FACTOR 
+        if keys[pygame.K_s]:
+            self.player.position.y += DEBUG_VEL * delta * SPEED_FACTOR
+
+    def _handle_mouse_input(self):
+        """Calculate launch force and player look angle when holding."""
+        if self.holding:
+            difference = self.player.cam_pos - self.mouse_pos
+            if difference == pygame.Vector2():
+                return
+            
+            if PLATFORM == 'emscripten':
+                # once camera scaling is done, this can be ✨removed✨
+                magnitude = difference.magnitude() * 0.05
+            else:
+                magnitude = difference.magnitude() * 0.02
+
+            magnitude = clamp(magnitude, self.min_speed, self.max_speed)
+            norm_diff = difference.normalize()
+
+            self.launch_force = norm_diff * magnitude
+            self.player.set_look_angle(norm_diff)

@@ -77,7 +77,7 @@ class PhysicsHandler:
 
             obstacle.update(delta)
 
-    def death_collision(self, obj: Object):
+    def object_collision(self, obj: Object):
         if not hasattr(obj, "radius"):
             raise AttributeError(
                 f"Object of type {type(obj).__name__} must have a 'radius' attribute."
@@ -119,7 +119,7 @@ class PhysicsHandler:
                 prediction_obj.position = pygame.Vector2(new_rect.center)
                 prediction_obj.velocity = new_vel
 
-            if self.death_collision(prediction_obj):
+            if self.object_collision(prediction_obj):
                 return positions
 
             positions.append(prediction_obj.position.copy())
