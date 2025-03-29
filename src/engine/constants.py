@@ -24,7 +24,7 @@ VOLUME = 0.6
 # Debug font path and size
 DEBUG_FONT = ABS_DIR + '/src/assets/other/debug_font.ttf'
 DEBUG_SIZE = 16
-DEBUG_TEXT_OFFSET = 22
+DEBUG_TEXT_SPACING = 5
 DEBUG_VEL = 5
 
 PLATFORM = __import__("sys").platform
