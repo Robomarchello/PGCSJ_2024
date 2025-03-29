@@ -5,27 +5,24 @@ from src.engine.asset_manager import AssetManager
 
 
 class SpaceBackground:
-    def __init__(self, stars_num): # add layers, or that just like speed factor
-        self.stars_num = stars_num
-        
-        self.texture_pos = pygame.Vector2(0, 0)
+    def __init__(self):
         self.space_texture = AssetManager.images['background_space_scaled'].convert()
+        self.size = self.space_texture.get_size()
 
         self.move_factor = 0.7
-        self.stars_layer = AssetManager.images['background_stars_scaled'].convert()
-        self.stars_layer.set_colorkey((255, 0, 0))
+        self.stars_layer = AssetManager.images['background_stars_scaled'].convert_alpha()
 
         self.move_vec = pygame.Vector2(0.1, 0.05)
         self.move_offset = pygame.Vector2(0, 0)
 
     def draw(self, surface):
-        size = self.space_texture.get_size()
+        size = self.size
         
         # Determine the number of tiles needed to cover the screen
-        num_tiles_x = (SCREEN_W // size[0]) + 2
-        num_tiles_y = (SCREEN_H // size[1]) + 2
+        num_tiles_x = (SCREEN_W // size[0]) + 1
+        num_tiles_y = (SCREEN_H // size[1]) + 1
         
-        texture_pos = Camera.displace_position(self.texture_pos) + self.move_offset
+        texture_pos = -Camera.pos + self.move_offset
         
         # Calculate the starting positions
         start_x = texture_pos[0] % size[0] - size[0]
@@ -37,8 +34,9 @@ class SpaceBackground:
                 position = (start_x + x * size[0], start_y + y * size[1])
                 surface.blit(self.space_texture, position)
 
-        star_pos = self.texture_pos - (Camera.displacement - Camera.offset) * self.move_factor
-        star_pos += self.move_offset * self.move_factor
+        # --- Stars layer ---
+        star_pos = -Camera.pos + self.move_offset
+        star_pos *= self.move_factor
 
         # Calculate the starting positions
         start_x = star_pos[0] % size[0] - size[0]
