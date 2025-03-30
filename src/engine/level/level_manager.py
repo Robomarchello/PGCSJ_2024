@@ -8,14 +8,14 @@ from src.engine.constants import *
 
 
 class LevelManager:
-    def __init__(self, levels_folder, player, controller, physics_handler, transition):
-        self.levels = self.get_levels(levels_folder)
+    def __init__(self, levels_path, player, controller, physics_handler, transition):
+        self.levels = self.get_levels(levels_path)
         self.level_count = len(self.levels)
 
         self.progress = [False] * self.level_count
         self.progress[0] = True
 
-        self.levels_folder = levels_folder
+        self.levels_path = levels_path
         self.player = player
         self.controller = controller
         self.physics_handler = physics_handler
@@ -24,17 +24,21 @@ class LevelManager:
         self.transition.function = self.next_level
 
         self.level_index = 0
-
         self.crnt_level = None
 
         # think about this
         Camera.focus = pygame.Vector2(SCREEN_AREA.center)
         Camera.offset = pygame.Vector2(SCREEN_AREA.center)
 
+    def draw(self, surface):
+        self.crnt_level.draw(surface)
+
     def update(self, delta):
         self.crnt_level.in_bounds = self.crnt_level.level_bounds.collidepoint(
             self.player.position
         )
+
+        self.crnt_level.update(delta)
         
         Camera.focus.update(self.get_focus())
         Debug.add_text(f'Level: {self.level_index}')

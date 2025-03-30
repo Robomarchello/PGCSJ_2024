@@ -2,7 +2,7 @@ import pygame
 from pygame.locals import *
 from src.engine import State, Debug, AssetManager
 from src.engine.save_manager import SaveManager
-from src.engine.constants import *
+from src.engine.constants import SCREENSIZE, LEVELS_PATH
 from src.engine.objects.player import Player, Controller
 from src.engine.physics_handler import PhysicsHandler
 from src.engine.level import LevelManager
@@ -17,27 +17,49 @@ class Game(State):
         super().__init__()
         self.surface = pygame.Surface(SCREENSIZE)
 
-        self.player = Player()
-        rect = pygame.Rect(0, 0, 150, 150)
-        rect.center = self.player.position
-
-        self.space_backgroud = SpaceBackground(50)
-
-        Camera.initialize(self.player)
+        # Temporary!!
+        self.end_screen = AssetManager.images['end_screen'].convert()
 
         self.transition = TransitionFade(2)
 
+        self.space_backgroud = SpaceBackground()
+        self.player = Player()
+        rect = pygame.Rect(0, 0, 150, 150)
+
         self.physics_handler = PhysicsHandler(self.player, [], [])
         self.controller = Controller(self.player, rect, self.physics_handler)
-        # self.level = Level(self.player, self.controller, self.physics_handler)
+        
         self.level_manager = LevelManager(
-            LEVELS_PATH, self.player, self.controller, 
-            self.physics_handler, self.transition
+            levels_path=LEVELS_PATH,
+            player=self.player,
+            controller=self.controller,
+            physics_handler=self.physics_handler,
+            transition=self.transition,
         )
+
+        Camera.initialize(self.player)
 
         SaveManager.get_save(self.level_manager.level_count)
         self.level_manager.start_level()
-        self.level = self.level_manager.crnt_level
+
+        # update and draw queues
+        self.update_queue = [
+            Camera,
+            self.player,
+            self.controller,
+            self.physics_handler,
+            self.level_manager,
+            self.space_backgroud,
+            self.transition,
+        ]
+        self.draw_queue = [
+            self.space_backgroud,
+            self.physics_handler,
+            self.level_manager,
+            self.controller,
+            self.player,
+            self.transition,
+        ]
 
     def on_start(self):
         pass
@@ -48,37 +70,21 @@ class Game(State):
     def draw(self):
         self.surface.fill((0, 0, 0))
 
-        self.space_backgroud.draw(self.surface)
-
-        self.physics_handler.draw(self.surface)
-        self.level.draw(self.surface)
-
-        self.controller.draw(self.surface)
-        self.player.draw(self.surface)
-
-        self.transition.draw(self.surface)
+        for obj in self.draw_queue:
+            obj.draw(self.surface)
 
         Debug.add_text(self.manager.clock.get_fps())
         Camera.debug_draw()
 
+        # such a temporary thing!! To be removed
         if self.level_manager.level_index == 31:
             self.surface.blit(
-                AssetManager.images['end_screen'].convert(), (0, 0)
+                self.end_screen, (0, 0)
             )
 
     def update(self, delta):
-        self.level = self.level_manager.crnt_level
-        Camera.update(delta)
-
-        self.player.update(delta)
-        self.controller.update(delta)
-        self.physics_handler.update(delta)
-        self.level.update(delta)
-        self.level_manager.update(delta)
-
-        self.space_backgroud.update(delta)
-
-        self.transition.update(delta)
+        for obj in self.update_queue:
+            obj.update(delta)
 
     def handle_event(self, event):
         self.controller.handle_event(event)
