@@ -6,3 +6,10 @@ class FinishPointState(Enum):
     TOUCHING = 2
     COMPLETED = 3
     REACTED = 4
+
+
+class TransitionState(Enum):
+    INACTIVE = 1
+    FADE_IN = 2
+    EXECUTING = 3
+    FADE_OUT = 4
