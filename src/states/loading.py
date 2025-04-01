@@ -3,6 +3,7 @@ from pygame.locals import *
 from src.engine import State
 from src.engine.constants import SCREENSIZE, ASSETS_PATH
 from src.engine.asset_manager import AssetManager
+from src.engine.save_manager import SaveManager
 
 
 class LoadState(State):
@@ -17,6 +18,7 @@ class LoadState(State):
         self.next_state = next_state
 
     def on_start(self):
+        SaveManager.get_save()
         AssetManager.load_assets(ASSETS_PATH)
 
     def on_exit(self):

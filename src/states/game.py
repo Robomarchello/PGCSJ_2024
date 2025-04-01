@@ -39,7 +39,6 @@ class Game(State):
 
         Camera.initialize(self.player)
 
-        SaveManager.get_save(self.level_manager.level_count)
         self.level_manager.start_level()
 
         # update and draw queues
@@ -97,7 +96,7 @@ class Game(State):
 
             if event.key == K_p:
                 if Debug.enabled:
-                    SaveManager.erase_data(self.level_manager.level_count)
+                    SaveManager.erase_data()
                 
             if event.key == K_ESCAPE:
                 self.manager.next_state = states.Menu()

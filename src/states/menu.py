@@ -210,7 +210,7 @@ class LevelSelection(State):
 
     def on_start(self):
         for i in range(len(self.level_buttons)):
-            self.level_buttons[i].finished = SaveManager.data['levels_completed'][i]
+            self.level_buttons[i].completed = SaveManager.data['levels_completed'][i]
 
     def on_exit(self):
         pass

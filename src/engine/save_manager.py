@@ -1,6 +1,7 @@
+import os
 import json
 from pathlib import Path
-from .constants import SAVE_PATH, PLATFORM
+from .constants import SAVE_PATH, LEVELS_PATH, PLATFORM
 
 
 class SaveManager:
@@ -12,14 +13,12 @@ class SaveManager:
         from platform import window
 
     @classmethod
-    def get_save(cls, level_count=None):
+    def get_save(cls):
         '''Retrieve or initialize game save data'''
         if cls._save_exists():
             cls._load_data()
         else:
-            if level_count is None:
-                raise ValueError('Specify the level_count in order to save file')
-            cls._initialize_save(level_count)
+            cls._initialize_save()
             cls.save_data()
 
     @classmethod
@@ -29,7 +28,9 @@ class SaveManager:
         return Path(SAVE_PATH).is_file()
 
     @classmethod
-    def _initialize_save(cls, level_count):
+    def _initialize_save(cls):
+        level_count = cls._get_level_count()
+
         cls.data['levels_completed'] = [False] * level_count
         cls.data['levels_completed'][0] = True
 
@@ -52,7 +53,15 @@ class SaveManager:
                 json.dump(cls.data, file)
 
     @classmethod
-    def erase_data(cls, level_count):
+    def erase_data(cls):
         '''Reset game data to the start'''
-        cls._initialize_save(level_count)
+        cls._initialize_save()
         cls.save_data()
+
+    def _get_level_count(cls):
+        count = 0
+        for path in os.listdir(LEVELS_PATH):
+            if path.endswith('.json'):
+                count += 1
+        
+        return count
