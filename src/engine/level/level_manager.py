@@ -1,21 +1,17 @@
+import pygame
 import os
 
 from .level_base import LevelLoader
 from src.engine.save_manager import SaveManager
 from src.engine.utils import Debug
 from src.engine.camera import Camera
-from src.engine.constants import *
+from src.engine.constants import SCREEN_AREA, LEVELS_PATH
 
 
 class LevelManager:
-    def __init__(self, levels_path, player, controller, physics_handler, transition):
-        self.levels = self.get_levels(levels_path)
-        self.level_count = len(self.levels)
+    def __init__(self, player, controller, physics_handler, transition):
+        self.levels = self.get_levels(LEVELS_PATH)
 
-        self.progress = [False] * self.level_count
-        self.progress[0] = True
-
-        self.levels_path = levels_path
         self.player = player
         self.controller = controller
         self.physics_handler = physics_handler
@@ -84,9 +80,6 @@ class LevelManager:
             )
         
         self.player.reset()
-
-        #asteroid = Asteroid((512, 200), (2.5, 0), 1, 20)
-        #self.crnt_level.obstacles.append(asteroid)
 
     def next_level(self):
         SaveManager.data['levels_completed'][self.level_index] = True

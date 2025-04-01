@@ -30,7 +30,6 @@ class Game(State):
         self.controller = Controller(self.player, rect, self.physics_handler)
         
         self.level_manager = LevelManager(
-            levels_path=LEVELS_PATH,
             player=self.player,
             controller=self.controller,
             physics_handler=self.physics_handler,
