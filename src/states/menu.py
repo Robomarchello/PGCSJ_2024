@@ -70,7 +70,7 @@ class Menu(State):
 
     def update(self, delta):
         for button in self.buttons:
-            button.update()
+            button.update(delta)
 
     def handle_event(self, event):
         for button in self.buttons:
@@ -95,7 +95,7 @@ class LevelSelection(State):
         levels_num = 30
         x_num = 5
         x_offset = 200
-        y_offset = 150
+        y_offset = 140
         crnt_pos = pygame.Vector2(50, 100)
 
         self.x_shake = 0
@@ -113,8 +113,7 @@ class LevelSelection(State):
 
             crnt_pos[0] += x_offset 
 
-        self.crnt_pos = crnt_pos
-        self.back_button.rect.top = crnt_pos[1] + 125 - self.offset      
+        self.back_button._rect.top = crnt_pos[1] + y_offset     
 
     def selected_level(self, level, just_shake=False):
         if just_shake:
@@ -158,15 +157,6 @@ class LevelSelection(State):
 
         self.surface.blit(render, rect.topleft)
 
-    def draw_unsupported(self):
-        font  = AssetManager.fonts['font_36']
-        render = font.render('level selection for web version \n will be post jam version;)', True, 'white')
-        rect = render.get_rect()
-        rect.centerx = SCREEN_W / 2 - self.x_shake
-        rect.top = 250 - self.offset
-
-        self.surface.blit(render, rect.topleft)
-
     def update(self, delta):
         friction = self.scroll_vel * -0.05
         self.scroll_acc += friction
@@ -182,10 +172,6 @@ class LevelSelection(State):
 
         self.scroll_acc = 0 
 
-        for button in self.level_buttons:
-            button.update_offset(self.x_shake, self.offset)
-            button.update()
-
         if self.shake_timer > 0:
             self.shake_timer -= delta
 
@@ -193,8 +179,12 @@ class LevelSelection(State):
         else:
             self.x_shake = 0
 
-        self.back_button.rect.top = self.crnt_pos[1] + 125 - self.offset
-        self.back_button.update()
+        for button in self.level_buttons:
+            button.set_offset(self.x_shake, -self.offset)
+            button.update(delta)
+
+        self.back_button.set_offset(self.x_shake, -self.offset)
+        self.back_button.update(delta)
 
     def handle_event(self, event):
         if event.type == KEYDOWN:
@@ -222,6 +212,7 @@ class Settings(State):
         self.surface = pygame.Surface(SCREENSIZE)
 
         self.back_button = BackButton(self.to_menu)
+        self.back_button._rect.top = SCREEN_H - 150
 
         add_vol_btn = ChangeVolButton((200, 300), '<', self.change_volume, -0.1)
         sub_vol_btn = ChangeVolButton((1024-300, 300), '>', self.change_volume, 0.1)
@@ -249,7 +240,7 @@ class Settings(State):
 
     def update(self, delta):
         for button in self.buttons:
-            button.update()
+            button.update(delta)
 
     def draw(self):
         self.surface.fill((0, 0, 0))
