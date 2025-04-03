@@ -1,5 +1,5 @@
 class Base:
-    def draw(self, screen):
+    def draw(self, surface):
         pass
 
     def update(self, delta):

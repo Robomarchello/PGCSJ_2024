@@ -75,7 +75,7 @@ class Game(State):
         Camera.debug_draw()
 
         # such a temporary thing!! To be removed
-        if self.level_manager.level_index == 31:
+        if self.level_manager.level_index == 30:
             self.surface.blit(
                 self.end_screen, (0, 0)
             )

@@ -58,6 +58,7 @@ class SaveManager:
         cls._initialize_save()
         cls.save_data()
 
+    @classmethod
     def _get_level_count(cls):
         count = 0
         for path in os.listdir(LEVELS_PATH):

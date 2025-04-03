@@ -166,10 +166,4 @@ class ChangeVolButton(Button):
         hover_color = (0, 255, 0)
         text_color = (255, 255, 255)
 
-        super().__init__(rect, font, text, text_color, button_color, hover_color, func)
-
-    def handle_event(self, event):
-        if event.type == MOUSEBUTTONDOWN:
-            if event.button == 1:
-                if self.hovered:
-                    self.func(self.change_value)
+        super().__init__(rect, font, text, text_color, button_color, hover_color, func, change_value)

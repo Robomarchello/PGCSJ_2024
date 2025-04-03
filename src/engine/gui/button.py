@@ -15,10 +15,11 @@ class Button(Base):
         btn_color: pygame.Color, 
         hover_color: pygame.Color, 
         func: Callable,
+        *args
     ):
         self._rect = rect
         self.rect = self._rect.copy()
-        self.offset = pygame.Vector2(0, 0)
+        self.offset = pygame.Vector2()
 
         self.font = font
         self.text = text
@@ -26,7 +27,9 @@ class Button(Base):
         self.btn_color = btn_color
         self.hover_color = hover_color
         self.text_color  = text_color
+        
         self.func = func
+        self.args = args
 
         self.hovered = False
         self.last_hover = False
@@ -62,7 +65,7 @@ class Button(Base):
         if event.type == MOUSEBUTTONDOWN:
             if event.button == 1:
                 if self.hovered:
-                    self.func()
+                    self.func(*self.args)
 
     def set_offset(self, x, y):
         self.offset.update(x, y)
