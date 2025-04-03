@@ -1,9 +1,10 @@
+from .interface import GUInterface
 from .button import Button
 from .menu_buttons import *
 
 __all__ = [
-    'Button', 'PlayButton', 'LevelSelectionButton',
-    'SettingsButton', 'ExitButton', 'BackButton',
-    'LevelButton', 'ChangeVolButton'
+    'GUInterface', 'Button', 'PlayButton', 
+    'LevelSelectionButton', 'SettingsButton', 'ExitButton', 
+    'BackButton', 'LevelButton', 'ChangeVolButton'
 ]
 
