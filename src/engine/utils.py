@@ -113,7 +113,7 @@ class Debug:
             position = (10, offset)
             screen.blit(render, position)
 
-            offset += render.height + DEBUG_TEXT_SPACING
+            offset += render.get_height() + DEBUG_TEXT_SPACING
 
         cls.points = []
         cls.lines = []

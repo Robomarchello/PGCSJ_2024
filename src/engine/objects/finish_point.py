@@ -18,7 +18,7 @@ class FinishPoint(Object):
         self.complete_timer = 1.0
         self.timer = self.complete_timer
 
-        self.crnt_state = FinishPointState.IDLE
+        self.state = FinishPointState.IDLE
 
         # images
         self.image = AssetManager.images['planet'].convert_alpha()
@@ -29,8 +29,8 @@ class FinishPoint(Object):
 
     def _change_state(self, new_state):
         '''Handles state transitions.'''
-        if self.crnt_state != new_state:
-            self.crnt_state = new_state
+        if self.state != new_state:
+            self.state = new_state
             if new_state == FinishPointState.TOUCHING:
                 self.sound.play()
                 self.player.freeze = True
@@ -41,11 +41,11 @@ class FinishPoint(Object):
             self.player.position, self.player.radius
         )
 
-        if self.crnt_state == FinishPointState.IDLE:
+        if self.state == FinishPointState.IDLE:
             if collision and not self.player.exploded:
                 self._change_state(FinishPointState.TOUCHING)
 
-        elif self.crnt_state == FinishPointState.TOUCHING:
+        elif self.state == FinishPointState.TOUCHING:
             pull_force = self.pulling_force(self.player.position)
             self.player.position += pull_force * delta * SPEED_FACTOR
             self.timer -= delta

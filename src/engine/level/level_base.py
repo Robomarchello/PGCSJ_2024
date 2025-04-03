@@ -176,7 +176,7 @@ class Level:
 
         self.finish_point.update(delta)
 
-        if self.finish_point.crnt_state == FinishPointState.COMPLETED:
+        if self.finish_point.state == FinishPointState.COMPLETED:
             self.level_manager.transition_next_level()
             
             self.finish_point._change_state(FinishPointState.REACTED)

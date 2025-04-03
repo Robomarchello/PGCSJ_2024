@@ -2,7 +2,7 @@ import pygame
 from pygame.locals import *
 from src.engine import State, Debug, AssetManager
 from src.engine.save_manager import SaveManager
-from src.engine.constants import SCREENSIZE, LEVELS_PATH
+from src.engine.constants import SCREENSIZE
 from src.engine.objects.player import Player, Controller
 from src.engine.physics_handler import PhysicsHandler
 from src.engine.level import LevelManager

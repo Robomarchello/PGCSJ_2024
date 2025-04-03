@@ -1,8 +1,9 @@
 import pygame
 from src.engine.constants import SCREENSIZE
+from src.engine.base import Base
 
 
-class StateMachine:
+class StateMachine(Base):
     def __init__(self, initial_state):
         self.active_state = initial_state
         self.active_state.on_start()
@@ -25,16 +26,16 @@ class StateMachine:
         
         self.active_state.update(delta)
     
-    def draw(self, screen):
+    def draw(self, surface):
         self.active_state.draw()
 
-        screen.blit(self.active_state.surface, (0, 0))
+        surface.blit(self.active_state.surface, (0, 0))
 
     def change_state(self, new_state:'State', transition):
         pass
     
 
-class State:
+class State(Base):
     def __init__(self):
         self.surface = pygame.Surface(SCREENSIZE)
         self.manager: StateMachine | None = None
