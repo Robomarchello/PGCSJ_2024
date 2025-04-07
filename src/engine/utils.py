@@ -82,6 +82,38 @@ def draw_dashed_rect(surface, rect, dash_len, blank_len, color, width=1):
         draw_dashed_line(surface, start, end, dash_len, blank_len, color, width)
 
 
+def calculate_gradient(colors, intervals, steps) -> List:
+    '''
+    Something like cozyfractal have done https://github.com/ddorn
+    Precalculate colors of a gradient
+    '''
+    assert len(colors) > 2
+
+    if intervals[0] != 0.0 or intervals[-1] != 1.0:
+        raise ValueError("Intervals must start at 0.0 and end at 1.0")
+
+    colors = [pygame.Color(color) for color in colors]
+    #intervals = sorted(intervals)
+
+    gradient = []
+    color1_i = 0
+    color2_i = 1
+    interval_size = intervals[color2_i] - intervals[color1_i]
+    for step in range(steps):
+        full_progress = step / steps
+        lerp_progress = (full_progress - intervals[color1_i]) / interval_size
+        lerp_progress = clamp(lerp_progress, 0.0, 1.0)
+
+        crnt_color = colors[color1_i].lerp(colors[color2_i], lerp_progress)
+        gradient.append(crnt_color)
+
+        if full_progress > intervals[color2_i]:
+            color1_i += 1
+            color2_i += 1
+
+    return gradient
+
+
 class Debug:
     points = []
     lines = []

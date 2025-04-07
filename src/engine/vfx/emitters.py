@@ -1,132 +1,232 @@
 import math
 import random
+from typing import Optional, Tuple
+from dataclasses import dataclass
+from enum import Enum
 import pygame
-from src.engine.utils import Debug
+from pygame.locals import *
 from src.engine.constants import SPEED_FACTOR
-from src.engine.asset_manager import AssetManager
-from .particles import Particle
+from src.engine.utils import Debug, calculate_gradient
+
+
+class Shape(Enum):
+    RECT = 1
+    CIRCLE = 2
+
+
+class EmitterShape(Enum):
+    RECT = 'rect'
+    ELLIPSE = 'ellipse'
+
+
+def to_range(value):
+    if isinstance(value, tuple):
+        return list(value)
+    if isinstance(value, list):
+        return value
+    return [value, value]
+
+
+@dataclass
+class ParticleTemplate:
+    angle_range: float | Tuple[float]
+    speed_range: float | Tuple[float]
+    texture_rot_range: float | Tuple[float]
+    life_range: float | Tuple[float]
+    scale_range: float | Tuple[float]
+    color: 'ColorBehavior'
+    velocity_change: float = 1.0
+    scale_change: float = 1.0
+    texture: Optional[pygame.Surface] = None
+    shape: Optional[Shape] = None
+
+
+@dataclass
+class ColorBehavior:
+    color: Optional[pygame.Color] = None
+    gradient: Optional[Tuple[pygame.Color]] = None
+
+    def get_color(self, age: float, life: float) -> pygame.Color:
+        if self.color is not None:
+            return self.color
+        if self.gradient is not None:
+            progress = min(age / life, 0.9999) # so the index in bounds
+            index = int(progress * len(self.gradient))
+            return self.gradient[index]
+
+class Particle:
+    def __init__(
+            self,
+            position,
+            angle,
+            speed,
+            texture_rot_speed,
+            life,
+            scale,
+            gradient,
+            velocity_change = 1.0,
+            scale_change = 1.0,
+            texture=None,
+            shape=None,
+            ):
+        self.position = position
+        self.velocity = pygame.Vector2(
+            speed * math.cos(math.radians(angle)),
+            -speed * math.sin(math.radians(angle))
+        )
+        self.acceleration = pygame.Vector2()
+        
+        self.texture_rotation = angle
+        self.texture_rot_speed = texture_rot_speed
+
+        self.crnt_color = gradient[0]
+
+        self.life = life
+        self.half_life = self.life / 2
+        self.crnt_life = life
+
+        self.scale = scale
+
+        self.velocity_change = velocity_change
+        self.scale_change = scale_change
+
+        self.texture_rect = texture.get_rect()
+        self.shape = shape
 
 
 class Emitter:
     def __init__(
         self,
-        angle_range: tuple[float, float],
-        speed_range: tuple[float, float],
-        life_range: tuple[float, float],
-        rotation_range: tuple[float, float],
-        color1,
-        color2,
-        texture,
-        particle_num,
-        emit_rect,
-        blend_mode=None
+        particle_template: ParticleTemplate,
+        emit_rect: pygame.Rect,
+        blend_mode=BLENDMODE_NONE
     ):
-        self.angle_range = self.start_angle, self.end_angle = angle_range
-        self.speed_range = self.min_speed, self.max_speed = speed_range
-        self.life_range = self.life_min, self.life_max = life_range
-        self.rotation_range = self.rotation_min, self.rotation_max = rotation_range
+        self.particle_template = particle_template
 
-        self.color1 = pygame.Color(color1)
-        self.color2 = pygame.Color(color2)
-
-        self.texture = texture
-        self.cached_texture_rot = self.cache_rotation(self.texture, 0, 360, 1)
-
-        self.particle_num = particle_num
         self.emit_rect = emit_rect
         self.particles = []
-        self.remove_queue = []
+
+        self.gradient = calculate_gradient(
+            particle_template.colors, 
+            particle_template.color_intervals,
+            300
+        )
+
+        # continious emitting
+        self.emit_timer = 3.5 / 1000
+        self.timer = self.emit_timer
 
         self.blend_mode = blend_mode
 
-    def burst(self):
-        for _ in range(self.particle_num):
-            particle = self.new_particle(
-                self.angle_range, 
-                self.speed_range, 
-                self.life_range, 
-                self.rotation_range,
-                self.color1,
-                self.color2,
-                self.texture,
-                self.emit_rect,
-            )
+        # Make this a parameter
+        self.emitter_type = EmitterShape.ELLIPSE
+
+    def burst(self, particle_num):
+        for _ in range(particle_num):
+            particle = self.new_particle(self.emit_rect)
             self.particles.append(particle)
 
     def update(self, delta):
         Debug.add_text(f'particle count: {len(self.particles)}')
+        
         for particle in self.particles:
             self._update_particle(particle, delta)
 
-        # check if this really necessary
-        for particle in self.remove_queue:
-            self.particles.remove(particle)
+        self.timer -= delta
+        if self.timer < 0:
+            steps_skipped = abs(math.ceil(self.timer / self.emit_timer))
+            for _ in range(steps_skipped + 1):
+                particle = self.new_particle(self.emit_rect)
+
+                self.particles.append(particle)
+            
+            self.timer = self.emit_timer
 
     def draw(self, surface):
-        for particle in self.particles:
-            self._draw_particle(particle, surface)
+        surface.fblits([self._draw_particle(particle, surface) for particle in self.particles], self.blend_mode)
 
-    def new_particle(
-        self,
-        angle_range: tuple[float, float],
-        speed_range: tuple[float, float],
-        life_range: tuple[float, float],
-        rotation_range: tuple[float, float],
-        color1,
-        color2,
-        texture,
-        emit_rect,
-        ) -> Particle:
-        
-        position = [
-            random.randint(0, emit_rect.width) + emit_rect.x,
-            random.randint(0, emit_rect.height) + emit_rect.y
-        ]
-        angle = random.uniform(*angle_range)
-        speed = random.uniform(*speed_range)
-        life_time = random.uniform(*life_range)
-        texture_rotation = random.randint(0, 360)
-        rotation_change = random.randint(*rotation_range)
+    def _get_particle_color(self, particle: Particle):
+        progress = 1 - (particle.crnt_life / particle.life)
 
-        particle = Particle(position, angle, speed, life_time, texture_rotation, rotation_change, color1, color2, texture)
+        gradient = self.gradient
+        # bug here
+        color = gradient[int(progress * len(gradient))] # - 1
+
+        return color
+    
+    def _update_particle(self, particle: Particle, delta):
+        # Update acceleration
+        particle.acceleration += particle.velocity * (particle.velocity_change - 1)
+
+        particle.crnt_color = self._get_particle_color(particle)
+
+        # Update physics
+        particle.motion_logic(delta)
+
+        # Update life
+        particle.crnt_life -= delta
+        if particle.crnt_life < 0:
+            self.particles.remove(particle)
+            return 
+
+        # Update scale
+        scale_change = particle.scale * (particle.scale_change - 1) * delta * SPEED_FACTOR
+        particle.scale += scale_change
+
+        # Update texture rotation
+        particle.texture_rotation += particle.texture_rot_speed * delta * SPEED_FACTOR
+
+    def _draw_particle(self, particle: Particle, surface):
+        pass
+
+    def new_particle(self, emit_rect) -> Particle: 
+        if self.emitter_type == EmitterShape.RECT:
+            position = self._rect_random(emit_rect)
+
+        elif self.emitter_type == EmitterShape.ELLIPSE:
+            position = self._ellipse_random(emit_rect)
+
+        angle = random.uniform(*to_range(self.particle_template.angle_value))
+        speed = random.uniform(*to_range(self.particle_template.speed_value))
+        texture_rot_speed = random.uniform(*to_range(self.particle_template.texture_rot_value))
+        life = random.uniform(*to_range(self.particle_template.life_value))
+        scale = random.uniform(*to_range(self.particle_template.scale_value))
+
+        particle = Particle(
+            position,
+            angle,
+            speed,
+            texture_rot_speed,
+            life,
+            scale,
+            self.gradient,
+            self.particle_template.velocity_change,
+            self.particle_template.scale_change,
+            texture=self.particle_template.texture,
+            shape=self.particle_template.shape
+        )
 
         return particle
 
-    def _update_particle(self, particle, delta):
-        friction = 0.005 * particle.velocity
-        particle.acceleration += friction
-        
-        try:
-            progress = 1 - (particle.crnt_life / particle.life)
-        except:
-            print("I don't care about float division")
-            progress = 0.9
-        particle.crnt_color = particle.color1.lerp(particle.color2, progress)
+    def _ellipse_random(self, rect):
+        angle = random.uniform(0, 6.28)
+        length_w = random.uniform(0, rect.width / 2)
+        length_h = random.uniform(0, rect.height / 2)
+        position = (
+            math.cos(angle) * length_w + rect.centerx,
+            -math.sin(angle) * length_h + rect.centery
+        )
 
-        particle.crnt_life -= delta
-        if particle.crnt_life <= 0:
-            self.particles.remove(particle)
+        return position
+    
+    def _rect_random(self, rect):
+        position = (
+            random.randint(0, rect.width) + rect.x,
+            random.randint(0, rect.height) + rect.y
+        )
 
-        particle.texture_rotation += particle.rotation_change * delta * SPEED_FACTOR
-
-        particle.velocity += particle.acceleration * delta * SPEED_FACTOR
-        particle.position += particle.velocity * delta * SPEED_FACTOR
-        
-        particle.acceleration *= 0
-
-    def _draw_particle(self, particle, surface):
-        rotated_texture = self.cached_texture_rot[int(particle.texture_rotation) % 360 - 1]
-        rotated_texture_rect = rotated_texture.get_rect(center=particle.texture_rect.center)
-        texture = pygame.Surface(rotated_texture_rect.size)
-        texture.fill(particle.crnt_color)
-        texture.blit(rotated_texture, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
-
-        rotated_texture_rect.center = particle.cam_pos
-        surface.blit(texture, rotated_texture_rect.topleft) # special_flags=self.blend_mode
-
-    def clear(self):
-        self.particles = []
-
+        return position
+    
     def cache_rotation(self, texture, start_angle, end_angle, interval):
         cached_list = []
 
@@ -136,144 +236,76 @@ class Emitter:
             cached_list.append(rotated_texture)
         
         return cached_list
+
+    def from_file():
+        # TODO: create emitter from json file
+        pass
+
+
+class Textured_Emitter(Emitter):
+    def __init__(
+        self,
+        particle_template: ParticleTemplate,
+        emit_rect: pygame.Rect,
+        texture: pygame.Surface,
+        blend_mode=BLENDMODE_NONE
+    ):
+        self.texture = texture
+        self.cached_texture_rot = self.cache_rotation(texture, 0, 360, 1)
+
+        super().__init__(particle_template, emit_rect, blend_mode)
+
+    def draw(self, surface):
+        surface.fblits([self._draw_particle(particle, surface) for particle in self.particles], self.blend_mode)
+    
+    def _draw_particle(self, particle: Particle, surface):
+        rot_frame = int(particle.texture_rotation) % 360 - 1
+        rotated_texture = self.cached_texture_rot[rot_frame]
+        transformed_texture = pygame.transform.scale_by(
+            rotated_texture, 
+            particle.scale
+        )
+        trans_texture_rect = transformed_texture.get_rect()
+
+        transformed_texture.fill(
+            particle.crnt_color,
+            special_flags=BLEND_RGB_MULT
+        )
+        transformed_texture.set_alpha(particle.crnt_color.a)
+
+        trans_texture_rect.center = particle.position
+
+        return transformed_texture, trans_texture_rect.topleft
     
 
-class JetEmitter(Emitter):
-    def __init__(self):
-        self.look_range = (-10, 10)
-        speed_range = (0.1, 0.2)
-        life_range = (15, 20)
-        rotation_range = (-1, 1)
-        color1 = pygame.Color(67, 85, 133)
-        color2 = pygame.Color(67, 85, 133)
-
-        self.emit_timer = 0.1
-        self.timer = self.emit_timer
-        self.flying = False
-
-        particle_num = 10
-        emit_rect = pygame.Rect(0, 0, 5, 5)
-
-        texture = AssetManager.images['particle'].convert_alpha()
-        texture.set_colorkey((0, 0, 0))
-
-        super().__init__(
-            self.look_range, 
-            speed_range, 
-            life_range, 
-            rotation_range, 
-            color1, 
-            color2, 
-            texture, 
-            particle_num, 
-            emit_rect
-        )
-
-    def update(self, delta, look_angle, jet_back, speed):
-        for particle in self.particles:
-            self._update_particle(particle, delta)
-            
-        self.emit_rect.center = jet_back
-
-        self.look_range = (look_angle - 10 - 90, look_angle + 10 - 90)
-        
-        if self.flying:
-            self.timer -= delta
-            if self.timer < 0:
-                particle = self.new_particle(
-                    self.look_range, 
-                    self.speed_range, 
-                    self.life_range, 
-                    self.rotation_range,
-                    self.color1,
-                    self.color2,
-                    self.texture,
-                    self.emit_rect,
-                )
-                self.particles.append(particle)
-                self.timer = self.emit_timer
-
-
-class BlackHoleEmitter(Emitter):
-    def __init__(self, position, radius, mass):
-        self.look_range = (-10, 10)
-        speed_range = (0.1, 0.2)
-        life_range = (0.5, 1)
-        rotation_range = (-1, 1)
-        color1 = pygame.Color(67, 85, 133)
-        color2 = pygame.Color(67, 85, 133)
-
-        self.emit_timer = 0.05
-        self.timer = self.emit_timer
-        self.flying = False
-
-        self.mass = mass
-        self.speed = mass * 0.05
-
-        particle_num = 10
-        if self.mass > 0:
-            emit_rect = pygame.Rect(0, 0, radius * 2 + 60, radius * 2 + 60)
-        else:
-            emit_rect = pygame.Rect(0, 0, radius, radius)
-
-        emit_rect.center = position
-
-        texture = AssetManager.images['particle'].convert_alpha()
-        texture.set_colorkey((0, 0, 0))
-
-        super().__init__(
-            self.look_range, 
-            speed_range, 
-            life_range, 
-            rotation_range, 
-            color1, 
-            color2, 
-            texture, 
-            particle_num, 
-            emit_rect
-        )
-
-    def update_rect(self, position):
-        self.emit_rect.center = position
-
-    def update(self, delta):
-        for particle in self.particles:
-            self._update_particle(particle, delta)
-        
-        self.timer -= delta
-        if self.timer < 0:
-            particle = self.new_particle(
-                self.life_range, 
-                self.rotation_range,
-                self.color1,
-                self.color2,
-                self.texture
-            )
-            self.particles.append(particle)
-            self.timer = self.emit_timer
-
-    def new_particle(
+class pg_draw_Emitter(Emitter):
+    def __init__(
         self,
-        life_range: tuple[float, float],
-        rotation_range: tuple[float, float],
-        color1,
-        color2,
-        texture,
-        ) -> Particle:
+        particle_template: ParticleTemplate,
+        emit_rect: pygame.Rect,
+        shape: Shape,
+        blend_mode=BLENDMODE_NONE
+    ):
+        self.shape = shape
         
-        position = [
-            random.randint(0, self.emit_rect.width) + self.emit_rect.x,
-            random.randint(0, self.emit_rect.height) + self.emit_rect.y
-        ]
-        diff = pygame.Vector2(self.emit_rect.center) - position
-        angle = math.degrees(math.atan2(-diff.y, diff.x))
-        if self.mass > 0:
-            life_time = (diff.length() / self.speed) * 0.016
-        else:
-            life_time = random.uniform(*life_range)
-        texture_rotation = random.randint(0, 360)
-        rotation_change = random.randint(*rotation_range)
+        super().__init__(particle_template, emit_rect, blend_mode)
 
-        particle = Particle(position, angle, self.speed, life_time, texture_rotation, rotation_change, color1, color2, texture)
+    def draw(self, surface):
+        for particle in self.particles:
+            self._particle_draw(surface, particle)
 
-        return particle
+    def _particle_draw(self, surface, particle: Particle):
+        if self.shape == Shape.RECT:
+            pygame.draw.rect(
+                surface,
+                self._get_particle_color(particle),
+                particle.texture_rect
+            )
+            
+        if self.shape == Shape.CIRCLE:
+            pygame.draw.circle(
+                surface,
+                self._get_particle_color(particle),
+                particle.position,
+                30 * particle.scale
+            )
