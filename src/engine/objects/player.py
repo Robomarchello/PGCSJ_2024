@@ -10,7 +10,8 @@ from src.engine.base import Base
 from src.engine.camera import Camera
 from src.engine.utils import Debug, clamp
 from src.engine.asset_manager import AssetManager
-from src.engine.vfx.emitters import Emitter, JetEmitter
+from src.engine.vfx.emitters import Emitter
+from src.engine.vfx.game_particles import JetEmitter, ExplodeEmitter
 from src.engine.objects import Object, LaunchPoint
 from src.engine.physics_handler import PhysicsHandler
 
@@ -39,11 +40,8 @@ class Player(Object):
 
         # particles
         emitter_rect = pygame.Rect(0, 0, 32, 32)
-        self.explode_emitter = Emitter(
-            (0, 360), (1, 2), (2.5, 3.5), (0, 1), (245, 232, 199), (5, 24, 75), 
-            AssetManager.images['particle'].convert_alpha(), 130, emitter_rect, None
-        )
-        self.jet_emitter = JetEmitter()
+        self.explode_emitter = ExplodeEmitter(emitter_rect)
+        self.jet_emitter = JetEmitter(pygame.Rect(0, 0, 10, 10))
         self.jet_location = pygame.Vector2()
 
     def draw(self, surface):
@@ -102,7 +100,7 @@ class Player(Object):
             random_sound.play()
 
             self.explode_emitter.emit_rect.center = self.position
-            self.explode_emitter.burst()
+            self.explode_emitter.burst(300)
 
     def reset(self):
         self.freeze = True

@@ -62,7 +62,7 @@ def to_range(value):
         return value
     return [value, value]
 
-def ellipse_random(self, rect):
+def ellipse_random(rect):
     angle = random.uniform(0, 6.28)
     length_w = random.uniform(0, rect.width / 2)
     length_h = random.uniform(0, rect.height / 2)
@@ -73,7 +73,7 @@ def ellipse_random(self, rect):
 
     return position
 
-def rect_random(self, rect):
+def rect_random(rect):
     position = (
         random.randint(0, rect.width) + rect.x,
         random.randint(0, rect.height) + rect.y
@@ -86,7 +86,9 @@ def calculate_gradient(colors, intervals, steps) -> List:
     Something like cozyfractal have done https://github.com/ddorn
     Precalculate colors of a gradient
     '''
-    assert len(colors) > 2
+    assert len(colors) >= 2
+
+    colors = colors[::-1] # quick but spaghetti fix
 
     if intervals[0] != 0.0 or intervals[-1] != 1.0:
         raise ValueError("Intervals must start at 0.0 and end at 1.0")
