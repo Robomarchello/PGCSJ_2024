@@ -13,3 +13,8 @@ class TransitionState(Enum):
     FADE_IN = 2
     EXECUTING = 3
     FADE_OUT = 4
+
+
+class EmitterShape(Enum):
+    RECT = 'rect'
+    ELLIPSE = 'ellipse'

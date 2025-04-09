@@ -18,32 +18,6 @@ def get_shake(strength):
     )
     return shake
 
-def load_spritesheet(image, sprite_size) -> List[pygame.Surface]:
-    image_size = image.get_size()
-
-    sprites = []
-    sprite = pygame.Surface(sprite_size)
-    for y in range(0, image_size[1], sprite_size[1]):
-        for x in range(0, image_size[0], sprite_size[0]):
-            sprite.fill((0, 0, 0))
-            sprite.blit(image, (-x, -y))
-            sprites.append(sprite.copy())
-
-    return sprites
-
-def json_spritesheet(image, file_path):
-    sprites = []
-    with open(file_path, 'r') as file:
-        rects = json.load(file)
-
-    for rect in rects:
-        surface = pygame.Surface(rect.size)
-        surface.blit(image, (-rect.x, -rect.y))
-
-        sprites.append(surface.copy())
-
-    return sprites
-
 def collide_circles(position1, radius1, position2, radius2):
     difference = (
         position2[0] - position1[0],
@@ -81,6 +55,31 @@ def draw_dashed_rect(surface, rect, dash_len, blank_len, color, width=1):
     for start, end in zip(corners, corners[1:] + [corners[0]]):
         draw_dashed_line(surface, start, end, dash_len, blank_len, color, width)
 
+def to_range(value):
+    if isinstance(value, tuple):
+        return list(value)
+    if isinstance(value, list):
+        return value
+    return [value, value]
+
+def ellipse_random(self, rect):
+    angle = random.uniform(0, 6.28)
+    length_w = random.uniform(0, rect.width / 2)
+    length_h = random.uniform(0, rect.height / 2)
+    position = (
+        math.cos(angle) * length_w + rect.centerx,
+        -math.sin(angle) * length_h + rect.centery
+    )
+
+    return position
+
+def rect_random(self, rect):
+    position = (
+        random.randint(0, rect.width) + rect.x,
+        random.randint(0, rect.height) + rect.y
+    )
+
+    return position
 
 def calculate_gradient(colors, intervals, steps) -> List:
     '''
