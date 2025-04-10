@@ -117,8 +117,7 @@ class LevelSelection(State):
             self.scroll_acc -= (abs(self.offset) - abs(self.bounds[1])) * 0.03
 
         self.scroll_vel += self.scroll_acc * delta * SPEED_FACTOR
-        self.offset += self.scroll_vel * delta * SPEED_FACTOR
-
+        self.offset += self.scroll_vel
         self.scroll_acc = 0 
 
     def _calculate_shake(self, delta):
