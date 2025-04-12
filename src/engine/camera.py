@@ -9,6 +9,7 @@ from src.engine.utils import get_shake
 class Camera:
     # for every object, separate the physics position and player's view
     displacement = Vector2()
+    scale_factor = 0.5
     pos = Vector2() 
     offset = Vector2(SCREEN_W // 2, SCREEN_H // 2)
     rect = pygame.Rect(*pos, *SCREENSIZE)
@@ -18,13 +19,6 @@ class Camera:
 
     shake_timer = 0
     shake_strength = 0
-    
-    player = None
-    secondary_focus: Vector2 | None = None
-    
-    @classmethod
-    def initialize(cls, player):
-        cls.player = player
 
     @classmethod
     def shake(cls, time, strength):
@@ -50,26 +44,15 @@ class Camera:
 
         Debug.add_point(cls.offset)
 
+        Debug.add_text('scale: ' + str(cls.scale_factor))
+
     @classmethod
     def update(cls, delta):
         if cls.focus is not None:
             difference = cls.focus - cls.displacement
             cls.displacement += difference * 0.1 * delta * SPEED_FACTOR
             cls.pos = cls.displacement - cls.offset
-        else:
-            pass
     
-        if cls.secondary_focus is not None:
-            diff = pygame.Vector2(
-                cls.player.position.x - cls.secondary_focus[0],
-                cls.player.position.y - cls.secondary_focus[1]
-                )
-            diff_len = min(diff.length(), 400)
-            diff_norm = diff.normalize()
-            displacement = diff_norm * diff_len
-            cls.offset[0] = SCREEN_W // 2 + displacement[0] * 0.5
-            cls.offset[1] = SCREEN_H // 2 + displacement[1] * 0.3
-
         if cls.bounds is not None:
             cls.rect.topleft = cls.pos
             cls.rect.clamp_ip(cls.bounds)
@@ -77,22 +60,30 @@ class Camera:
 
         if cls.shake_timer > 0:
             cls.shake_timer -= delta
-            
             cls.pos += get_shake(cls.shake_strength)
 
     @classmethod
     def displace_position(cls, position: Vector2):
-        return position - cls.pos
+        '''
+        1. get distance from origin
+        2. mult distance by zoom factor
+        3. add origin back'''
+        camera_pos = Vector2()
+        camera_pos.x = (position.x - cls.displacement.x) * cls.scale_factor
+        camera_pos.y = (position.y - cls.displacement.y) * cls.scale_factor
+
+        camera_pos += cls.offset
+        return camera_pos
 
     @classmethod
     def displace_rect(cls, rect: Vector2):
-        cam_rect = rect.copy()
-        cam_rect.x -= cls.pos.x
-        cam_rect.y -= cls.pos.y
+        cam_rect = rect.scale_by(cls.scale_factor)
+        cam_rect.topleft = cls.displace_position(Vector2(rect.topleft))
         return cam_rect
 
     @classmethod
     def handle_event(cls, event):
         # put some controls here
-        pass
-
+        if event.type == pygame.MOUSEWHEEL:
+            cls.scale_factor += 0.01 * event.y
+            cls.scale_factor = round(cls.scale_factor, 3)

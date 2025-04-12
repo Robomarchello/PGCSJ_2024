@@ -18,7 +18,7 @@ class Object(Base):
 
     @property
     def cam_pos(self):
-        return self.position - Camera.pos
+        return Camera.displace_position(self.position)
     
     def motion_logic(self, delta):
         self.acceleration = self.force / self.mass

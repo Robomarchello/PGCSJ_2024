@@ -36,8 +36,6 @@ class Game(State):
             transition=self.transition,
         )
 
-        Camera.initialize(self.player)
-
         self.level_manager.start_level()
 
         # update and draw queues
@@ -100,3 +98,5 @@ class Game(State):
             if event.key == K_ESCAPE:
                 self.manager.next_state = states.Menu()
                 SaveManager.save_data()
+        
+        Camera.handle_event(event)
