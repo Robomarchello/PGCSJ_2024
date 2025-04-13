@@ -18,15 +18,7 @@ class Label(Base):
         self.antialias = antialias
         self.anchors = anchors
 
-        self.render = font.render(text, antialias, color)
-
-        self.offset = pygame.Vector2()
-        self._rect = self.render.get_rect()
-
-        for attr, value in anchors.items():
-            setattr(self._rect, attr, value)
-
-        self.rect = self._rect.copy()
+        self.set_text(self.text)
 
     def draw(self, surface):
         surface.blit(self.render, self.rect.topleft)
