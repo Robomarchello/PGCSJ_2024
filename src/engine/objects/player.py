@@ -14,6 +14,7 @@ from src.engine.vfx.emitters import Emitter
 from src.engine.vfx.game_particles import JetEmitter, ExplodeEmitter
 from src.engine.objects import Object, LaunchPoint
 from src.engine.physics_handler import PhysicsHandler
+from src.engine.sprite import Sprite
 
 
 class Player(Object):
@@ -30,7 +31,8 @@ class Player(Object):
         self.flying_last = False
 
         # assets
-        self.image = AssetManager.images['player'].convert_alpha()
+        self.image = AssetManager.images['player'].convert()
+        self.image.set_colorkey((255, 0, 0))
         self.jet_sound = AssetManager.sounds['jet']
         self.jet_channel = pygame.mixer.Channel(0)
         self.explosion_sounds = [
@@ -44,18 +46,15 @@ class Player(Object):
         self.jet_emitter = JetEmitter(pygame.Rect(0, 0, 10, 10))
         self.jet_location = pygame.Vector2()
 
+        self.sprite = Sprite(self.image, ['center'])
+
     def draw(self, surface):
         self.jet_emitter.draw(surface)
         self.explode_emitter.draw(surface)
 
         rotated_img = pygame.transform.rotate(self.image, self.look_angle)
-        rotated_rect = rotated_img.get_rect(center=self.cam_pos)
-
-        if not self.exploded:
-            surface.blit(rotated_img, rotated_rect.topleft)
-        
-        # debug below
-        # pygame.draw.circle(surface, 'red', self.cam_pos, self.radius, 2)
+        self.sprite.update_image(rotated_img)
+        self.sprite.draw(surface)
 
     def update(self, delta):
         Debug.add_text(f'player_pos: {self.position}')
@@ -67,6 +66,7 @@ class Player(Object):
         self.set_look_angle(self.velocity)
         self._update_emitters(delta)
         self._handle_jet_sound()
+        self.sprite.update(self.position)
 
     def set_look_angle(self, vector): 
         self.look_angle = math.degrees(math.atan2(-vector.y, vector.x))
@@ -93,6 +93,7 @@ class Player(Object):
     def explode(self):
         if not self.exploded and not self.freeze:
             self.exploded = True
+            self.sprite.visible = False
 
             Camera.shake(0.3, 5)
 
@@ -105,6 +106,7 @@ class Player(Object):
     def reset(self):
         self.freeze = True
         self.exploded = False
+        self.sprite.visible = True
         self.velocity *= 0
         self.acceleration *= 0
         self._clear_emitters()
@@ -143,7 +145,7 @@ class Controller(Base):
         if self.player.exploded:
             return
         
-        pygame.draw.circle(surface, (245, 232, 199), self.cam_rect.center, self.radius, 3)
+        pygame.draw.circle(surface, (245, 232, 199), self.cam_rect.center, self.radius * Camera.scale_factor, 3)
         
         self.draw_trajectory(surface)
 
@@ -177,15 +179,16 @@ class Controller(Base):
                 self.holding = False
                 
         if event.type == MOUSEBUTTONUP:
-            if self.holding:
-                self.player.velocity += self.launch_force
-                self.player.freeze = False
+            if event.button == 1:
+                if self.holding:
+                    self.player.velocity += self.launch_force
+                    self.player.freeze = False
 
-                if self.launch_point is not None:
-                    self.launch_point.used = True
-                    self.launch_point = None
+                    if self.launch_point is not None:
+                        self.launch_point.used = True
+                        self.launch_point = None
 
-                self.holding = False
+                    self.holding = False
 
     # --- Private Methods ---
 

@@ -134,7 +134,7 @@ class LevelSelection(State):
                 self.manager.next_state = states.Menu()
 
         if event.type == MOUSEWHEEL:
-            self.scroll_acc -= event.y * 8
+            self.scroll_acc -= event.y * 3
 
         self.interface.handle_event(event)
 

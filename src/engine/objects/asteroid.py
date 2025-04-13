@@ -1,13 +1,16 @@
 import pygame
 from src.engine.asset_manager import AssetManager
 from src.engine.objects import Object
+from src.engine.sprite import Sprite
 
 
 class Asteroid(Object):
     def __init__(self, position, velocity, mass, radius):
         super().__init__(position, velocity, mass)
-        self.texture = AssetManager.images['asteroid'].convert_alpha()
-        self.texture_rect = self.texture.get_rect()
+        self.texture = AssetManager.images['asteroid'].convert()
+        self.texture.set_colorkey((255, 0, 0))
+
+        self.sprite = Sprite(self.texture, ['center'], static=True)
 
         self.radius = radius
 
@@ -16,11 +19,10 @@ class Asteroid(Object):
     def update(self, delta):
         self.motion_logic(delta)
 
-    def draw(self, surface):
-        pygame.draw.circle(surface, 'grey', self.cam_pos, self.radius)
+        self.sprite.update(self.position)
 
-        self.texture_rect.center = self.cam_pos
-        surface.blit(self.texture, self.texture_rect.topleft)
+    def draw(self, surface):
+        self.sprite.draw(surface)
 
     def serialize(self):
         return {

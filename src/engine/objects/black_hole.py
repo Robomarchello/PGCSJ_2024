@@ -4,6 +4,7 @@ from src.engine.constants import GRAVITY_CONST
 from src.engine.asset_manager import AssetManager
 from src.engine.vfx.game_particles import BlackHoleEmitter
 from src.engine.objects import Object
+from src.engine.sprite import Sprite
 
 
 class BlackHole(Object):
@@ -14,43 +15,44 @@ class BlackHole(Object):
         self.color = pygame.Color(255, 255, 255)
 
         self.texture = self._determine_texture()
-        self.texture_rect = pygame.Rect(0, 0, self.radius * 2, self.radius * 2)
+        self.texture.set_colorkey((255, 0, 0))
 
         self.emitter = BlackHoleEmitter(self.position, self.radius, self.mass)
 
         self.pulsing_timer = 0.0
         self.pulsing = 1 + math.cos(self.pulsing_timer) * 0.1
 
+        self.sprite = Sprite(self.texture, ['center'])
+
     def draw(self, surface):
-        scaled_rect = self.texture_rect.copy()
-        scaled_rect.scale_by_ip(self.pulsing)
-        scaled_rect.center = self.cam_pos
-
-        scaled_texture = pygame.transform.scale(self.texture, scaled_rect.size)  
-
         self.emitter.draw(surface)
-        surface.blit(scaled_texture, scaled_rect.topleft)
+        self.sprite.draw(surface)
 
     def _determine_texture(self):
         if self.mass > 0:
             if self.radius <= 64:
-                return AssetManager.images['smol_blek_hole'].convert_alpha()
+                return AssetManager.images['smol_blek_hole'].convert()
             else:
-                return AssetManager.images['black_hole'].convert_alpha()
+                return AssetManager.images['black_hole'].convert()
                 
         elif self.mass < 0:
             if self.radius <= 64:
-                return AssetManager.images['smol_white_hole'].convert_alpha()
+                return AssetManager.images['smol_white_hole'].convert()
             else:
-                return AssetManager.images['white_hole'].convert_alpha()
+                return AssetManager.images['white_hole'].convert()
 
     def update(self, delta):
-        self.pulsing_timer += delta * 3 # meh constant
+        self.pulsing_timer += delta * 3
 
         self.pulsing = 1 + math.cos(self.pulsing_timer) * 0.1
+        self._update_sprite()
 
         self.emitter.update_rect(self.position)
         self.emitter.update(delta)
+
+    def _update_sprite(self):
+        self.sprite.texture_scale = self.pulsing
+        self.sprite.update(self.position)
 
     def calculate_attraction(self, obj: Object):
         '''Calculate gravitation force between two objects'''

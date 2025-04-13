@@ -1,6 +1,7 @@
 import random
 import pygame
 from pygame.locals import *
+from src.engine.camera import Camera
 from src.engine.constants import SPEED_FACTOR
 from src.engine.enums import EmitterShape
 from src.engine.utils import rect_random, ellipse_random, to_range, Debug
@@ -90,7 +91,7 @@ class Emitter:
     def _draw_particle(self, particle: Particle):
         rot_frame = int(particle.texture_rotation) % 360 - 1
         rotated_texture = self.cached_texture_rot[rot_frame]
-        transformed = pygame.transform.scale_by(rotated_texture, particle.scale)
+        transformed = pygame.transform.scale_by(rotated_texture, particle.scale * Camera.scale_factor)
 
         transformed.fill(particle.color, special_flags=BLEND_RGB_MULT)
         transformed.set_alpha(particle.color.a)

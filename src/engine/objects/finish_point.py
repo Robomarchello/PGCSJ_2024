@@ -1,5 +1,6 @@
 import pygame
 from src.engine.constants import SPEED_FACTOR
+from src.engine.sprite import Sprite
 from src.engine.utils import collide_circles
 from src.engine.asset_manager import AssetManager
 from src.engine.objects import Object
@@ -21,7 +22,10 @@ class FinishPoint(Object):
         self.state = FinishPointState.IDLE
 
         # images
-        self.image = AssetManager.images['planet'].convert_alpha()
+        self.image = AssetManager.images['planet'].convert()
+        self.image.set_colorkey((255, 0, 0))
+
+        self.sprite = Sprite(self.image, ['center'])
 
         # sounds
         self.last_change = False
@@ -36,11 +40,12 @@ class FinishPoint(Object):
                 self.player.freeze = True
 
     def update(self, delta):
+        self.sprite.update(self.position)
+
         collision = collide_circles(
             self.position, self.radius,
             self.player.position, self.player.radius
         )
-
         if self.state == FinishPointState.IDLE:
             if collision and not self.player.exploded:
                 self._change_state(FinishPointState.TOUCHING)
@@ -57,8 +62,11 @@ class FinishPoint(Object):
 
     def draw(self, surface):
         rotated_image = pygame.transform.rotate(self.image, self.rotation)
-        image_rect = rotated_image.get_rect(center=self.cam_pos)
-        surface.blit(rotated_image, image_rect.topleft)
+        self.sprite.update_image(rotated_image)
+
+        self.sprite.draw(surface)
+        # image_rect = rotated_image.get_rect(center=self.cam_pos)
+        # surface.blit(rotated_image, image_rect.topleft)
 
     def pulling_force(self, position: pygame.Vector2): 
         difference = self.position - position

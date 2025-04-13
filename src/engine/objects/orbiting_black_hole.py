@@ -13,6 +13,7 @@ class OrbitingBlackHole(BlackHole):
     # def draw additional circle
 
     def update(self, delta):
+        super().update(delta)
         vec = self.position - self.origin
         vec.rotate_ip(self.rot_speed * delta * SPEED_FACTOR)
 

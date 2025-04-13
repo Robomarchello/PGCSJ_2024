@@ -2,6 +2,7 @@ import pygame
 from src.engine.constants import SPEED_FACTOR
 from src.engine.utils import collide_circles
 from src.engine.objects import Object
+from src.engine.camera import Camera
 
 
 class LaunchPoint(Object):
@@ -34,7 +35,7 @@ class LaunchPoint(Object):
         return difference * 0.18
 
     def draw(self, surface):
-        pygame.draw.circle(surface, 'grey', self.cam_pos, self.radius)
+        pygame.draw.circle(surface, 'grey', self.cam_pos, self.radius * Camera.scale_factor)
 
     def serialize(self):
         return {

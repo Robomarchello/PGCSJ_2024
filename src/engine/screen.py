@@ -13,9 +13,7 @@ class Screen:
         self.window_size = screen_size
         self.window = pygame.display.set_mode(self.window_size, *self.FLAGS)
         pygame.display.set_caption(title)
-        pygame.display.set_icon(
-            pygame.transform.rotate(AssetManager.images['player'].convert_alpha(), 90)
-        )
+        pygame.display.set_icon(AssetManager.images['logo'])
 
         self.draw_surface = self.window.copy()
 

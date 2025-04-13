@@ -42,7 +42,7 @@ class LevelManager:
     def get_focus(self):
         # case for small levels
         if self.crnt_level.in_bounds:
-            focus = SCREEN_AREA.center
+            focus = self.crnt_level.level_bounds.center
 
             if self.crnt_level.collided:
                 focus = self.player.position
