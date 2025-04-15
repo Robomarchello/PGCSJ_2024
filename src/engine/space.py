@@ -1,3 +1,4 @@
+import math
 import pygame
 from src.engine.constants import SPEED_FACTOR, SCREEN_W, SCREEN_H
 from src.engine.camera import Camera
@@ -20,8 +21,8 @@ class SpaceBackground:
         size = self.size
         
         # Determine the number of tiles needed to cover the screen
-        num_tiles_x = (SCREEN_W // size[0]) + 1
-        num_tiles_y = (SCREEN_H // size[1]) + 1
+        num_tiles_x = math.ceil(SCREEN_W / size[0]) + 1
+        num_tiles_y = math.ceil(SCREEN_H / size[1]) + 1
         
         texture_pos = -Camera.pos + self.move_offset
         
@@ -30,8 +31,8 @@ class SpaceBackground:
         start_y = texture_pos[1] % size[1] - size[1]
         
         # Draw the textures in a grid
-        for x in range(num_tiles_x):
-            for y in range(num_tiles_y):
+        for x in range(int(num_tiles_x)):
+            for y in range(int(num_tiles_y)):
                 position = (start_x + x * size[0], start_y + y * size[1])
                 surface.blit(self.space_texture, position)
 
@@ -44,8 +45,8 @@ class SpaceBackground:
         start_y = star_pos[1] % size[1] - size[1]
         
         # Draw the textures in a grid
-        for x in range(num_tiles_x):
-            for y in range(num_tiles_y):
+        for x in range(int(num_tiles_x)):
+            for y in range(int(num_tiles_y)):
                 position = (start_x + x * size[0], start_y + y * size[1])
                 surface.blit(self.stars_layer, position)
 

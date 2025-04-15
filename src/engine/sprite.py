@@ -5,7 +5,7 @@ from src.engine.base import Base
 
 class Sprite(Base):
     prescale = [0.5, 2]
-    def __init__(self, image, rect_anchors=[], static=False):
+    def __init__(self, image, rect_anchors=['topleft'], static=False):
         self._original_image = image
 
         self.texture_scale = 1.0
@@ -48,9 +48,6 @@ class Sprite(Base):
         self._original_image = image
         if self.static:
             self._scale_image()
-        # image_scale = self.texture_scale * self.scale_factor
-        # self.image = pygame.transform.scale_by(self._original_image, image_scale)
-        # self.rect = self.image.get_rect()
 
     def _scale_image(self):
         if self.scale_factor in self.image_scaled.keys():

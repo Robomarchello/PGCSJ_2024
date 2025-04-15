@@ -225,14 +225,10 @@ class Controller(Base):
             if difference == pygame.Vector2():
                 return
             
-            if PLATFORM == 'emscripten':
-                # once camera scaling is done, this can be ✨removed✨
-                magnitude = difference.magnitude() * 0.05
-            else:
-                magnitude = difference.magnitude() * 0.02
-
-            magnitude = clamp(magnitude, self.min_speed, self.max_speed)
             norm_diff = difference.normalize()
+
+            magnitude = difference.magnitude() * 0.025# * (1 / (Camera.scale_factor))
+            magnitude = clamp(magnitude, self.min_speed, self.max_speed)
 
             self.launch_force = norm_diff * magnitude
             self.player.set_look_angle(norm_diff)

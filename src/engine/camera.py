@@ -3,13 +3,13 @@ from pygame import Vector2
 
 from src.engine.utils import Debug
 from src.engine.constants import *
-from src.engine.utils import get_shake
+from src.engine.utils import get_shake, clamp
 
 
 class Camera:
     # for every object, separate the physics position and player's view
     displacement = Vector2()
-    scale_factor = 0.5
+    scale_factor = 1.0
     pos = Vector2() 
     offset = Vector2(SCREEN_W // 2, SCREEN_H // 2)
     rect = pygame.Rect(*pos, *SCREENSIZE)
@@ -87,3 +87,5 @@ class Camera:
         if event.type == pygame.MOUSEWHEEL:
             cls.scale_factor += 0.01 * event.y
             cls.scale_factor = round(cls.scale_factor, 3)
+            cls.scale_factor = clamp(cls.scale_factor, 0.01, 10)
+
