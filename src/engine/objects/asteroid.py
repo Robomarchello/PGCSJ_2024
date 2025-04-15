@@ -1,4 +1,3 @@
-import pygame
 from src.engine.asset_manager import AssetManager
 from src.engine.objects import Object
 from src.engine.sprite import Sprite
@@ -19,9 +18,9 @@ class Asteroid(Object):
     def update(self, delta):
         self.motion_logic(delta)
 
+    def draw(self, surface):
         self.sprite.update(self.position)
 
-    def draw(self, surface):
         self.sprite.draw(surface)
 
     def serialize(self):
