@@ -1,6 +1,8 @@
 import pygame
 import os
 
+from src.engine.enums import FinishPointState
+
 from .level_base import LevelLoader
 from src.engine.save_manager import SaveManager
 from src.engine.utils import Debug
@@ -36,15 +38,20 @@ class LevelManager:
 
         self.crnt_level.update(delta)
         
-        Camera.focus.update(self.get_focus())
+        self._update_camera()
         Debug.add_text(f'Level: {self.level_index}')
+
+    def _update_camera(self):
+        if self.crnt_level.finish_point.state in {FinishPointState.TOUCHING, FinishPointState.REACTED}:
+            Camera.set_target_scale(1.25)
+        Camera.focus.update(self.get_focus())
 
     def get_focus(self):
         # case for small levels
         if self.crnt_level.in_bounds:
             focus = self.crnt_level.level_bounds.center
-
-            if self.crnt_level.collided:
+            if (self.crnt_level.finish_point.state in {FinishPointState.TOUCHING, FinishPointState.REACTED}
+                or self.crnt_level.collided):
                 focus = self.player.position
         else:
             focus = self.player.position
@@ -66,6 +73,8 @@ class LevelManager:
         return levels
     
     def start_level(self):
+        Camera.set_scale(Camera.camera_zoom.scale_modes[-1])
+
         if self.level_index >= len(self.levels):
             return
         
