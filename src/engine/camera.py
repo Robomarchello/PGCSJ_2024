@@ -27,6 +27,7 @@ class CameraZoom:
     scale_modes = [1.5, 0.7, 1]
     scale = 1.0
     target_scale = 1.0
+    reference_scale = (SCREEN_W / BASE_SCREENSIZE[0] + SCREEN_H / BASE_SCREENSIZE[1]) / 2
 
     extra_space = False
 
@@ -36,7 +37,7 @@ class CameraZoom:
             cls.scale += (cls.target_scale - cls.scale - 0.1) * 0.1 * delta * SPEED_FACTOR
         else:
             cls.scale += (cls.target_scale - cls.scale) * 0.1 * delta * SPEED_FACTOR
-        return round(cls.scale, 3)
+        return round(cls.scale * cls.reference_scale, 3)
 
     @classmethod
     def handle_event(cls, event):

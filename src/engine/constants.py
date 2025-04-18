@@ -2,7 +2,8 @@ import pygame
 from pathlib import Path
 
 TITLE = 'Mediocre Game with Golf-Like Gameplay in Space!'
-SCREENSIZE = SCREEN_W, SCREEN_H = (1365, 768)
+BASE_SCREENSIZE = (1365, 768)
+SCREENSIZE = SCREEN_W, SCREEN_H = (1920, 1080)
 SCREEN_AREA = pygame.Rect(0, 0, SCREEN_W, SCREEN_H)
 FPS = 480
 

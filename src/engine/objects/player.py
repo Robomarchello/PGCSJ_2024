@@ -222,7 +222,7 @@ class Controller(Base):
         """Calculate launch force and player look angle when holding."""
         Camera.camera_zoom.extra_space = False
         if self.holding:
-            if self.mouse_pos[0] < 100 and Camera.scale_factor > 0.9:
+            if self.mouse_pos[0] < 100 and Camera.camera_zoom.target_scale > 0.9:
                 Camera.camera_zoom.extra_space = True
             
             difference = self.player.cam_pos - self.mouse_pos
