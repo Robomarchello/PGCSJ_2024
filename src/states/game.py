@@ -57,7 +57,7 @@ class Game(State):
             self.transition,
         ]
 
-        pygame.mixer.music.load('src/assets/sfx/music_3.mp3')
+        pygame.mixer.music.load('src/assets/sfx/music.mp3')
         pygame.mixer.music.set_volume(0.1)
         pygame.mixer.music.play(-1)
 
