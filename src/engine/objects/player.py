@@ -5,7 +5,7 @@ import pygame
 from pygame import Vector2
 from pygame.locals import MOUSEBUTTONDOWN, MOUSEBUTTONUP
 
-from src.engine.constants import SPEED_FACTOR, DEBUG_VEL, PLATFORM
+from src.engine.config import SPEED_FACTOR, DEBUG_VEL, PLATFORM
 from src.engine.base import Base
 from src.engine.camera import Camera
 from src.engine.utils import Debug, clamp

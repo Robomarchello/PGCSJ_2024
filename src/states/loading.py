@@ -1,7 +1,7 @@
 import pygame
 from pygame.locals import *
 from src.engine import State
-from src.engine.constants import SCREENSIZE, ASSETS_PATH
+from src.engine.config import SCREENSIZE, ASSETS_PATH
 from src.engine.asset_manager import AssetManager
 from src.engine.save_manager import SaveManager
 

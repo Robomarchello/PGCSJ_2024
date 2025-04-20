@@ -1,7 +1,7 @@
 import pygame
 from src.engine.camera import Camera
 from src.engine.base import Base
-from src.engine.constants import SPEED_FACTOR
+from src.engine.config import SPEED_FACTOR
 
 
 # base class for all objects

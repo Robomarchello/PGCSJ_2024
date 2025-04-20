@@ -2,7 +2,7 @@ import asyncio
 import pygame
 from pygame.locals import *
 
-from src.engine.constants import *
+from src.engine.config import *
 from src.engine.state_machine import StateMachine, State
 from src.engine.screen import Screen
 from src.engine.utils import Debug
@@ -26,7 +26,6 @@ class App(StateMachine):
 
             Debug.draw_queue(self.screen.draw_surface)
 
-            self.screen.update_window()
             pygame.display.update()
             self.clock.tick(FPS)
 
@@ -38,8 +37,6 @@ class App(StateMachine):
                 pygame.quit()
                 raise SystemExit
             
-            #if event.type == WINDOWSIZECHANGED:
-            #    self.screen.on_resize((event.x, event.y))
 
             Debug.handle_event(event)
             self.active_state.handle_event(event)

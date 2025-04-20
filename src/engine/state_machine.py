@@ -1,5 +1,5 @@
 import pygame
-from src.engine.constants import SCREENSIZE
+from src.engine.config import SCREENSIZE
 from src.engine.base import Base
 
 
@@ -51,6 +51,9 @@ class State(Base):
     
     def on_exit(self):
         raise NotImplementedError()
+    
+    def on_resize(self, size):
+        self.surface = pygame.Surface(size)
 
     def handle_event(self, event):
         pass

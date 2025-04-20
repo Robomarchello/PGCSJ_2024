@@ -2,7 +2,7 @@ import random
 import pygame
 from pygame.locals import *
 from src.engine.camera import Camera
-from src.engine.constants import SPEED_FACTOR
+from src.engine.config import SPEED_FACTOR
 from src.engine.enums import EmitterShape
 from src.engine.utils import rect_random, ellipse_random, to_range, Debug
 from .particles import Particle, ParticleTemplate

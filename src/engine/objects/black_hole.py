@@ -1,6 +1,6 @@
 import math
 import pygame
-from src.engine.constants import GRAVITY_CONST
+from src.engine.config import GRAVITY_CONST
 from src.engine.asset_manager import AssetManager
 from src.engine.vfx.game_particles import BlackHoleEmitter
 from src.engine.objects import Object

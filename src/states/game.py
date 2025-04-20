@@ -2,7 +2,6 @@ import pygame
 from pygame.locals import *
 from src.engine import State, Debug, AssetManager
 from src.engine.save_manager import SaveManager
-from src.engine.constants import SCREENSIZE
 from src.engine.objects.player import Player, Controller
 from src.engine.physics_handler import PhysicsHandler
 from src.engine.level import LevelManager
@@ -15,8 +14,6 @@ import src.states as states
 class Game(State):
     def __init__(self):
         super().__init__()
-        self.surface = pygame.Surface(SCREENSIZE)
-
         # Temporary!!
         self.end_screen = AssetManager.images['end_screen'].convert()
 

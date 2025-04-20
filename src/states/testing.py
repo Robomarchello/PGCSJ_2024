@@ -2,7 +2,7 @@ import pygame
 from pygame.locals import *
 from src.engine import State, Debug
 from src.engine.asset_manager import AssetManager
-from src.engine.constants import SCREENSIZE, SCREEN_W, SCREEN_H
+from src.engine.config import SCREENSIZE, SCREEN_W, SCREEN_H
 from src.engine.gui.nine_slice import NineSlice
 
 

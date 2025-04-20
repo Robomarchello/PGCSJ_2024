@@ -1,6 +1,6 @@
 import pygame
 from pygame.locals import *
-from src.engine.constants import SCREENSIZE, SCREEN_AREA
+from src.engine.config import SCREENSIZE, SCREEN_AREA
 from src.engine.asset_manager import AssetManager
 from .button import Button
 

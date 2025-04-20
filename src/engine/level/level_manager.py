@@ -7,7 +7,7 @@ from .level_base import LevelLoader
 from src.engine.save_manager import SaveManager
 from src.engine.utils import Debug
 from src.engine.camera import Camera
-from src.engine.constants import SCREEN_AREA, LEVELS_PATH
+from src.engine.config import SCREEN_AREA, LEVELS_PATH
 
 
 class LevelManager:

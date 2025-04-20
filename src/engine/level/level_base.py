@@ -7,7 +7,7 @@ from src.engine.objects import *
 from src.engine.asset_manager import AssetManager
 from src.engine.utils import collide_circles, draw_dashed_rect
 from src.engine.camera import Camera
-from src.engine.constants import *
+from src.engine.config import *
 from src.engine.enums import FinishPointState
 
 

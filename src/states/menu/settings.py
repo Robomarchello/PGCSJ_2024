@@ -3,8 +3,8 @@ from pygame.locals import *
 
 from src.engine import State, AssetManager
 from src.engine.utils import clamp
-from src.engine.constants import *
-import src.engine.constants as c
+from src.engine.config import *
+import src.engine.config as c
 from src.engine.gui import *
 import src.states as states
 

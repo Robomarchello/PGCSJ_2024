@@ -1,7 +1,7 @@
 import os
 import json
 from pathlib import Path
-from .constants import SAVE_PATH, LEVELS_PATH, PLATFORM
+from .config import SAVE_PATH, LEVELS_PATH, PLATFORM
 
 
 class SaveManager:

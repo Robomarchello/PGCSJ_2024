@@ -3,7 +3,7 @@ import random
 import pygame
 from src.engine.utils import calculate_gradient, Debug
 from src.engine.asset_manager import AssetManager
-from src.engine.constants import SPEED_FACTOR
+from src.engine.config import SPEED_FACTOR
 from .emitters import Emitter, EmitterShape
 from .particles import ParticleTemplate, Particle
 

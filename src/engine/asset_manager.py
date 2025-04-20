@@ -12,7 +12,7 @@ import json
 import os
 from pathlib import Path
 import pygame
-from src.engine.constants import FONTS_JSON_PATH
+from src.engine.config import FONTS_JSON_PATH
 
 pygame.init()
 pygame.mixer.init()

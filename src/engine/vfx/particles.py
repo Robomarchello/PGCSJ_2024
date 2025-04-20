@@ -4,7 +4,7 @@ from dataclasses import dataclass
 import pygame
 from pygame.locals import *
 from src.engine.camera import Camera
-from src.engine.constants import SPEED_FACTOR
+from src.engine.config import SPEED_FACTOR
 
 
 @dataclass

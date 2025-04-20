@@ -1,5 +1,5 @@
 import pygame
-from src.engine.constants import SPEED_FACTOR
+from src.engine.config import SPEED_FACTOR
 from src.engine.objects import BlackHole
 
 

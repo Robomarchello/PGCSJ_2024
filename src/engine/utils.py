@@ -5,7 +5,7 @@ from time import perf_counter
 from typing import List, Tuple, Any
 import pygame
 from pygame.locals import KEYDOWN, K_g
-from src.engine.constants import *
+from src.engine.config import *
 from src.engine.asset_manager import AssetManager
 
 def clamp(value, min_, max_):

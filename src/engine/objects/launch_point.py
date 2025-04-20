@@ -1,5 +1,5 @@
 import pygame
-from src.engine.constants import SPEED_FACTOR
+from src.engine.config import SPEED_FACTOR
 from src.engine.utils import collide_circles
 from src.engine.objects import Object
 from src.engine.camera import Camera

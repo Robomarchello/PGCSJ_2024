@@ -1,6 +1,6 @@
 import pygame
 from pygame.locals import BLEND_SUB
-from src.engine.constants import SCREENSIZE
+from src.engine.config import SCREENSIZE
 from src.engine.enums import TransitionState
 from src.engine.base import Base
 from src.engine.utils import clamp

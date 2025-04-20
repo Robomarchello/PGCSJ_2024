@@ -4,7 +4,7 @@ from pygame.locals import *
 from src.engine.save_manager import SaveManager
 from src.engine.utils import get_shake
 from src.engine import State, AssetManager
-from src.engine.constants import *
+from src.engine.config import *
 from src.engine.gui import *
 import src.states as states
 

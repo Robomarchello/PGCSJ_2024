@@ -2,7 +2,7 @@ import pygame
 from pygame import Vector2
 
 from src.engine.utils import Debug
-from src.engine.constants import *
+from src.engine.config import *
 from src.engine.utils import get_shake, clamp
 
 
@@ -77,6 +77,11 @@ class Camera:
     def set_scale(cls, scale):
         CameraZoom.target_scale = scale
         CameraZoom.scale = scale
+
+    def restart(cls):
+        cls.displacement = Vector2()
+        cls.scale_factor = 1.0
+        cls.set_scale(cls.scale_factor)
 
     @classmethod
     def origin_lock(cls):
