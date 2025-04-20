@@ -4,7 +4,7 @@ from src.engine.constants import SCREENSIZE, SCREEN_AREA
 from src.engine.asset_manager import AssetManager
 from .button import Button
 
-
+# --- main menu ---
 class PlayButton(Button):
     def __init__(self, func):
         rect = pygame.Rect(
@@ -104,7 +104,7 @@ class BackButton(Button):
 
         super().__init__(rect, font, text, text_color, button_color, hover_color, func)
 
-
+# --- level selection menu
 class LevelButton(Button):
     def __init__(self, level, position, func):
         rect = pygame.Rect(
@@ -151,6 +151,7 @@ class LevelButton(Button):
                         self.func(None, True)
 
 
+# --- settings menu ---
 class ChangeVolButton(Button):
     def __init__(self, position, text, func, change_value):
         rect = pygame.Rect(
