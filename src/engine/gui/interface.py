@@ -34,12 +34,17 @@ class GUInterface(Base):
         for label in self.labels:
             label.handle_event(event)
 
-    def set_offset_all(self, x, y):
+    def set_offset(self, x, y):
+        '''Shift positions of all elements by offset'''
         for button in self.buttons:
             button.set_offset(x, y)
 
         for label in self.labels:
             label.set_offset(x, y)
+
+    def set_enabled(self, enabled: bool):
+        for button in self.buttons:
+            button.enabled = True
 
     def add_button(self, button: Button):
         self.buttons.append(button)

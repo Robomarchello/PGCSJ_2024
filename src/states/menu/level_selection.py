@@ -103,7 +103,7 @@ class LevelSelection(State):
         self._scroll_logic(delta)
         self._calculate_shake(delta)
 
-        self.interface.set_offset_all(self.x_shake, -self.offset)
+        self.interface.set_offset(self.x_shake, -self.offset)
         self.interface.update(delta)
 
     def _scroll_logic(self, delta):
