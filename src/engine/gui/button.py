@@ -2,10 +2,10 @@ from typing import Callable
 import pygame
 from pygame.locals import MOUSEBUTTONDOWN
 from src.engine.asset_manager import AssetManager
-from src.engine.base import Base
+from .ui_element import UIElement
 
 
-class Button(Base):
+class Button(UIElement):
     def __init__(
         self, 
         rect: pygame.Rect, 
@@ -17,9 +17,7 @@ class Button(Base):
         func: Callable,
         *args
     ):
-        self._rect = rect
-        self.rect = self._rect.copy()
-        self.offset = pygame.Vector2()
+        super().__init__(rect)
 
         self.font = font
         self.text = text
@@ -53,6 +51,9 @@ class Button(Base):
     def update(self, delta):
         self._get_offset_rect()
         
+        if not self.enabled:
+            return
+        
         mouse_pos = pygame.mouse.get_pos()
         self.hovered = self.rect.collidepoint(mouse_pos)
 
@@ -66,13 +67,3 @@ class Button(Base):
             if event.button == 1:
                 if self.hovered:
                     self.func(*self.args)
-
-    def set_offset(self, x, y):
-        self.offset.update(x, y)
-
-    def _get_offset_rect(self):
-        '''Needed to be able to move the buttons around, like in level selection menu.'''
-        self.rect = self._rect.copy()
-
-        self.rect.x += self.offset.x
-        self.rect.y += self.offset.y
