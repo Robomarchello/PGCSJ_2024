@@ -42,6 +42,10 @@ class GUInterface(Base):
         for label in self.labels:
             label.set_offset(x, y)
 
+    def set_scale(self, scale):
+        for label in self.labels:
+            label.scale = scale
+
     def set_enabled(self, enabled: bool):
         for button in self.buttons:
             button.enabled = True

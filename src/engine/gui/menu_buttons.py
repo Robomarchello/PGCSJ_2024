@@ -1,88 +1,55 @@
 import pygame
 from pygame.locals import *
-from src.engine.config import SCREENSIZE, SCREEN_AREA
+import src.engine.config as c
 from src.engine.asset_manager import AssetManager
-from .button import Button
+from .button import Button, IconButton
+from .nine_slice import NineSlice
+
 
 # --- main menu ---
-class PlayButton(Button):
+class ToSettingsButton(IconButton):
     def __init__(self, func):
-        rect = pygame.Rect(
-            0, 
-            200,
-            SCREENSIZE[0] * 0.4,
-            SCREENSIZE[1] * 0.13,
-        )
-        rect.centerx = SCREEN_AREA.centerx
+        rect = pygame.Rect(0, 0, 80, c.SCREEN_H / 3)
 
-        font = AssetManager.fonts['font_36']
-        text = 'Play'
+        self.anchors = {
+            'left': -10,
+            'centery': c.SCREEN_H / 2
+        }
 
-        button_color = (105, 105, 105)
-        hover_color = (0, 255, 0)
-        text_color = (255, 255, 255)
+        icon = AssetManager.images['settings_icon']
+        base_slice = NineSlice(AssetManager.images['button_slice'])
+        base_hovered_slice = NineSlice(AssetManager.images['button_slice_hover'])
 
-        super().__init__(rect, font, text, text_color, button_color, hover_color, func)
+        super().__init__(rect, base_slice, base_hovered_slice, icon, func, (), self.anchors)
 
 
-class LevelSelectionButton(Button):
+class ToPlayMenuButton(IconButton):
+    def __init__(self, func, anchors):
+        rect = pygame.Rect(0, 0, 80, c.SCREEN_H / 3)
+
+        self.anchors = anchors
+
+        icon = AssetManager.images['play_icon']
+        base_slice = NineSlice(AssetManager.images['button_slice'])
+        base_hovered_slice = NineSlice(AssetManager.images['button_slice_hover'])
+
+        super().__init__(rect, base_slice, base_hovered_slice, icon, func, (), self.anchors)
+
+
+class ToLevelSelectionButton(IconButton):
     def __init__(self, func):
-        rect = pygame.Rect(
-            0, 
-            340,
-            SCREENSIZE[0] * 0.4,
-            SCREENSIZE[1] * 0.13,
-        )
-        rect.centerx = SCREEN_AREA.centerx
+        rect = pygame.Rect(0, 0, 80, c.SCREEN_H / 3)
 
-        font = AssetManager.fonts['font_36']
-        text = 'Level Selection'
+        self.anchors = {
+            'right': c.SCREEN_W + 10,
+            'centery': c.SCREEN_H / 2
+        }
 
-        button_color = (105, 105, 105)
-        hover_color = (0, 255, 0)
-        text_color = (255, 255, 255)
+        icon = AssetManager.images['levels_icon']
+        base_slice = NineSlice(AssetManager.images['button_slice'])
+        base_hovered_slice = NineSlice(AssetManager.images['button_slice_hover'])
 
-        super().__init__(rect, font, text, text_color, button_color, hover_color, func)
-
-
-class SettingsButton(Button):
-    def __init__(self, func):
-        rect = pygame.Rect(
-            0, 
-            480,
-            SCREENSIZE[0] * 0.4,
-            SCREENSIZE[1] * 0.13,
-        )
-        rect.centerx = SCREEN_AREA.centerx
-
-        font = AssetManager.fonts['font_36']
-        text = 'Settings'
-
-        button_color = (105, 105, 105)
-        hover_color = (0, 255, 0)
-        text_color = (255, 255, 255)
-
-        super().__init__(rect, font, text, text_color, button_color, hover_color, func)
-
-
-class ExitButton(Button):
-    def __init__(self, func):
-        rect = pygame.Rect(
-            0, 
-            620,
-            SCREENSIZE[0] * 0.4,
-            SCREENSIZE[1] * 0.13,
-        )
-        rect.centerx = SCREEN_AREA.centerx
-
-        font = AssetManager.fonts['font_36']
-        text = 'Exit'
-
-        button_color = (105, 105, 105)
-        hover_color = (255, 0, 0)
-        text_color = (255, 0, 0)
-
-        super().__init__(rect, font, text, text_color, button_color, hover_color, func)
+        super().__init__(rect, base_slice, base_hovered_slice, icon, func, (), self.anchors)
 
 
 class BackButton(Button):

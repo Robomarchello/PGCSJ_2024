@@ -20,10 +20,15 @@ class Label(UIElement):
 
         self.set_text(self.text)
 
+        self.scale = 1.0
+
         super().__init__(self.rect)
 
     def draw(self, surface):
-        surface.blit(self.render, self.rect.topleft)
+        render = pygame.transform.scale_by(self.render, self.scale)
+        rect = self.rect.scale_by(self.scale)
+        
+        surface.blit(render, rect.topleft)
 
     def update(self, delta):
         self._get_offset_rect()
@@ -32,7 +37,6 @@ class Label(UIElement):
         self.render = self.font.render(text, self.antialias, self.color)
 
         self._rect = self.render.get_rect()
-        for attr, value in self.anchors.items():
-            setattr(self._rect, attr, value)
+        self.rect_to_achors()
 
         self.rect = self._rect.copy()

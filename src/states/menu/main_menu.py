@@ -7,7 +7,7 @@ from src.engine.gui import *
 import src.states as states
 from src.engine.space import SpaceBackground
 from src.engine.camera import Camera
-from .sub_menus import PlayMenu, SettingsMenu
+from .sub_menus import LevelSelectionMenu, PlayMenu, SettingsMenu
 
 
 class Menu(State):
@@ -19,8 +19,9 @@ class Menu(State):
 
         self.space_background = SpaceBackground()
 
-        self.play_menu = PlayMenu()
-        self.settings_menu = SettingsMenu()
+        self.play_menu = PlayMenu(self)
+        self.settings_menu = SettingsMenu(self)
+        self.level_selection_menu = LevelSelectionMenu(self)
         self.crnt_menu = self.play_menu
         self.next_menu = None
         
@@ -65,10 +66,19 @@ class Menu(State):
         self.manager.next_state = states.Game()
 
     def to_level_selection(self):
-        self.manager.next_state = states.LevelSelection()
+        self.next_menu = self.level_selection_menu
+        self.crnt_menu.set_enabled(False)
+        self.next_menu.set_enabled(False)
 
     def to_settings(self):
-        self.manager.next_state = states.Settings()
+        self.next_menu = self.settings_menu
+        self.crnt_menu.set_enabled(False)
+        self.next_menu.set_enabled(False)
+
+    def to_play_menu(self):
+        self.next_menu = self.play_menu
+        self.crnt_menu.set_enabled(False)
+        self.next_menu.set_enabled(False)
 
     def exit_app(self):
         pygame.quit()
@@ -76,7 +86,3 @@ class Menu(State):
 
     def handle_event(self, event):
         self.crnt_menu.handle_event(event)
-        if event.type == KEYDOWN:
-            self.next_menu = self.settings_menu
-            self.crnt_menu.set_enabled(False)
-            self.next_menu.set_enabled(False)

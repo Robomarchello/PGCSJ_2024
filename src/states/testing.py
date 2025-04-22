@@ -13,7 +13,7 @@ class Testing(State):
 
         self.rect = pygame.Rect(0, 0, 0, 0)
 
-        self.nine_slice = NineSlice(AssetManager.images['slice_another'].convert_alpha())
+        self.nine_slice = NineSlice(AssetManager.images['button_slice'].convert_alpha())
 
     def on_start(self):
         pass

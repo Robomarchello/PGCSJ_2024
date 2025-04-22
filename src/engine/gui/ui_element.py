@@ -8,7 +8,7 @@ class UIElement(Base):
         self.rect = self._rect.copy()
         self.offset = pygame.Vector2()
 
-        self.enabled = False
+        self.enabled = True
 
     def set_offset(self, x, y):
         self.offset.update(x, y)
@@ -19,6 +19,10 @@ class UIElement(Base):
 
         self.rect.x += self.offset.x
         self.rect.y += self.offset.y
+
+    def rect_to_achors(self):
+        for attr, value in self.anchors.items():
+            setattr(self._rect, attr, value)
 
     def handle_event(self, event):
         pass
