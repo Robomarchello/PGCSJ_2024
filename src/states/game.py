@@ -64,18 +64,18 @@ class Game(State):
     def on_exit(self):
         self.player.jet_channel.stop()
 
-    def draw(self):
-        self.surface.fill((0, 0, 0))
+    def draw(self, surface):
+        surface.fill((0, 0, 0))
 
         for obj in self.draw_queue:
-            obj.draw(self.surface)
+            obj.draw(surface)
 
         Debug.add_text(self.manager.clock.get_fps())
         Camera.debug_draw()
 
         # such a temporary thing!! To be removed
         if self.level_manager.level_index == 30:
-            self.surface.blit(
+            surface.blit(
                 self.end_screen, (0, 0)
             )
 

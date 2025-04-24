@@ -27,9 +27,7 @@ class StateMachine(Base):
         self.active_state.update(delta)
     
     def draw(self, surface):
-        self.active_state.draw()
-
-        surface.blit(self.active_state.surface, (0, 0))
+        self.active_state.draw(surface)
 
     def change_state(self, new_state:'State', transition):
         pass
@@ -37,10 +35,9 @@ class StateMachine(Base):
 
 class State(Base):
     def __init__(self):
-        self.surface = pygame.Surface(SCREENSIZE)
         self.manager: StateMachine | None = None
 
-    def draw(self):
+    def draw(self, surface):
         pass
 
     def update(self, delta=1):

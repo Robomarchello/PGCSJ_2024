@@ -13,8 +13,6 @@ from .sub_menus import LevelSelectionMenu, PlayMenu, SettingsMenu
 class Menu(State):
     def __init__(self):
         super().__init__()
-        self.surface = pygame.Surface(c.SCREENSIZE)
-
         AssetManager.set_volume(c.VOLUME)
 
         self.space_background = SpaceBackground()
@@ -27,13 +25,13 @@ class Menu(State):
         
         Camera.focus = pygame.Vector2(c.SCREEN_W / 2, c.SCREEN_H / 2)
 
-    def draw(self):
-        self.space_background.draw(self.surface)
+    def draw(self, surface):
+        self.space_background.draw(surface)
 
-        self.crnt_menu.draw(self.surface)
+        self.crnt_menu.draw(surface)
 
         if self.next_menu is not None:
-            self.next_menu.draw(self.surface)
+            self.next_menu.draw(surface)
 
     def update(self, delta):
         Camera.update(delta)

@@ -13,8 +13,6 @@ class LoadState(State):
     '''
     def __init__(self, next_state: State):
         super().__init__()
-        self.surface = pygame.Surface(SCREENSIZE)
-
         self.next_state = next_state
 
     def on_start(self):
