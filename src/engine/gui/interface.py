@@ -1,14 +1,16 @@
 from typing import List
 import pygame
 from src.engine.base import Base
-from .button import Button
+from .button import BaseButton
 from .label import Label
 
 
 class GUInterface(Base):
     def __init__(self):
-        self.buttons: List[Button] = []
+        self.buttons: List[BaseButton] = []
         self.labels: List[Label] = []
+
+        self.offset = pygame.Vector2()
 
         # All ui elements inherit element class. Could to that
         # self.elements = [] 
@@ -36,6 +38,8 @@ class GUInterface(Base):
 
     def set_offset(self, x, y):
         '''Shift positions of all elements by offset'''
+        self.offset.update(x, y)
+
         for button in self.buttons:
             button.set_offset(x, y)
 
@@ -48,9 +52,9 @@ class GUInterface(Base):
 
     def set_enabled(self, enabled: bool):
         for button in self.buttons:
-            button.enabled = True
+            button.enabled = enabled
 
-    def add_button(self, button: Button):
+    def add_button(self, button: BaseButton):
         self.buttons.append(button)
 
     def add_label(

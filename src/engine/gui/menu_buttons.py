@@ -2,7 +2,7 @@ import pygame
 from pygame.locals import *
 import src.engine.config as c
 from src.engine.asset_manager import AssetManager
-from .button import Button, IconButton
+from .button import TextButton, IconButton
 from .nine_slice import NineSlice
 
 
@@ -12,7 +12,7 @@ class ToSettingsButton(IconButton):
         rect = pygame.Rect(0, 0, 80, c.SCREEN_H / 3)
 
         self.anchors = {
-            'left': -10,
+            'left': 0,
             'centery': c.SCREEN_H / 2
         }
 
@@ -41,7 +41,7 @@ class ToLevelSelectionButton(IconButton):
         rect = pygame.Rect(0, 0, 80, c.SCREEN_H / 3)
 
         self.anchors = {
-            'right': c.SCREEN_W + 10,
+            'right': c.SCREEN_W,
             'centery': c.SCREEN_H / 2
         }
 
@@ -52,7 +52,20 @@ class ToLevelSelectionButton(IconButton):
         super().__init__(rect, base_slice, base_hovered_slice, icon, func, (), self.anchors)
 
 
-class BackButton(Button):
+class FullscreenButton(IconButton):
+    def __init__(self, func, anchors):
+        rect = pygame.Rect(0, 0, 80, c.SCREEN_H / 3)
+
+        self.anchors = anchors
+
+        icon = AssetManager.images['play_icon']
+        base_slice = NineSlice(AssetManager.images['button_slice'])
+        base_hovered_slice = NineSlice(AssetManager.images['button_slice_hover'])
+
+        super().__init__(rect, base_slice, base_hovered_slice, icon, func, (), self.anchors)
+
+
+class BackButton(TextButton):
     def __init__(self, func):
         rect = pygame.Rect(
             0, 
@@ -72,7 +85,7 @@ class BackButton(Button):
         super().__init__(rect, font, text, text_color, button_color, hover_color, func)
 
 # --- level selection menu
-class LevelButton(Button):
+class LevelButton(TextButton):
     def __init__(self, level, position, func):
         rect = pygame.Rect(
             *position,
@@ -119,7 +132,7 @@ class LevelButton(Button):
 
 
 # --- settings menu ---
-class ChangeVolButton(Button):
+class ChangeVolButton(TextButton):
     def __init__(self, position, text, func, change_value):
         rect = pygame.Rect(
             *position,

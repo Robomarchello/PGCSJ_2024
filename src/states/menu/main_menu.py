@@ -7,7 +7,8 @@ from src.engine.gui import *
 import src.states as states
 from src.engine.space import SpaceBackground
 from src.engine.camera import Camera
-from .sub_menus import LevelSelectionMenu, PlayMenu, SettingsMenu
+from .sub_menus import PlayMenu, SettingsMenu
+from .level_selection import LevelSelectionMenu
 
 
 class Menu(State):
@@ -45,8 +46,8 @@ class Menu(State):
 
             distance = (Camera.displacement - self.next_menu.position).length()
             if distance <= 100:
-                self.crnt_menu.set_enabled(True)
                 self.crnt_menu = self.next_menu
+                self.crnt_menu.set_enabled(True)
                 self.next_menu = None
         else:
             Camera.focus = self.crnt_menu.position
@@ -77,6 +78,9 @@ class Menu(State):
         self.next_menu = self.play_menu
         self.crnt_menu.set_enabled(False)
         self.next_menu.set_enabled(False)
+    
+    def to_game(self):
+        self.manager.next_state = states.Game()
 
     def exit_app(self):
         pygame.quit()

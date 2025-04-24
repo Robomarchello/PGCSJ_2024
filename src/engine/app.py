@@ -37,6 +37,5 @@ class App(StateMachine):
                 pygame.quit()
                 raise SystemExit
             
-
             Debug.handle_event(event)
             self.active_state.handle_event(event)

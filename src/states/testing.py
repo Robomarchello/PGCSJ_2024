@@ -27,7 +27,8 @@ class Testing(State):
         self.rect.width = abs(SCREEN_W / 2- mp[0]) * 2
         self.rect.height = abs(SCREEN_H / 2 - mp[1]) * 2
 
-        self.nine_slice.draw(surface, self.rect)
+        surf = self.nine_slice.as_surface(self.rect)
+        surface.blit(surf, (0, 0))
         
     def update(self, delta):
         pass

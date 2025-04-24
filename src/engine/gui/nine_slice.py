@@ -44,10 +44,11 @@ class NineSlice:
         surface.blit(middle, (rect.left + tile_w, rect.top + tile_h))
 
     def as_surface(self, rect: pygame.Rect) -> pygame.Surface:
-        surface = pygame.Surface(rect.size)
+        surface = pygame.Surface(rect.size, flags=pygame.SRCALPHA)
+        surface.fill((0, 0, 0, 0))
 
         rect_zero = rect.copy()
         rect_zero.topleft = (0, 0)
-        self.draw(surface, rect)
+        self.draw(surface, rect_zero)
 
         return surface
