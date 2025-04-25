@@ -18,7 +18,7 @@ class BaseSubMenu(Base):
         
         self.interface = GUInterface()
 
-        self.manager = manager
+        self.manager: 'Menu' = manager
 
     def draw(self, surface):
         self.interface.draw(surface)

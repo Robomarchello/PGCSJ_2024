@@ -25,12 +25,18 @@ class BaseButton(UIElement):
         self.anchors = anchors
         self.rect_to_achors()
 
+        self.base_surf = self.base.as_surface(rect)
+        self.base_hover_surf = self.base_hover.as_surface(rect)
+
         self.hovered = False
         self.last_hover = False
         self.hover_sound = AssetManager.sounds['hover_sound']
 
     def _draw_base(self, surface):
-        (self.base_hover if self.hovered else self.base).draw(surface, self.rect)
+        if self.hovered:
+            surface.blit(self.base_hover_surf, self.rect.topleft)
+        else:
+            surface.blit(self.base_surf, self.rect.topleft)
 
     def update(self, delta):
         self._get_offset_rect()
