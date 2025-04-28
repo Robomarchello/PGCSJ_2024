@@ -65,7 +65,7 @@ class FullscreenButton(IconButton):
         super().__init__(rect, base_slice, base_hovered_slice, icon, func, (), self.anchors)
 
 
-class NewLevelButton(TextButton):
+class LevelButton(TextButton):
     def __init__(self, level, position, func):
         rect = pygame.Rect(
             *position,
@@ -88,11 +88,23 @@ class NewLevelButton(TextButton):
 
         # rect, base, base_hover, font, text, text_color, func, func_args, anchors
         super().__init__(rect, border_slice, border_slice, font, text, self.text_color, func)
+        self.last_scale = self.scale
 
-        self.lock_img = AssetManager.images['lock'].convert_alpha()
-        self.lock_rect = self.lock_img.get_rect()
+        self._lock_img = AssetManager.images['lock'].convert_alpha()
+        self.lock_img = self._lock_img
+        self.lock_rect = self._lock_img.get_rect()
 
         self.completed = False
+
+    def scale_lock_img(self):
+        if self.last_scale != self.scale:
+            self.last_scale = self.scale
+            self.lock_img = pygame.transform.scale_by(self._lock_img, self.scale)
+            self.lock_rect = self.lock_img.get_rect()
+
+    def update(self, delta):
+        self.scale_lock_img()
+        return super().update(delta)
 
     def draw(self, surface):
         self._draw_base(surface)

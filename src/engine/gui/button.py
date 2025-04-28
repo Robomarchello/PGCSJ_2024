@@ -23,7 +23,7 @@ class BaseButton(UIElement):
         self.func = func
         self.func_args = func_args
         self.anchors = anchors
-        self.rect_to_achors()
+        self.rect_to_anchors()
 
         self.base_surf = self.base.as_surface(rect)
         self.base_hover_surf = self.base_hover.as_surface(rect)
@@ -31,6 +31,8 @@ class BaseButton(UIElement):
         self.hovered = False
         self.last_hover = False
         self.hover_sound = AssetManager.sounds['hover_sound']
+
+        self.scale = 1.0
 
     def _draw_base(self, surface):
         if self.hovered:
@@ -81,7 +83,10 @@ class TextButton(BaseButton):
 
     def _draw_text(self, surface):
         render = self.font.render(self.text, False, self.text_color)
+        if self.scale != 1.0:
+            render = pygame.transform.scale_by(render, self.scale)
         rect = render.get_rect(center=self.rect.center)
+
         surface.blit(render, rect.topleft)
 
 

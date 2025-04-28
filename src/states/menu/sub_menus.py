@@ -3,7 +3,7 @@ from pygame.locals import *
 from src.engine.base import Base
 from src.engine.gui import GUInterface, TextButton
 from src.engine.asset_manager import AssetManager
-from src.engine.gui import NineSlice
+from src.engine.gui import NineSlice, Slider
 from src.engine.gui.menu_buttons import ToLevelSelectionButton, ToPlayMenuButton, ToSettingsButton
 import src.engine.config as c
 
@@ -18,7 +18,7 @@ class BaseSubMenu(Base):
         
         self.interface = GUInterface()
 
-        self.manager: 'Menu' = manager
+        self.manager: 'Menu' = manager # type: ignore
 
     def draw(self, surface):
         self.interface.draw(surface)
@@ -137,15 +137,60 @@ class SettingsMenu(BaseSubMenu):
         # fullscreen option
         self.interface.add_label(
             font=AssetManager.fonts['font_42'],
-            text='Fullscreen',
-            color=pygame.Color('white'),
+            text='SFX Volume',
+            color=pygame.Color(220, 220, 220),
             antialias=False,
             anchors={
                 'left': self.ui_body.left + padding_left,
                 'top': self.ui_body.top + padding_top
             }
         )
-        fullscreen_button = None
+        
+        self.interface.add_slider(
+            length=300,
+            start_value=0.5,
+            value_range=(0, 1),
+            anchors={
+                'right': self.ui_body.right - padding_left,
+                'top': self.ui_body.top + padding_top + 20 * self.reference_scale
+            },
+            step=0.05,
+            on_change=self.master_volume_update,
+        )
+        # --- Music Volume
+        self.interface.add_label(
+            font=AssetManager.fonts['font_42'],
+            text='Music Volume',
+            color=pygame.Color(220, 220, 220),
+            antialias=False,
+            anchors={
+                'left': self.ui_body.left + padding_left,
+                'top': self.ui_body.top + padding_top + 100 * self.reference_scale
+            }
+        )        
+        self.interface.add_slider(
+            length=300,
+            start_value=0.5,
+            value_range=(0, 1),
+            anchors={
+                'right': self.ui_body.right - padding_left,
+                'top': self.ui_body.top + padding_top + 120 * self.reference_scale
+            },
+            step=0.05,
+            on_change=self.music_volume_update,
+        )
+
+        self.clack_channel = pygame.mixer.Channel(0)
+
+    def master_volume_update(self, volume):
+        if not self.clack_channel.get_busy():
+            self.clack_channel.play(AssetManager.sounds['clack'])
+        AssetManager.set_volume(volume)
+
+    def music_volume_update(self, volume):
+        if not self.clack_channel.get_busy():
+            self.clack_channel.play(AssetManager.sounds['clack'])
+        AssetManager.set_music_volume(volume)
 
     def draw(self, surface):
         surface.blit(self.body_slice_surf, self.ui_body.topleft)

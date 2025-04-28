@@ -20,7 +20,7 @@ class UIElement(Base):
         self.rect.x += self.offset.x
         self.rect.y += self.offset.y
 
-    def rect_to_achors(self):
+    def rect_to_anchors(self):
         for attr, value in self.anchors.items():
             setattr(self._rect, attr, value)
 

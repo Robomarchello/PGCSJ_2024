@@ -4,7 +4,7 @@ from src.engine.asset_manager import AssetManager
 
 
 class Screen:
-    FLAGS = []
+    FLAGS = [RESIZABLE]
 
     draw_surface: pygame.Surface
     window_size: tuple[int, int]

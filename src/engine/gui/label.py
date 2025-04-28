@@ -37,6 +37,6 @@ class Label(UIElement):
         self.render = self.font.render(text, self.antialias, self.color)
 
         self._rect = self.render.get_rect()
-        self.rect_to_achors()
+        self.rect_to_anchors()
 
         self.rect = self._rect.copy()

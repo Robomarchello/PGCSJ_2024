@@ -24,6 +24,9 @@ class AssetManager():
     fonts: Dict[str, pygame.Font] = {}
     data = {}
 
+    volume = 1.0
+    music_volume = 1.0
+
     @classmethod
     def load_assets(cls, assets_path):
         '''Load assets folder: images, sounds, fonts'''
@@ -107,6 +110,10 @@ class AssetManager():
     def set_volume(cls, master_volume):
         for sound in cls.sounds:
             cls.sounds[sound].set_volume(master_volume)
+
+    @classmethod
+    def set_music_volume(cls, volume):
+        pygame.mixer.music.set_volume(volume)
 
     
 if __name__ == '__main__':

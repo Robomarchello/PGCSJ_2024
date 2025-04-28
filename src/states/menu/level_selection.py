@@ -1,7 +1,7 @@
 import pygame
 from pygame.locals import *
 from src.engine.asset_manager import AssetManager
-from src.engine.gui.menu_buttons import NewLevelButton, ToPlayMenuButton
+from src.engine.gui.menu_buttons import LevelButton, ToPlayMenuButton
 import src.engine.config as c
 from src.engine.gui.nine_slice import NineSlice
 from src.engine.save_manager import SaveManager
@@ -62,7 +62,7 @@ class LevelSelectionMenu(BaseSubMenu):
             x_pos = self.ui_body.x + padding_left + x * (c.SCREEN_W * 0.15)
             y_pos = self.ui_body.y + padding_top + y * (c.SCREEN_H * 0.17)
 
-            button = NewLevelButton(lvl_i, (x_pos, y_pos), self.level_button_func)
+            button = LevelButton(lvl_i, (x_pos, y_pos), self.level_button_func)
             button.completed = completed
             self.interface.add_button(button)
 
