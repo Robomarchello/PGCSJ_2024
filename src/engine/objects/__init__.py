@@ -9,9 +9,11 @@ from .portals import Portal, PortalPair
 from .launch_point import LaunchPoint
 from .finish_point import FinishPoint
 from .prediction_object import PredictionObject
+from .decoration import Decoration
 
 __all__ = ['Object', 'BlackHole', 'OrbitingBlackHole', 'Asteroid', 
            'ForceZone', 'GravityInvertor', 
            'Collectible', 'Portal', 'PortalPair', 
-           'LaunchPoint', 'FinishPoint', 'PredictionObject'
+           'LaunchPoint', 'FinishPoint', 'PredictionObject',
+           'Decoration'
 ]

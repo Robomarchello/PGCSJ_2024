@@ -18,7 +18,8 @@ class LevelLoader:
         'ForceZone': ForceZone,
         'Asteroid': Asteroid,
         'Collectible': Collectible,
-        'LaunchPoint': LaunchPoint
+        'LaunchPoint': LaunchPoint,
+        'Decoration': Decoration
     }
 
     @classmethod
@@ -48,6 +49,14 @@ class LevelLoader:
             group = data['type'] + 's'
 
             level_dict['collectibles'][group].append(data)
+
+        # decorations
+        level_dict['decorations'] = defaultdict(list)
+        for collectible in level.decorations:
+            data = collectible.serialize()
+            group = data['type'] + 's'
+
+            level_dict['decorations'][group].append(data)
 
         # launch points
         level_dict['launch_points'] = defaultdict(list)
@@ -102,6 +111,13 @@ class LevelLoader:
                     cls.obj_classes[data['type']].deserialize(data)
                 )
 
+        # read decorations
+        for group in level_dict['decorations'].values():
+            for data in group:
+                level.decorations.append(
+                    cls.obj_classes[data['type']].deserialize(data)
+                )
+
         # read launch points
         for group in level_dict['launch_points'].values():
             for data in group:
@@ -135,6 +151,7 @@ class Level:
         self.obstacles = []
         self.launch_points = []
         self.collectibles = []
+        self.decorations = []
         self.finish_point: FinishPoint = None
 
         self.path = None
@@ -171,6 +188,9 @@ class Level:
                                collectible.position, collectible.radius):
                 collectible.picked_up = True
         
+        for decoration in self.decorations:
+            decoration.update(delta)
+
         for launch_point in self.launch_points:
             launch_point.update(delta)
 
@@ -189,6 +209,9 @@ class Level:
         for collectible in self.collectibles:
             collectible.draw(surface)
 
+        for decoration in self.decorations:
+            decoration.draw(surface)
+        
         for launch_point in self.launch_points:
             launch_point.draw(surface)
 
