@@ -7,8 +7,6 @@ from src.engine.gui import *
 import src.states as states
 from src.engine.space import SpaceBackground
 from src.engine.camera import Camera
-from .sub_menus import PlayMenu, SettingsMenu
-from .level_selection import LevelSelectionMenu
 
 
 class Menu(State):
@@ -18,9 +16,9 @@ class Menu(State):
 
         self.space_background = SpaceBackground()
 
-        self.play_menu = PlayMenu(self)
-        self.settings_menu = SettingsMenu(self)
-        self.level_selection_menu = LevelSelectionMenu(self)
+        self.play_menu = states.menu.PlayMenu(self)
+        self.settings_menu = states.menu.SettingsMenu(self)
+        self.level_selection_menu = states.menu.LevelSelectionMenu(self)
         self.crnt_menu = self.play_menu
         self.next_menu = None
         

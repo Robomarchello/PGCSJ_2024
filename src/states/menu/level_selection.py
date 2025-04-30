@@ -7,7 +7,7 @@ from src.engine.gui.nine_slice import NineSlice
 from src.engine.save_manager import SaveManager
 from src.engine.utils import clamp
 from src.states.game import Game
-from src.states.menu.sub_menus import BaseSubMenu
+from src.states.menu.base_submenu import BaseSubMenu
 
 
 class LevelSelectionMenu(BaseSubMenu):

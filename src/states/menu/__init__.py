@@ -1,2 +1,4 @@
 from .main_menu import Menu
-from .settings import Settings
+from .level_selection import LevelSelectionMenu
+from .play_menu import PlayMenu
+from .settings import SettingsMenu
