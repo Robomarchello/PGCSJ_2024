@@ -18,3 +18,4 @@ class TransitionState(Enum):
 class EmitterShape(Enum):
     RECT = 'rect'
     ELLIPSE = 'ellipse'
+    STAR = 'star'

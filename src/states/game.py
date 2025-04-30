@@ -14,9 +14,6 @@ import src.states as states
 class Game(State):
     def __init__(self):
         super().__init__()
-        # Temporary!!
-        self.end_screen = AssetManager.images['end_screen'].convert()
-
         self.transition = TransitionFade(2)
 
         self.space_backgroud = SpaceBackground()
@@ -54,10 +51,6 @@ class Game(State):
             self.transition,
         ]
 
-        pygame.mixer.music.load('src/assets/sfx/music.mp3')
-        pygame.mixer.music.set_volume(0.1)
-        pygame.mixer.music.play(-1)
-
     def on_start(self):
         pass
     
@@ -73,11 +66,8 @@ class Game(State):
         Debug.add_text(self.manager.clock.get_fps())
         Camera.debug_draw()
 
-        # such a temporary thing!! To be removed
-        if self.level_manager.level_index == 30:
-            surface.blit(
-                self.end_screen, (0, 0)
-            )
+        if self.level_manager.level_index == len(self.level_manager.levels):
+            self.manager.next_state = states.EndScreen()
 
     def update(self, delta):
         for obj in self.update_queue:
@@ -97,7 +87,7 @@ class Game(State):
                     SaveManager.erase_data()
                 
             if event.key == K_ESCAPE:
-                self.manager.next_state = states.Menu()
                 SaveManager.save_data()
+                self.manager.next_state = states.Menu()
         
         Camera.handle_event(event)

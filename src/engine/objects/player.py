@@ -83,7 +83,7 @@ class Player(Object):
             self.jet_emitter.flying = True
         else:
             self.jet_emitter.flying = False
-            self.jet_channel.fadeout(100) # could cause the bug
+            self.jet_channel.stop() # could cause the bug
 
         if not self.flying_last and self.jet_emitter.flying:
             self.jet_channel.play(self.jet_sound, -1)

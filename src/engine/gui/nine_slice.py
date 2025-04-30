@@ -3,7 +3,7 @@ import pygame
 
 class NineSlice:
     def __init__(self, image: pygame.Surface):
-        self.image = image
+        self.image = image.convert_alpha() # i know that's meh but who cares
         size = self.image.get_size()
         self.tile_size = (size[0] // 3, size[1] // 3)
         

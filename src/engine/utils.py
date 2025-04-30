@@ -81,6 +81,54 @@ def rect_random(rect):
 
     return position
 
+
+def star_random(rect: pygame.Rect, rotation):
+    position = pygame.Vector2(rect.center)
+    
+    radius = rect.width / 2
+    angle = math.radians(random.uniform(0, 360))  # Angle in radians
+
+    # Star-shaped radius function: r = 1 + 0.5 * cos(5θ)
+    star_r = 1 - 2 * math.cos(5 * (angle + rotation))
+
+    # Scale to the rectangle's radius
+    r_scaled = radius * star_r
+
+    # Convert to Cartesian coordinates
+    dx = r_scaled * math.cos(angle)
+    dy = r_scaled * math.sin(-angle)
+
+    # Offset from the center
+    position += pygame.Vector2(dx, dy)
+
+    return position, math.degrees(angle)
+
+
+def heart_random(rect: pygame.Rect, rotation: float = 0):
+    t = random.uniform(0, 2 * math.pi)
+
+    # Parametric heart shape
+    x = 16 * math.sin(t) ** 3
+    y = 13 * math.cos(t) - 5 * math.cos(2 * t) - 2 * math.cos(3 * t) - math.cos(4 * t)
+
+    # Scale to fit rect
+    x *= rect.width / 32
+    y *= rect.height / 32
+
+    # Flip y since screen coordinates go down
+    y = -y
+
+    # Rotate if needed
+    rotated = pygame.Vector2(x, y).rotate_rad(rotation)
+
+    # Offset to center of rect
+    center = pygame.Vector2(rect.center)
+    final_pos = center + rotated
+
+    return final_pos, math.degrees(math.atan2(-rotated.y, rotated.x))
+
+
+
 def calculate_gradient(colors, intervals, steps) -> List:
     '''
     Something like cozyfractal have done https://github.com/ddorn

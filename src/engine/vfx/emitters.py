@@ -1,10 +1,11 @@
 import random
+from math import pi
 import pygame
 from pygame.locals import *
 from src.engine.camera import Camera
 from src.engine.config import SPEED_FACTOR
 from src.engine.enums import EmitterShape
-from src.engine.utils import rect_random, ellipse_random, to_range, Debug
+from src.engine.utils import rect_random, ellipse_random, star_random, to_range, Debug
 from .particles import Particle, ParticleTemplate
 
 
@@ -31,6 +32,10 @@ class Emitter:
         self.timer = 0
         self.to_emit = 0
 
+        # yeah i know that's meh
+        self.star_rotation = random.uniform(0, 2 * pi)
+
+
     # ------------------------------
     # Public methods
     # ------------------------------
@@ -39,6 +44,7 @@ class Emitter:
         self.timer = duration
 
     def burst(self, particle_count: int):
+        self.star_rotation = random.uniform(0, 2 * pi)
         self.to_emit += particle_count
 
     def update(self, delta: float):
@@ -101,14 +107,17 @@ class Emitter:
 
     def new_particle(self) -> Particle:
         # Position based on emitter shape
+        angle = random.uniform(*to_range(self.template.angle_range))
+
         if self.emitter_type == EmitterShape.RECT:
             position = rect_random(self.emit_rect)
         elif self.emitter_type == EmitterShape.ELLIPSE:
             position = ellipse_random(self.emit_rect)
+        elif self.emitter_type == EmitterShape.STAR:
+            position, angle = star_random(self.emit_rect, self.star_rotation)
         else:
             raise ValueError("Unsupported emitter shape")
 
-        angle = random.uniform(*to_range(self.template.angle_range))
         speed = random.uniform(*to_range(self.template.speed_range))
         texture_rot_speed = random.uniform(*to_range(self.template.texture_rot_range))
         life = random.uniform(*to_range(self.template.life_range))

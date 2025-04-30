@@ -109,6 +109,7 @@ class SettingsMenu(BaseSubMenu):
         )
         super().__init__(position, manager)
 
+
         self.ui_body = pygame.Rect(0, 0, c.SCREEN_W * 0.7, c.SCREEN_H * 0.8)
         self._update_ui_body()
         self.body_slice = NineSlice(AssetManager.images['body_slice'])
@@ -170,15 +171,16 @@ class SettingsMenu(BaseSubMenu):
         )        
         self.interface.add_slider(
             length=300,
-            start_value=0.5,
-            value_range=(0, 1),
+            start_value=c.MUSIC_VOLUME,
+            value_range=(0, 0.7),
             anchors={
                 'right': self.ui_body.right - padding_left,
                 'top': self.ui_body.top + padding_top + 120 * self.reference_scale
             },
-            step=0.05,
+            step=0.025,
             on_change=self.music_volume_update,
         )
+        AssetManager.set_music_volume(c.MUSIC_VOLUME)
 
         self.clack_channel = pygame.mixer.Channel(0)
 
@@ -190,6 +192,7 @@ class SettingsMenu(BaseSubMenu):
     def music_volume_update(self, volume):
         if not self.clack_channel.get_busy():
             self.clack_channel.play(AssetManager.sounds['clack'])
+        c.MUSIC_VOLUME = volume
         AssetManager.set_music_volume(volume)
 
     def draw(self, surface):

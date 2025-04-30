@@ -26,6 +26,9 @@ class Menu(State):
         
         Camera.focus = pygame.Vector2(c.SCREEN_W / 2, c.SCREEN_H / 2)
 
+        pygame.mixer.music.load('src/assets/sfx/music.mp3')
+        pygame.mixer.music.play(-1)
+
     def draw(self, surface):
         self.space_background.draw(surface)
 

@@ -91,9 +91,10 @@ class LevelManager:
         self.player.reset()
 
     def next_level(self):
-        SaveManager.data['levels_completed'][self.level_index] = True
+        self.level_index += 1
+        if self.level_index < len(SaveManager.data['levels_completed']):
+            SaveManager.data['levels_completed'][self.level_index] = True        
 
-        self.level_index += 1        
         self.start_level()
 
     def transition_next_level(self):
