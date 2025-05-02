@@ -25,8 +25,9 @@ class BaseButton(UIElement):
         self.anchors = anchors
         self.rect_to_anchors()
 
-        self.base_surf = self.base.as_surface(rect)
-        self.base_hover_surf = self.base_hover.as_surface(rect)
+        if self.base is not None:
+            self.base_surf = self.base.as_surface(rect)
+            self.base_hover_surf = self.base_hover.as_surface(rect)
 
         self.hovered = False
         self.last_hover = False
@@ -35,10 +36,11 @@ class BaseButton(UIElement):
         self.scale = 1.0
 
     def _draw_base(self, surface):
-        if self.hovered:
-            surface.blit(self.base_hover_surf, self.rect.topleft)
-        else:
-            surface.blit(self.base_surf, self.rect.topleft)
+        if self.base is not None:
+            if self.hovered:
+                surface.blit(self.base_hover_surf, self.rect.topleft)
+            else:
+                surface.blit(self.base_surf, self.rect.topleft)
 
     def update(self, delta):
         self._get_offset_rect()

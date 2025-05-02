@@ -79,7 +79,7 @@ class LevelSelectionMenu(BaseSubMenu):
             self.manager.manager.next_state = game_state
         else:
             # shake screen
-            # play sound
+            AssetManager.sounds['no'].play()
             pass
 
     def draw(self, surface):

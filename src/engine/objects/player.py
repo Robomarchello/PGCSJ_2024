@@ -34,7 +34,7 @@ class Player(Object):
         self.image = AssetManager.images['player'].convert()
         self.image.set_colorkey((255, 0, 0))
         self.jet_sound = AssetManager.sounds['jet']
-        self.jet_channel = pygame.mixer.Channel(0)
+        self.jet_channel = None
         self.explosion_sounds = [
             AssetManager.sounds['explosion_1'],
             AssetManager.sounds['explosion_2'],
@@ -83,10 +83,13 @@ class Player(Object):
             self.jet_emitter.flying = True
         else:
             self.jet_emitter.flying = False
-            self.jet_channel.stop() # could cause the bug
+            if self.jet_channel is not None:
+                self.jet_channel.stop()
+                self.jet_channel = None
 
         if not self.flying_last and self.jet_emitter.flying:
-            self.jet_channel.play(self.jet_sound, -1)
+            if self.jet_channel is None:
+                self.jet_channel = self.jet_sound.play(-1)
 
         self.flying_last = self.jet_emitter.flying
 

@@ -8,6 +8,7 @@ from src.engine.level import LevelManager
 from src.engine.camera import Camera
 from src.engine.space import SpaceBackground
 from src.states.transition import TransitionFade
+from src.engine.gui.infobar import InfoBar
 import src.states as states
 
 
@@ -32,6 +33,8 @@ class Game(State):
 
         self.level_manager.start_level()
 
+        self.infobar = InfoBar(self.controller, self.level_manager)
+
         # update and draw queues
         self.update_queue = [
             Camera,
@@ -40,6 +43,7 @@ class Game(State):
             self.physics_handler,
             self.level_manager,
             self.space_backgroud,
+            self.infobar,
             self.transition,
         ]
         self.draw_queue = [
@@ -48,14 +52,21 @@ class Game(State):
             self.level_manager,
             self.controller,
             self.player,
+            self.infobar,
             self.transition,
+        ]
+        self.event_handler_queue = [
+            self.controller,
+            Camera,
+            self.infobar
         ]
 
     def on_start(self):
         pass
     
     def on_exit(self):
-        self.player.jet_channel.stop()
+        if self.player.jet_channel is not None:
+            self.player.jet_channel.stop()
 
     def draw(self, surface):
         surface.fill((0, 0, 0))
@@ -74,7 +85,8 @@ class Game(State):
             obj.update(delta)
 
     def handle_event(self, event):
-        self.controller.handle_event(event)
+        for event_handler in self.event_handler_queue:
+            event_handler.handle_event(event)
 
         if event.type == KEYDOWN:
             if event.key == K_r:
@@ -89,5 +101,3 @@ class Game(State):
             if event.key == K_ESCAPE:
                 SaveManager.save_data()
                 self.manager.next_state = states.Menu()
-        
-        Camera.handle_event(event)

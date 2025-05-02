@@ -49,6 +49,14 @@ class GUInterface(Base):
         for slider in self.sliders:
             slider.set_offset(x, y)
 
+    def update_anchors(self):
+        for button in self.buttons:
+            button.rect_to_anchors()
+        for label in self.labels:
+            label.rect_to_anchors()
+        for slider in self.sliders:
+            slider.rect_to_anchors()
+
     def set_scale(self, scale):
         for button in self.buttons:
             button.scale = scale

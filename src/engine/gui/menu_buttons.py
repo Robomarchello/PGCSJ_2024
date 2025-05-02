@@ -81,6 +81,7 @@ class LevelButton(TextButton):
         self.level = level
         text = str(level)
 
+        # this is REALLY bad!
         border_slice = NineSlice(AssetManager.images['button_slice_border'])
         self.border_slice = border_slice.as_surface(rect)
         self.border_locked = NineSlice(AssetManager.images['border_locked']).as_surface(rect)
