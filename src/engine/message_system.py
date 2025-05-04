@@ -43,8 +43,8 @@ class Message:
         # spring
         # f = -kx
         self.velocity = pygame.Vector2()
-        self.damping = 0.985
-        self.stiffness = 0.020
+        self.damping = 0.85
+        self.stiffness = 5
 
     def draw(self, surface):
         surface.blit(self.render, self.rect)
@@ -61,10 +61,11 @@ class Message:
                 self._change_state(MessageState.DONE)
 
         diff = self.target_pos - self.position
-        self.velocity += diff * self.stiffness
+        self.velocity += diff * self.stiffness * delta
+        self.velocity -= (self.velocity * (1 - self.damping)) * delta * c.SPEED_FACTOR
+
         self.position += self.velocity * delta * c.SPEED_FACTOR
 
-        self.velocity -= self.velocity * (1 - self.damping)
         length = self.velocity.length()
         if length > self.SPEED_LIMIT:
             self.velocity = self.velocity.normalize() * self.SPEED_LIMIT
