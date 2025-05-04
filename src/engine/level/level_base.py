@@ -136,6 +136,9 @@ class LevelLoader:
 
         physics_handler.objects = level.objects
         physics_handler.obstacles = level.obstacles
+
+        for launch_point in level.launch_points:
+            launch_point.set_solution_trajectory(physics_handler)
         
         return level
 

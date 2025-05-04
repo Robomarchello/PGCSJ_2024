@@ -6,9 +6,9 @@ from .force_zone import ForceZone
 from .gravity_invertor import GravityInvertor
 from .collectible import Collectible
 from .portals import Portal, PortalPair
+from .prediction_object import PredictionObject
 from .launch_point import LaunchPoint
 from .finish_point import FinishPoint
-from .prediction_object import PredictionObject
 from .decoration import Decoration
 
 __all__ = ['Object', 'BlackHole', 'OrbitingBlackHole', 'Asteroid', 

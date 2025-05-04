@@ -9,7 +9,10 @@ from src.engine.camera import Camera
 from src.engine.space import SpaceBackground
 from src.states.transition import TransitionFade
 from src.engine.gui.infobar import InfoBar
+from src.engine.message_system import MessageHandler
 import src.states as states
+
+
 
 
 class Game(State):
@@ -32,6 +35,7 @@ class Game(State):
         )
 
         self.level_manager.start_level()
+        MessageHandler.init_font()
 
         self.infobar = InfoBar(self.controller, self.level_manager)
 
@@ -44,6 +48,7 @@ class Game(State):
             self.level_manager,
             self.space_backgroud,
             self.infobar,
+            MessageHandler,
             self.transition,
         ]
         self.draw_queue = [
@@ -53,6 +58,7 @@ class Game(State):
             self.controller,
             self.player,
             self.infobar,
+            MessageHandler,
             self.transition,
         ]
         self.event_handler_queue = [

@@ -19,3 +19,10 @@ class EmitterShape(Enum):
     RECT = 'rect'
     ELLIPSE = 'ellipse'
     STAR = 'star'
+    
+
+class MessageState(Enum):
+    INTRO = 'intro'
+    HOLD = 'hold'
+    OUTRO = 'outro'
+    DONE = 'done'

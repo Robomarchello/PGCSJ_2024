@@ -1,6 +1,7 @@
 from typing import Callable
 import pygame
 from pygame.locals import MOUSEBUTTONDOWN
+import src.engine.config as c
 from src.engine.asset_manager import AssetManager
 from .ui_element import UIElement
 from .nine_slice import NineSlice
@@ -15,7 +16,6 @@ class BaseButton(UIElement):
         func: Callable,
         func_args=(),
         anchors: dict = {},
-        # is toggle
     ):
         super().__init__(rect)
         self.base = base
@@ -33,7 +33,7 @@ class BaseButton(UIElement):
         self.last_hover = False
         self.hover_sound = AssetManager.sounds['hover_sound']
 
-        self.scale = 1.0
+        self.scale = 1.0  # Original scale, for buttons
 
     def _draw_base(self, surface):
         if self.base is not None:
@@ -57,8 +57,10 @@ class BaseButton(UIElement):
         self.last_hover = self.hovered
 
     def handle_event(self, event):
-        if event.type == MOUSEBUTTONDOWN and event.button == 1 and self.hovered:
-            self.func(*self.func_args)
+        if event.type == MOUSEBUTTONDOWN:
+            if event.button == 1:
+                if self.hovered:
+                    self.func(*self.func_args)
 
 
 class TextButton(BaseButton):
@@ -107,12 +109,28 @@ class IconButton(BaseButton):
         self.icon = icon
         self.icon_rect = self.icon.get_rect(center=self.rect.center)
 
+        # for icon scale animation
+        self.icon_scale = 1.0
+        self.icon_scale_target = 1.0
+
+    def update(self, delta):
+        # hover animation
+        if self.hovered:
+            self.icon_scale_target = 1.1
+        else:
+            self.icon_scale_target = 1.0
+        self.icon_scale += (self.icon_scale_target - self.icon_scale) * delta * c.SPEED_FACTOR * 0.5
+
+        return super().update(delta)
+
     def draw(self, surface):
         self._draw_base(surface)
         self._draw_icon(surface)
 
     def _draw_icon(self, surface):
-        surface.blit(self.icon, self.icon_rect.topleft)
+        scaled_icon = pygame.transform.scale_by(self.icon, self.icon_scale)
+        scaled_rect = scaled_icon.get_rect(center=self.rect.center)
+        surface.blit(scaled_icon, scaled_rect.topleft)
 
     def _get_offset_rect(self):
         super()._get_offset_rect()

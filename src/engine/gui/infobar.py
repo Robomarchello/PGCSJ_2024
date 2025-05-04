@@ -1,6 +1,8 @@
 import pygame
 from pygame.locals import *
 import src.engine.config as c
+from src.engine.message_system import MessageHandler
+from src.engine.objects.player import Controller
 from . import GUInterface, IconButton, NineSlice
 from src.engine.asset_manager import AssetManager
 
@@ -30,19 +32,35 @@ class ArrowButton(IconButton):
 class HintButton(IconButton):
     def __init__(self, func):
         rect = pygame.Rect(0, 0, 50, 50)
-        icon = AssetManager.images['light_bulb']
+
+        self.locked = True
+        self.icon_locked = AssetManager.images['hint_locked'].convert_alpha()
+        self.icon_unlocked = AssetManager.images['hint_unlocked'].convert_alpha()
         self.angle = 0
         super().__init__(
             rect=rect,
             base=None,
             base_hover=None,
-            icon=icon,
+            icon=self.icon_locked,
             func=func,
             func_args=())
+        
+    def _update_icon(self):
+        self.icon = self.icon_locked if self.locked else self.icon_unlocked
+            
+    def update(self, delta):
+        self._update_icon()
+        return super().update(delta)
+    
+    def handle_event(self, event):
+        if event.type == MOUSEBUTTONDOWN:
+            if event.button == 1:
+                if self.hovered:
+                    self.func(self.locked)
 
-
+                    
 class InfoBar:
-    def __init__(self, controller, level_manager):
+    def __init__(self, controller: Controller, level_manager):
         self.interface = GUInterface()
 
         self.controller = controller
@@ -78,8 +96,13 @@ class InfoBar:
             True: 180
         }
 
-    def hint_reveal(self):
-        print('hint')
+    def hint_reveal(self, locked):
+        if locked:
+            MessageHandler.post('Processing... Hint unlocks in {Y} launches.')
+        else:
+            launch_point = self.controller.launch_point
+            if launch_point is not None:
+                launch_point.solution_revealed = True
 
     def toggle_reveal(self):
         self.revealed = not self.revealed

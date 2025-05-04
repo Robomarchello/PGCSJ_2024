@@ -3,6 +3,7 @@ from src.engine.config import SPEED_FACTOR
 from src.engine.utils import collide_circles
 from src.engine.objects import Object
 from src.engine.camera import Camera
+from src.engine.physics_handler import PhysicsHandler
 
 
 class LaunchPoint(Object):
@@ -15,6 +16,21 @@ class LaunchPoint(Object):
         self.controller = controller
         
         self.used = False
+
+        self.solution_vector = pygame.Vector2(5.775, -1.65)
+        self.solution_vector = pygame.Vector2(7.0, 0.0)
+        self.solution_revealed = False
+        self.trajectory = []
+
+    def set_solution_trajectory(self, physics_handler: PhysicsHandler):
+        self.trajectory = physics_handler.predict_player(
+            time=0.016,
+            position=self.player.position,
+            start_vel=self.solution_vector,
+            mass=self.player.mass,
+            radius=self.player.radius,
+            count=51
+        )[::3]
 
     def update(self, delta):
         collision = collide_circles(
@@ -36,6 +52,14 @@ class LaunchPoint(Object):
 
     def draw(self, surface):
         pygame.draw.circle(surface, 'grey', self.cam_pos, self.radius * Camera.scale_factor)
+
+        self.draw_trajectory(surface)
+
+    def draw_trajectory(self, surface):
+        if self.solution_revealed:
+            for position in self.trajectory:
+                cam_pos = Camera.displace_position(position)
+                pygame.draw.circle(surface, 'grey', cam_pos, 3)
 
     def serialize(self):
         return {

@@ -3,7 +3,7 @@ import math
 
 import pygame
 from pygame import Vector2
-from pygame.locals import MOUSEBUTTONDOWN, MOUSEBUTTONUP
+from pygame.locals import MOUSEBUTTONDOWN, MOUSEBUTTONUP, KEYDOWN
 
 from src.engine.config import SPEED_FACTOR, DEBUG_VEL, PLATFORM
 from src.engine.base import Base
@@ -192,6 +192,9 @@ class Controller(Base):
                         self.launch_point = None
 
                     self.holding = False
+        
+        if event.type == KEYDOWN:
+            print(self.launch_force)
 
     # --- Private Methods ---
 
