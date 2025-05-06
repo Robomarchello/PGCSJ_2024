@@ -74,6 +74,8 @@ class Game(State):
         if self.player.jet_channel is not None:
             self.player.jet_channel.stop()
 
+        SaveManager.save_data()
+
     def draw(self, surface):
         surface.fill((0, 0, 0))
 
@@ -105,5 +107,4 @@ class Game(State):
                     SaveManager.erase_data()
                 
             if event.key == K_ESCAPE:
-                SaveManager.save_data()
                 self.manager.next_state = states.Menu()

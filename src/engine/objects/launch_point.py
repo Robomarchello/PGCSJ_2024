@@ -7,7 +7,7 @@ from src.engine.physics_handler import PhysicsHandler
 
 
 class LaunchPoint(Object):
-    def __init__(self, position, radius, player, controller):
+    def __init__(self, position, radius, solution_vector, player, controller):
         super().__init__(position)
 
         self.radius = radius
@@ -17,9 +17,8 @@ class LaunchPoint(Object):
         
         self.used = False
 
-        self.solution_vector = pygame.Vector2(5.775, -1.65)
-        self.solution_vector = pygame.Vector2(7.0, 0.0)
-        self.solution_revealed = False
+        self.solution_vector = solution_vector
+        self.solution_revealed = True
         self.trajectory = []
 
     def set_solution_trajectory(self, physics_handler: PhysicsHandler):
@@ -66,6 +65,7 @@ class LaunchPoint(Object):
             'type': 'LaunchPoint',
             'position': tuple(self.position),
             'radius': self.radius,
+            'solution_vector': self.solution_vector
         }
 
     @classmethod
@@ -73,6 +73,7 @@ class LaunchPoint(Object):
         return cls(
             position=data['position'],
             radius=data['radius'],
+            solution_vector=data['solution_vector'],
             player=player,
             controller=controller
             )

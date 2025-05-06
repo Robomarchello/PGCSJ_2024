@@ -1,6 +1,7 @@
 import pygame
 from pygame.locals import *
 import src.engine.config as c
+from src.engine.level.level_manager import LevelManager
 from src.engine.message_system import MessageHandler
 from src.engine.objects.player import Controller
 from . import GUInterface, IconButton, NineSlice
@@ -60,7 +61,7 @@ class HintButton(IconButton):
 
                     
 class InfoBar:
-    def __init__(self, controller: Controller, level_manager):
+    def __init__(self, controller: Controller, level_manager: LevelManager):
         self.interface = GUInterface()
 
         self.controller = controller
@@ -86,6 +87,11 @@ class InfoBar:
             (245, 232, 200)
         )
 
+        self.index_last = self.level_manager.level_index
+        self.launch_last = None
+        self.launches = 0
+        self.launch_threshold = 5
+
         self.revealed = False
         self.reveal_y = {
             False: c.SCREEN_H - 50,
@@ -96,10 +102,16 @@ class InfoBar:
             True: 180
         }
 
+        self.processing_sound = AssetManager.sounds['reject']
+        self.success_sound = AssetManager.sounds['success']
+
     def hint_reveal(self, locked):
         if locked:
-            MessageHandler.post('Processing... Hint unlocks in {Y} launches.')
+            launches_left = self.launch_threshold - self.launches
+            MessageHandler.post(f'Processing... Hint unlocks in {launches_left} launches.', sound=self.processing_sound)
         else:
+            MessageHandler.post('Hint activated!', sound=self.success_sound)
+
             launch_point = self.controller.launch_point
             if launch_point is not None:
                 launch_point.solution_revealed = True
@@ -123,8 +135,23 @@ class InfoBar:
         angle_step = (angle_diff) * speed
         self.arrow_button.angle += angle_step
 
+        self._update_hint_state()
         self._update_level_index()
         self._update_anchors()
+
+    def _update_hint_state(self):
+        if (self.controller.launch_point is None and
+            self.launch_last is not None): 
+            self.launches += 1
+        self.launch_last = self.controller.launch_point
+        if self.launches >= self.launch_threshold:
+            self.hint_button.locked = False
+        else:
+            self.hint_button.locked = True
+
+        if self.index_last != self.level_manager.level_index:
+            self.index_last = self.level_manager.level_index
+            self.launches = 0
 
     def _update_level_index(self):
         if self.level_index != self.level_manager.level_index:

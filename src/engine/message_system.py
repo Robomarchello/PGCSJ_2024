@@ -96,10 +96,13 @@ class MessageHandler(Base):
         cls.font = AssetManager.fonts[f'font_{cls.FONT_SIZE}']
 
     @classmethod
-    def post(cls, text, duration=2.0):
+    def post(cls, text, duration=2.0, sound=None):
         if len(cls.messages) < cls.MESSAGE_LIMIT:
             msg = Message((-500, 0), text, duration, cls.font)
             cls.messages.append(msg)
+        
+            if sound:
+                sound.play()
 
     @classmethod
     def update(cls, delta):
