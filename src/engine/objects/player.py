@@ -192,9 +192,6 @@ class Controller(Base):
                         self.launch_point = None
 
                     self.holding = False
-        
-        if event.type == KEYDOWN:
-            print(self.launch_force)
 
     # --- Private Methods ---
 

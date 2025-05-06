@@ -18,7 +18,7 @@ class LaunchPoint(Object):
         self.used = False
 
         self.solution_vector = solution_vector
-        self.solution_revealed = True
+        self.solution_revealed = False
         self.trajectory = []
 
     def set_solution_trajectory(self, physics_handler: PhysicsHandler):
