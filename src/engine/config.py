@@ -27,3 +27,4 @@ DEBUG_FONT = ABS_DIR + '/src/assets/other/debug_font.ttf'
 DEBUG_SIZE = 16
 DEBUG_TEXT_SPACING = 5
 DEBUG_VEL = 5
+DEBUG_BUTTON = True

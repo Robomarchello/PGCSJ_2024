@@ -8,10 +8,11 @@ from src.engine.save_manager import SaveManager
 from src.engine.utils import Debug
 from src.engine.camera import Camera
 from src.engine.config import SCREEN_AREA, LEVELS_PATH
+from src.engine.gui.restart_bar import RestartBar
 
 
 class LevelManager:
-    def __init__(self, player, controller, physics_handler, transition):
+    def __init__(self, player, controller, physics_handler, transition, restart_func):
         self.levels = self.get_levels(LEVELS_PATH)
 
         self.player = player
@@ -24,22 +25,32 @@ class LevelManager:
         self.level_index = 0
         self.crnt_level = None
 
+        self.collided = False
+        self.in_bounds = False
+
+        self.restart_bar = RestartBar(self.controller, self, restart_func)
+
         # think about this
         Camera.focus = pygame.Vector2(SCREEN_AREA.center)
         Camera.offset = pygame.Vector2(SCREEN_AREA.center)
 
     def draw(self, surface):
         self.crnt_level.draw(surface)
+        self.restart_bar.draw(surface)
 
     def update(self, delta):
-        self.crnt_level.in_bounds = self.crnt_level.level_bounds.collidepoint(
-            self.player.position
-        )
-
         self.crnt_level.update(delta)
-        
+
+        self._update_game(delta)
         self._update_camera()
         Debug.add_text(f'Level: {self.level_index}')
+
+    def _update_game(self, delta):
+        self.in_bounds = self.crnt_level.level_bounds.collidepoint(
+            self.player.position
+        )
+        self.restart_bar.revealed = self.collided or not self.in_bounds
+        self.restart_bar.update(delta)
 
     def _update_camera(self):
         if self.crnt_level.finish_point.state in {FinishPointState.TOUCHING, FinishPointState.REACTED}:
@@ -48,10 +59,10 @@ class LevelManager:
 
     def get_focus(self):
         # case for small levels
-        if self.crnt_level.in_bounds:
+        if self.in_bounds:
             focus = self.crnt_level.level_bounds.center
             if (self.crnt_level.finish_point.state in {FinishPointState.TOUCHING, FinishPointState.REACTED}
-                or self.crnt_level.collided):
+                or self.collided):
                 focus = self.player.position
         else:
             focus = self.player.position
@@ -91,6 +102,7 @@ class LevelManager:
         self.player.reset()
 
     def next_level(self):
+        self.collided = False
         self.level_index += 1
         if self.level_index < len(SaveManager.data['levels_completed']):
             SaveManager.data['levels_completed'][self.level_index] = True        
@@ -101,3 +113,6 @@ class LevelManager:
         transition = self.transition
         transition.function = self.next_level
         transition.start(1.5)
+
+    def handle_event(self, event):
+        self.restart_bar.handle_event(event)

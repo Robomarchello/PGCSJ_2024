@@ -1,6 +1,5 @@
 import random
 import math
-import json
 from time import perf_counter
 from typing import List, Tuple, Any
 import pygame
@@ -212,5 +211,9 @@ class Debug:
             if len(cls.keys_pressed) > len(cls.konami):
                 cls.keys_pressed.pop(0)
             
-            if cls.keys_pressed == cls.konami or event.key == K_g:
+            if event.key == K_g:
+                if DEBUG_BUTTON:
+                    cls.enabled = not cls.enabled
+                    
+            if cls.keys_pressed == cls.konami:
                 cls.enabled = not cls.enabled

@@ -32,6 +32,7 @@ class Game(State):
             controller=self.controller,
             physics_handler=self.physics_handler,
             transition=self.transition,
+            restart_func=self.restart_level
         )
 
         self.level_manager.start_level()
@@ -62,6 +63,7 @@ class Game(State):
             self.transition,
         ]
         self.event_handler_queue = [
+            self.level_manager,
             self.controller,
             Camera,
             self.infobar
@@ -92,15 +94,17 @@ class Game(State):
         for obj in self.update_queue:
             obj.update(delta)
 
+    def restart_level(self):
+        self.transition.function = self.level_manager.start_level
+        self.transition.start(0.5)
+
     def handle_event(self, event):
         for event_handler in self.event_handler_queue:
             event_handler.handle_event(event)
 
         if event.type == KEYDOWN:
             if event.key == K_r:
-                # Level restart
-                self.transition.function = self.level_manager.start_level
-                self.transition.start(0.5)
+                self.restart_level()
 
             if event.key == K_p:
                 if Debug.enabled:

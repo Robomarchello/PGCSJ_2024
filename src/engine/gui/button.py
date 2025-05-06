@@ -110,15 +110,16 @@ class IconButton(BaseButton):
         self.icon_rect = self.icon.get_rect(center=self.rect.center)
 
         # for icon scale animation
+        self._icon_scale = 1.0
         self.icon_scale = 1.0
         self.icon_scale_target = 1.0
 
     def update(self, delta):
         # hover animation
         if self.hovered:
-            self.icon_scale_target = 1.1
+            self.icon_scale_target = self._icon_scale * 1.1
         else:
-            self.icon_scale_target = 1.0
+            self.icon_scale_target = self._icon_scale
         self.icon_scale += (self.icon_scale_target - self.icon_scale) * delta * c.SPEED_FACTOR * 0.5
 
         return super().update(delta)

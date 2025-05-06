@@ -158,8 +158,6 @@ class Level:
         self.finish_point: FinishPoint = None
 
         self.path = None
-        self.collided = False
-        self.in_bounds = False
 
         self.max_speed = None
         if self.max_speed is not None:
@@ -171,11 +169,6 @@ class Level:
         #self.save_level('src/levels/level14.json', False)
         #self.load_level('src/levels/level13.json')
         
-        self.text_timer = 1
-        self.text_timer_crnt = self.text_timer
-
-        self.text_visible = False
-
     def update(self, delta):   
         if self.physics_handler.object_collision(self.player):
             self.player.velocity *= 0
@@ -183,8 +176,7 @@ class Level:
 
             self.player.explode()
 
-            if not self.collided:
-                self.collided = True
+            self.level_manager.collided = True
 
         for collectible in self.collectibles:
             if collide_circles(self.player.position, self.player.radius,
@@ -204,8 +196,6 @@ class Level:
             
             self.finish_point._change_state(FinishPointState.REACTED)
 
-        self.time_restart_text(delta)
-
     def draw(self, surface):
         cam_level_bounds = Camera.displace_rect(self.level_bounds)
         draw_dashed_rect(surface, cam_level_bounds, 10, 3, 'white', 3)
@@ -219,23 +209,3 @@ class Level:
             launch_point.draw(surface)
 
         self.finish_point.draw(surface)
-
-        self.restart_text(surface)
-
-    def restart_text(self, surface):
-        font = AssetManager.fonts['font_24']
-        text = 'Press R To Restart'
-
-        render = font.render(text, False, 'white')
-        render_rect = render.get_rect()
-        render_rect.centerx = SCREEN_W // 2
-        render_rect.top = SCREEN_H - 150
-
-        if self.collided or not self.in_bounds:
-            surface.blit(render, render_rect.topleft)
-
-    def time_restart_text(self, delta):
-        self.text_timer_crnt -= delta
-        if self.text_timer_crnt < 0.0:
-            self.text_visible = not self.text_visible
-            self.text_timer_crnt = self.text_timer
