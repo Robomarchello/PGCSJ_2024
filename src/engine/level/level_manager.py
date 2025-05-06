@@ -84,6 +84,8 @@ class LevelManager:
         return levels
     
     def start_level(self):
+        self.collided = False
+
         Camera.set_scale(Camera.camera_zoom.scale_modes[-1])
 
         if self.level_index >= len(self.levels):
@@ -102,7 +104,6 @@ class LevelManager:
         self.player.reset()
 
     def next_level(self):
-        self.collided = False
         self.level_index += 1
         if self.level_index < len(SaveManager.data['levels_completed']):
             SaveManager.data['levels_completed'][self.level_index] = True        
