@@ -1,19 +1,18 @@
 import pygame
 from pygame.locals import *
 
-from src.engine import State, AssetManager
 import src.engine.config as c
 from src.engine.gui import *
+from src.engine.state_machine import State
 import src.states as states
 from src.engine.space import SpaceBackground
 from src.engine.camera import Camera
+from src.engine.asset_manager import AssetManager
 
 
 class Menu(State):
     def __init__(self):
         super().__init__()
-        AssetManager.set_volume(c.VOLUME)
-
         self.space_background = SpaceBackground()
 
         self.play_menu = states.menu.PlayMenu(self)
@@ -24,8 +23,8 @@ class Menu(State):
         
         Camera.focus = pygame.Vector2(c.SCREEN_W / 2, c.SCREEN_H / 2)
 
-        pygame.mixer.music.load('src/assets/sfx/music.mp3')
-        pygame.mixer.music.play(-1)
+        AssetManager.set_volume(c.VOLUME)
+        AssetManager.set_music_volume(c.MUSIC_VOLUME)
 
     def draw(self, surface):
         self.space_background.draw(surface)
@@ -63,7 +62,7 @@ class Menu(State):
         pass
 
     def to_game(self):
-        self.manager.next_state = states.Game()
+        self.manager.change_state(states.Game())
 
     def to_level_selection(self):
         self.next_menu = self.level_selection_menu
@@ -79,9 +78,6 @@ class Menu(State):
         self.next_menu = self.play_menu
         self.crnt_menu.set_enabled(False)
         self.next_menu.set_enabled(False)
-    
-    def to_game(self):
-        self.manager.next_state = states.Game()
 
     def exit_app(self):
         pygame.quit()

@@ -1,6 +1,6 @@
 import pygame
 from pygame.locals import *
-from src.engine import State
+from src.engine.state_machine import State
 from src.engine.config import SCREENSIZE, ASSETS_PATH
 from src.engine.asset_manager import AssetManager
 from src.engine.save_manager import SaveManager
@@ -14,6 +14,9 @@ class LoadState(State):
     def __init__(self, next_state: State):
         super().__init__()
         self.next_state = next_state
+
+        pygame.mixer.music.load('src/assets/sfx/music.mp3')
+        pygame.mixer.music.play(-1)
 
     def on_start(self):
         SaveManager.get_save()
