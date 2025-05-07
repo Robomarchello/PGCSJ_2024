@@ -75,8 +75,7 @@ class LevelSelectionMenu(BaseSubMenu):
             game_state = Game()
             game_state.level_manager.level_index = level
             game_state.level_manager.start_level()
-            # this is crazy...
-            self.manager.manager.next_state = game_state
+            self.manager.manager.change_state(game_state)
         else:
             # shake screen
             AssetManager.sounds['no'].play()

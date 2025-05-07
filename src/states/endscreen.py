@@ -2,7 +2,7 @@ import pygame
 from pygame.locals import *
 import src.states as states
 import src.engine.config as c
-from src.engine import State
+from src.engine.state_machine import State
 from src.engine.asset_manager import AssetManager
 from src.engine.objects.decoration import Decoration
 from src.engine.vfx.emitters import *
@@ -117,7 +117,7 @@ class EndScreen(State):
     def handle_event(self, event):
         if event.type == KEYDOWN:
             if event.key == K_ESCAPE:
-                self.manager.next_state = states.Menu()
+                self.manager.change_state(states.Menu())
 
         Camera.handle_event(event)
 

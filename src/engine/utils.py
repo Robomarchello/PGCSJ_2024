@@ -101,6 +101,12 @@ def star_random(rect: pygame.Rect, rotation):
 
     return position, math.degrees(angle)
 
+def ease_in_cubic(x: float):
+    return x ** 3
+
+def ease_out_cubic(x: float) -> float:
+    return 1 - pow(1 - x, 3)
+
 def calculate_gradient(colors, intervals, steps) -> List:
     '''
     Something like cozyfractal have done https://github.com/ddorn

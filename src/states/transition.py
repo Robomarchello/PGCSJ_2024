@@ -1,14 +1,14 @@
 import pygame
 from pygame.locals import BLEND_SUB
-from src.engine.config import SCREENSIZE
+import src.engine.config as c
 from src.engine.enums import TransitionState
 from src.engine.base import Base
-from src.engine.utils import clamp
+from src.engine.utils import clamp, ease_in_cubic, ease_out_cubic
 
 
 class Transition(Base):
     def __init__(self, duration, function=None, *args):
-        self.surface = pygame.Surface(SCREENSIZE)
+        self.surface = pygame.Surface(c.SCREENSIZE)
         
         self.duration = duration
         self.half_duration = duration / 2
@@ -70,3 +70,32 @@ class TransitionFade(Transition):
 
         self.surface.fill((alpha, alpha, alpha))
         surface.blit(self.surface, (0, 0), special_flags=BLEND_SUB)
+
+
+
+
+
+class TransitionClose(Transition):
+    def __init__(self, duration, function=None, *args):
+        super().__init__(duration, function, *args)
+
+        self.rect_top = pygame.Rect(0, 0, c.SCREEN_W, 0)
+        self.rect_bottom = pygame.Rect(0, 0, c.SCREEN_W, 0)
+
+        self.max_height = c.SCREEN_H * 0.55
+
+    def draw(self, surface):
+        progress = self.timer / self.half_duration
+        height = 0
+        if self.state == TransitionState.FADE_IN:
+            height = self.max_height * ease_out_cubic(1 - progress)
+
+        elif self.state == TransitionState.FADE_OUT:
+            height = self.max_height * ease_in_cubic(progress)
+        
+        self.rect_top.height = height
+        self.rect_bottom.height = height
+        self.rect_bottom.bottom = c.SCREEN_H
+
+        pygame.draw.rect(surface, (0, 0, 0), self.rect_top)
+        pygame.draw.rect(surface, (0, 0, 0), self.rect_bottom)        

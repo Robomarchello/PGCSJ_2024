@@ -1,6 +1,6 @@
 import pygame
-from src.engine.config import SCREENSIZE
 from src.engine.base import Base
+from src.states.transition import TransitionClose
 
 
 class StateMachine(Base):
@@ -9,6 +9,8 @@ class StateMachine(Base):
         self.active_state.on_start()
         self.active_state.manager = self
         self.next_state = None
+
+        self.transition = TransitionClose(2)
 
     def update(self, delta):
         if self.active_state is None:          
@@ -25,13 +27,18 @@ class StateMachine(Base):
             self.next_state = None
         
         self.active_state.update(delta)
+        self.transition.update(delta)
     
     def draw(self, surface):
         self.active_state.draw(surface)
+        self.transition.draw(surface)
 
-    def change_state(self, new_state:'State', transition):
-        pass
-    
+    def change_state(self, new_state:'State'):
+        def set_next_state():
+            self.next_state = new_state
+        self.transition.function = set_next_state
+        self.transition.start(0.7)
+
 
 class State(Base):
     def __init__(self):

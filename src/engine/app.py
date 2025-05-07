@@ -22,9 +22,9 @@ class App(StateMachine):
             delta = self.clock.get_time() / 1000
 
             self.update(delta)
-            self.draw(self.screen.draw_surface)
+            self.draw(self.screen.surface)
 
-            Debug.draw_queue(self.screen.draw_surface)
+            Debug.draw_queue(self.screen.surface)
 
             pygame.display.update()
             self.clock.tick(FPS)

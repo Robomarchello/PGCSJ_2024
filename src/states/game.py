@@ -1,18 +1,17 @@
 import pygame
 from pygame.locals import *
-from src.engine import State, Debug, AssetManager
 from src.engine.save_manager import SaveManager
 from src.engine.objects.player import Player, Controller
 from src.engine.physics_handler import PhysicsHandler
 from src.engine.level import LevelManager
 from src.engine.camera import Camera
 from src.engine.space import SpaceBackground
+from src.engine.state_machine import State
+from src.engine.utils import Debug
 from src.states.transition import TransitionFade
 from src.engine.gui.infobar import InfoBar
 from src.engine.message_system import MessageHandler
 import src.states as states
-
-
 
 
 class Game(State):
@@ -111,4 +110,4 @@ class Game(State):
                     SaveManager.erase_data()
                 
             if event.key == K_ESCAPE:
-                self.manager.next_state = states.Menu()
+                self.manager.change_state(states.Menu())
