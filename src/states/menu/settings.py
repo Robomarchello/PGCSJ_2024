@@ -92,6 +92,17 @@ class SettingsMenu(BaseSubMenu):
 
         self.clack_channel = pygame.mixer.Channel(0)
 
+        asteroid_img = AssetManager.images['asteroid_menu'].convert()
+        asteroid_img.set_colorkey((255, 0, 0))
+        self.asteroid_image = UIImage(
+            asteroid_img,
+            anchors={
+                'left': self.rect.left + 50 * self.reference_scale, 
+                'top': self.rect.top + 50 * self.reference_scale
+                },
+            )
+        self.interface.add_image(self.asteroid_image)
+
     def master_volume_update(self, volume):
         if not self.clack_channel.get_busy():
             self.clack_channel.play(AssetManager.sounds['clack'])

@@ -1,6 +1,7 @@
 from typing import List
 import pygame
 from src.engine.base import Base
+from src.engine.gui.ui_image import UIImage
 from .button import BaseButton
 from .label import Label
 from .slider import Slider
@@ -11,10 +12,13 @@ class GUInterface(Base):
         self.buttons: List[BaseButton] = []
         self.labels: List[Label] = []
         self.sliders: List[Slider] = []
+        self.images: List[UIImage] = []
 
         self.offset = pygame.Vector2()
 
     def draw(self, surface):
+        for image in self.images:
+            image.draw(surface)
         for button in self.buttons:
             button.draw(surface)
         for label in self.labels:
@@ -23,6 +27,8 @@ class GUInterface(Base):
             slider.draw(surface)
 
     def update(self, delta):
+        for image in self.images:
+            image.update(delta)
         for button in self.buttons:
             button.update(delta)
         for label in self.labels:
@@ -37,11 +43,14 @@ class GUInterface(Base):
             label.handle_event(event)
         for slider in self.sliders:
             slider.handle_event(event)
+        # UIImage is passive, no event handling needed
 
     def set_offset(self, x, y):
         """Shift positions of all elements by offset."""
         self.offset.update(x, y)
 
+        for image in self.images:
+            image.set_offset(x, y)
         for button in self.buttons:
             button.set_offset(x, y)
         for label in self.labels:
@@ -50,6 +59,8 @@ class GUInterface(Base):
             slider.set_offset(x, y)
 
     def update_anchors(self):
+        for image in self.images:
+            image.rect_to_anchors()
         for button in self.buttons:
             button.rect_to_anchors()
         for label in self.labels:
@@ -64,7 +75,13 @@ class GUInterface(Base):
             label.scale = scale
         # Sliders don't have explicit scale handling yet, so skip for now
 
+    def set_img_scale(self, scale):
+        for image in self.images:
+            image.scale = scale
+
     def set_enabled(self, enabled: bool):
+        for image in self.images:
+            image.enabled = enabled
         for button in self.buttons:
             button.enabled = enabled
         for label in self.labels:
@@ -86,6 +103,9 @@ class GUInterface(Base):
         label = Label(font, text, color, antialias, anchors)
         self.labels.append(label)
         return label
+
+    def add_image(self, image: UIImage):
+        self.images.append(image)
 
     def add_slider(
         self,

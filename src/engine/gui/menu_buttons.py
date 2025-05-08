@@ -66,7 +66,7 @@ class FullscreenButton(IconButton):
 
 
 class LevelButton(TextButton):
-    def __init__(self, level, position, func):
+    def __init__(self, level, position, func, slices):
         rect = pygame.Rect(
             *position,
             c.SCREENSIZE[0] * 0.13,
@@ -82,10 +82,10 @@ class LevelButton(TextButton):
         text = str(level)
 
         # this is REALLY bad!
-        border_slice = NineSlice(AssetManager.images['button_slice_border'])
+        border_slice = slices[0]
         self.border_slice = border_slice.as_surface(rect)
-        self.border_locked = NineSlice(AssetManager.images['border_locked']).as_surface(rect)
-        self.border_completed = NineSlice(AssetManager.images['border_allowed']).as_surface(rect)
+        self.border_locked = slices[1].as_surface(rect)
+        self.border_completed = slices[2].as_surface(rect)
 
         # rect, base, base_hover, font, text, text_color, func, func_args, anchors
         super().__init__(rect, border_slice, border_slice, font, text, self.text_color, func)

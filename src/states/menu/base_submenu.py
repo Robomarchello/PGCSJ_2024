@@ -26,6 +26,7 @@ class BaseSubMenu(Base):
     def update(self, delta):
         self.interface.update(delta)
         self.interface.set_scale(min(1, self.reference_scale))
+        self.interface.set_img_scale(self.reference_scale)
 
     def set_enabled(self, enabled: bool):
         self.interface.set_enabled(enabled)

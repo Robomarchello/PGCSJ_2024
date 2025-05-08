@@ -49,17 +49,27 @@ class PlayMenu(BaseSubMenu):
         self.interface.add_button(ToSettingsButton(self.manager.to_settings))
         self.interface.add_button(ToLevelSelectionButton(self.manager.to_level_selection))
 
+        planet_big = AssetManager.images['planet_big'].convert()
+        planet_big.set_colorkey((255, 0, 0))
+        self.planet_image = UIImage(
+            planet_big,
+            anchors={'center': c.SCREEN_AREA.center},
+            )
+        self.interface.add_image(self.planet_image)
+
     def update(self, delta):
         super().update(delta)
         self._update_clickable_area()
-    
+
+        self.planet_image.rotation += delta * 0.2
+
     def _update_clickable_area(self):
         self.clickable_area.center = self.position + self.interface.offset
 
     def handle_event(self, event):
         super().handle_event(event)
         if event.type == KEYDOWN:
-            if event.key == K_ESCAPE:
+            if event.key == K_ESCAPE and c.PLATFORM != 'emscripten':
                 pygame.quit()
                 raise SystemExit
             else:

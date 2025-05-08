@@ -27,6 +27,13 @@ class LevelSelectionMenu(BaseSubMenu):
         self.body_slice = NineSlice(AssetManager.images['body_slice'])
         self.body_slice_surf = self.body_slice.as_surface(self.ui_body)
 
+        # for level buttons
+        self.slices = [
+            NineSlice(AssetManager.images['button_slice_border']),
+            NineSlice(AssetManager.images['border_locked']),
+            NineSlice(AssetManager.images['border_allowed'])
+        ]
+
         self.interface.add_label(
             font=AssetManager.fonts['font_48'],
             text='Level Selection',
@@ -51,8 +58,6 @@ class LevelSelectionMenu(BaseSubMenu):
         self.generate_levels()
 
     def generate_levels(self):
-        SaveManager.get_save()
-
         padding_left = 30 * self.reference_scale
         padding_top = 30 * self.reference_scale
         for lvl_i, completed in enumerate(SaveManager.data['levels_completed']):
@@ -62,7 +67,7 @@ class LevelSelectionMenu(BaseSubMenu):
             x_pos = self.ui_body.x + padding_left + x * (c.SCREEN_W * 0.15)
             y_pos = self.ui_body.y + padding_top + y * (c.SCREEN_H * 0.17)
 
-            button = LevelButton(lvl_i, (x_pos, y_pos), self.level_button_func)
+            button = LevelButton(lvl_i, (x_pos, y_pos), self.level_button_func, self.slices)
             button.completed = completed
             self.interface.add_button(button)
 
