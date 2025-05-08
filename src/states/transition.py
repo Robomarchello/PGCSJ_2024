@@ -50,11 +50,12 @@ class Transition(Base):
     
     def start(self, duration):
         '''Starts transition'''
-        self.duration = duration
-        self.half_duration = duration / 2
-        self.timer = self.half_duration
+        if self.state == TransitionState.INACTIVE:
+            self.duration = duration
+            self.half_duration = duration / 2
+            self.timer = self.half_duration
 
-        self._change_state(TransitionState.FADE_IN)
+            self._change_state(TransitionState.FADE_IN)
 
 
 class TransitionFade(Transition):
