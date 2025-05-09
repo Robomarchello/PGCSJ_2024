@@ -106,7 +106,8 @@ class LevelManager:
     def next_level(self):
         self.level_index += 1
         if self.level_index < len(SaveManager.data['levels_completed']):
-            SaveManager.data['levels_completed'][self.level_index] = True        
+            SaveManager.data['levels_completed'][self.level_index] = True
+            SaveManager.save_data() 
 
         self.start_level()
 
